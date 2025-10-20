@@ -26,11 +26,12 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 
 | Component | Technology |
 |-----------|-----------|
-| Frontend | Next.js 14, TypeScript, Vercel |
+| Frontend | Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, Vercel |
 | Backend | FastAPI, Python 3.11+, Railway |
 | Vector DB | Pinecone (semantic search) |
 | SQL Database | Supabase PostgreSQL |
 | LLM | OpenAI GPT-4o / GPT-4o-mini |
+| UI Components | shadcn/ui (Radix UI + Tailwind CSS) |
 
 ## Quick Start
 
@@ -57,6 +58,7 @@ python scripts/test_connections.py
 # Frontend setup
 cd frontend
 npm install
+npx shadcn-ui@latest init  # Initialize shadcn/ui with Tailwind CSS
 cp .env.example .env.local
 # Edit .env.local with your API endpoints
 

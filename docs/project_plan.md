@@ -124,11 +124,11 @@ Natural language semantic layers will enable **15-25% higher execution accuracy*
 
 | Component | Technology | Cost |
 |-----------|-----------|------|
-| **Frontend** | Next.js 14, Vercel | Free |
-| **Backend** | FastAPI, Railway | $10-15 |
+| **Frontend** | Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, Vercel | Free |
+| **Backend** | FastAPI, Python 3.11+, Railway | $10-15 |
 | **Vector DB** | Pinecone | Free |
 | **SQL Database** | Supabase PostgreSQL | Free |
-| **LLM** | OpenAI API | $100-200 |
+| **LLM** | OpenAI API (GPT-4o, GPT-4o-mini) | $100-200 |
 | **Total** | | **~$110-215** |
 
 ---

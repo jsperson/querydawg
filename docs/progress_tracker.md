@@ -532,9 +532,15 @@
 
 ### Overall Progress
 **Weeks Completed:** 0 / 7
-**Current Week:** Week 1 (Days 1-2 complete, ready for Days 3-4)
+**Current Week:** Week 1 (Days 1-4 foundation complete, ready for Days 5-6)
 **Days into Project:** 5 / 49
 **Current Date:** 2025-10-20
+
+**Week 1 Progress:**
+- ✅ Days 1-2: Infrastructure & Environment Setup (100%)
+- ✅ Days 3-4: Spider Dataset Download & Documentation (100%)
+- ⏳ Days 5-6: Baseline Implementation (0%)
+- ⏳ Day 7: Baseline Evaluation (0%)
 
 ### Budget Tracking
 | Item | Budgeted | Actual | Remaining |
@@ -547,23 +553,23 @@
 | **Total** | **$110-195** | **$0** | **$110-195** |
 
 ### Key Metrics (Target vs Actual)
-| Metric | Target | Actual |
-|--------|--------|--------|
-| Databases processed | 15-20 | 0 |
-| Documents generated | 75-100 | 0 |
-| Baseline accuracy | 40-50% | - |
-| Enhanced accuracy | 60-75% | - |
-| Accuracy improvement | 15-25% | - |
-| Evaluation questions | 200-300 | 0 |
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| Databases selected | 20 | 20 | ✅ Selected |
+| Documents generated | 120 (6 types × 20 DBs) | 0 | ⏳ Week 2 |
+| Baseline accuracy | 40-50% | - | ⏳ Week 1 Day 7 |
+| Enhanced accuracy | 60-75% | - | ⏳ Week 4 |
+| Accuracy improvement | 15-25% | - | ⏳ Week 6 |
+| Evaluation questions | 1,034 (full dev set) | 0 | ⏳ Week 6 |
 
 ### Deliverables Checklist
-- [ ] Working application deployed
-- [ ] Semantic layers for 15-20 databases
-- [ ] Evaluation on 200+ questions
-- [ ] Technical summary document (8-12 pages)
-- [ ] Demo video (5-7 minutes)
-- [ ] Presentation slides (15-20 slides)
-- [ ] Open-source repository
+- [ ] Working application deployed (Week 1-5)
+- [ ] Semantic layers for 20 databases with data profiling (Week 2)
+- [ ] Evaluation on 1,034 dev questions - full Spider dev set (Week 6)
+- [ ] Technical summary document (8-12 pages) (Week 7)
+- [ ] Demo video (5-7 minutes) (Week 7)
+- [ ] Presentation slides (15-20 slides) (Week 7)
+- [x] Open-source repository with comprehensive documentation
 
 ---
 
@@ -602,7 +608,7 @@
 - 📝 All installed packages: 54 total including FastAPI, SQLAlchemy, pandas, numpy, pytest
 - 🎉 Days 1-2 complete! Environment fully configured and ready for Days 3-4 (Data Loading)
 
-**2025-10-20 - Days 3-4: Spider Dataset Download (Partial)**
+**2025-10-20 - Days 3-4: Spider Dataset Download & Setup (Complete)**
 - ✅ Installed gdown package for Google Drive downloads
 - ✅ Downloaded Spider 1.0 dataset (104MB) from Google Drive
 - ✅ Extracted dataset to data/spider/ (fixed nested directory structure)
@@ -613,7 +619,42 @@
   - 1,034 dev/test examples (20 databases)
   - tables.json with metadata for all 166 databases
 - 📊 Each database includes .sqlite file and schema.sql
-- ⏳ Database selection and PostgreSQL conversion pending (waiting for Supabase connection recovery)
+- ✅ Created comprehensive dataset documentation:
+  - data/spider/DOWNLOAD.md with setup instructions
+  - scripts/download_spider.py for automated download
+  - scripts/verify_spider.py for installation verification
+  - Updated main README with dataset download instructions
+- ✅ All dataset files excluded from git via .gitignore (only README.txt tracked)
+
+**2025-10-20 - Tech Stack & Architecture Refinements**
+- ✅ **Added shadcn/ui** as UI component library:
+  - Updated tech stack documentation across all files
+  - Added setup instructions in frontend/README.md
+  - Documented why shadcn/ui (accessible, customizable, TypeScript support)
+  - Added component examples and resources
+- ✅ **Added Drizzle ORM** for TypeScript database access:
+  - Updated tech stack with Database ORM row
+  - Added Drizzle setup instructions and usage examples
+  - Documented dual ORM architecture (Drizzle for Next.js, SQLAlchemy for FastAPI)
+  - Both ORMs connect to same Supabase PostgreSQL database
+- ✅ **Enhanced project plan** with data profiling:
+  - Added 6th semantic layer document type: Data Profile & Metadata
+  - Includes row counts, unique values, distributions, NULL percentages
+  - Added data profiling to Week 2 generation tasks
+  - New novel contribution: Data-Grounded Semantic Layer
+- ✅ **Updated database selection table** with accurate counts:
+  - Corrected table counts based on actual Spider data
+  - Added "Dev Qs" column showing dev question counts per database
+  - Reordered by question count for better visibility
+  - Clarified this is complete Spider 1.0 dev set (100% coverage)
+
+**Tech Stack Summary (as of 2025-10-20):**
+- Frontend: Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, Drizzle ORM, Vercel
+- Backend: FastAPI, Python 3.11+, SQLAlchemy, Railway
+- Database: Supabase PostgreSQL (Transaction Pooler for IPv4)
+- Vector DB: Pinecone
+- LLM: OpenAI GPT-4o / GPT-4o-mini
+- UI: shadcn/ui (Radix UI + Tailwind CSS)
 
 ### Week 2 Notes
 

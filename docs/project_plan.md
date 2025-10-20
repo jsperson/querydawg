@@ -160,32 +160,34 @@ CREATE TABLE semantic_layer.documents (
 
 **Source:** Yale Spider 1.0 - 10,181 questions, 5,693 SQL queries, 200 databases
 
-**Selected 15-20 Databases** for diversity and complexity:
+**Selected 20 Databases** for diversity and complexity:
 
-| Database | Domain | Tables | Complexity | Rationale |
-|----------|--------|--------|------------|-----------|
-| **concert_singer** | Entertainment | 3 | Medium | Clear relationships, common use case |
-| **pets_1** | Pet care | 6 | Medium | Multiple entity types, many-to-many |
-| **flight_2** | Aviation | 5 | Medium-High | Temporal queries, complex joins |
-| **car_1** | Automotive | 8 | Medium-High | Many tables, nested relationships |
-| **world_1** | Geography | 3 | Low-Medium | Large tables, good for aggregation |
-| **student_transcripts_tracking** | Education | 6 | Medium-High | Academic domain, complex queries |
-| **employee_hire_evaluation** | HR | 6 | Medium | Business domain, evaluation logic |
-| **cre_Doc_Template_Mgt** | Document mgmt | 6 | High | Business terminology, complex schema |
-| **course_teach** | Education | 3 | Low-Medium | Simple schema, good baseline |
-| **museum_visit** | Culture | 3 | Medium | Date/time queries, visitor tracking |
-| **wta_1** | Sports | 4 | Medium | Rankings, tournaments, stats |
-| **battle_death** | Historical | 2 | Low | Simple schema, good for testing |
-| **tvshow** | Entertainment | 4 | Medium | Temporal data, ratings |
-| **poker_player** | Gaming | 3 | Medium | Statistics, rankings |
-| **voter_1** | Politics | 3 | Medium | Demographic queries |
-| **network_1** | Technology | 2 | Low-Medium | Network topology |
-| **dog_kennels** | Pet services | 11 | High | Many tables, complex relationships |
-| **singer** | Music | 2 | Low | Simple, good baseline |
-| **real_estate_properties** | Real estate | 7 | Medium-High | Business domain, spatial data |
-| **orchestra** | Music | 3 | Medium | Hierarchical data |
+| Database | Domain | Tables | Dev Qs | Complexity | Rationale |
+|----------|--------|--------|--------|------------|-----------|
+| **world_1** | Geography | 4 | 120 | Low-Medium | Large tables, good for aggregation, highest question count |
+| **car_1** | Automotive | 6 | 92 | Medium-High | Multiple tables, nested relationships |
+| **cre_Doc_Template_Mgt** | Document mgmt | 4 | 84 | Medium-High | Business terminology, complex schema |
+| **dog_kennels** | Pet services | 8 | 82 | High | Many tables, complex relationships |
+| **flight_2** | Aviation | 3 | 80 | Medium | Temporal queries, joins |
+| **student_transcripts_tracking** | Education | 11 | 78 | High | Academic domain, most tables, complex queries |
+| **wta_1** | Sports | 3 | 62 | Medium | Rankings, tournaments, stats |
+| **tvshow** | Entertainment | 3 | 62 | Medium | Temporal data, ratings |
+| **network_1** | Technology | 3 | 56 | Low-Medium | Network topology |
+| **concert_singer** | Entertainment | 4 | 45 | Medium | Clear relationships, common use case |
+| **pets_1** | Pet care | 3 | 42 | Medium | Multiple entity types |
+| **poker_player** | Gaming | 2 | 40 | Low-Medium | Statistics, rankings |
+| **orchestra** | Music | 4 | 40 | Medium | Hierarchical data |
+| **employee_hire_evaluation** | HR | 4 | 38 | Medium | Business domain, evaluation logic |
+| **course_teach** | Education | 3 | 30 | Low-Medium | Simple schema, good baseline |
+| **singer** | Music | 2 | 30 | Low | Simple, good baseline |
+| **museum_visit** | Culture | 3 | 18 | Medium | Date/time queries, visitor tracking |
+| **battle_death** | Historical | 3 | 16 | Low | Simple schema, good for testing |
+| **voter_1** | Politics | 3 | 15 | Low-Medium | Demographic queries |
+| **real_estate_properties** | Real estate | 5 | 4 | Medium | Business domain, limited test coverage |
 
-**Note:** Database selection is custom-curated based on domain diversity, complexity range (3-11 tables), and representative SQL patterns. Not an official Spider subset.
+**Total: 20 databases, 82 tables, 1,034 dev questions (100% of Spider dev set)**
+
+**Note:** This selection represents the **complete Spider 1.0 dev set** (all 20 dev databases). This enables direct comparison with other Spider benchmark results and provides methodologically clean evaluation on the full development set. Databases range from 2-11 tables with excellent domain diversity (entertainment, business, education, sports, technology, etc.).
 
 ### Scope and Limitations
 

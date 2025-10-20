@@ -10,20 +10,27 @@
 **Goal:** Working baseline text-to-SQL system deployed to cloud
 
 ### Days 1-2: Infrastructure Setup (Oct 16-17)
-- [ ] Create Railway account and project
-- [ ] Create Vercel account and project
-- [ ] Create Supabase account and project
-- [ ] Create Pinecone account and index
-- [ ] Create/verify OpenAI API account
-- [ ] Set up GitHub repository structure
+- [x] Create Railway account and project
+- [x] Create Vercel account and project
+- [x] Create Supabase account and project
+- [x] Create Pinecone account and index
+- [x] Create/verify OpenAI API account
+- [x] Set up GitHub repository structure
 - [ ] Initialize backend/ directory (FastAPI)
 - [ ] Initialize frontend/ directory (Next.js)
 - [ ] Create data/, docs/, evaluation/, scripts/ directories
 - [ ] Set up .env files with API keys
 - [ ] Test all service connections
 
-**Status:** Not Started
+**Status:** In Progress (5/11 complete)
 **Notes:**
+- ✅ Supabase URL: https://invnoyuelwobmstjhidr.supabase.co
+- ✅ Pinecone Host: https://dataprism-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
+- ✅ OpenAI API key obtained
+- ✅ Railway and Vercel accounts created
+- ✅ Created railway.toml, .env.example, .gitignore
+- ✅ Created docs/services.md with all service configurations
+- Next: Initialize project directory structure
 
 ---
 
@@ -512,8 +519,9 @@
 
 ### Overall Progress
 **Weeks Completed:** 0 / 7
-**Current Week:** Week 1
-**Days into Project:** 0 / 49
+**Current Week:** Week 1 (Days 1-2 in progress)
+**Days into Project:** 1 / 49
+**Current Date:** 2025-10-16
 
 ### Budget Tracking
 | Item | Budgeted | Actual | Remaining |
@@ -550,6 +558,15 @@
 
 ### Week 1 Notes
 
+**2025-10-16 - Days 1-2: Infrastructure Setup**
+- ✅ All major service accounts created (Railway, Vercel, Supabase, Pinecone, OpenAI)
+- ✅ Supabase project: https://invnoyuelwobmstjhidr.supabase.co
+- ✅ Pinecone index created: dataprism-sematic (1536 dimensions, cosine metric)
+- ✅ Created railway.toml for deployment configuration
+- ✅ Created .env.example template with all service configurations
+- ✅ Created docs/services.md for permanent service documentation
+- ✅ Set up .gitignore to protect secrets
+- Next: Initialize project directory structure (backend/, frontend/, data/)
 
 ### Week 2 Notes
 

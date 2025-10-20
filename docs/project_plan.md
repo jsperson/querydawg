@@ -120,12 +120,19 @@ Natural language semantic layers will enable **15-25% higher execution accuracy*
 └──────────┘  └──────────┘  └──────────┘  └──────────┘
 ```
 
+**Database Access:**
+- **Frontend (Next.js):** Uses Drizzle ORM (TypeScript) for type-safe database access from Server Components and API routes
+- **Backend (FastAPI):** Uses SQLAlchemy (Python) for Spider database conversion, data profiling, and complex data operations
+
+Both connect to the same Supabase PostgreSQL database, enabling flexible data access patterns across the stack.
+
 ### Tech Stack
 
 | Component | Technology | Cost |
 |-----------|-----------|------|
 | **Frontend** | Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, Vercel | Free |
 | **Backend** | FastAPI, Python 3.11+, Railway | $10-15 |
+| **Database ORM** | Drizzle ORM (TypeScript), SQLAlchemy (Python) | Free |
 | **Vector DB** | Pinecone | Free |
 | **SQL Database** | Supabase PostgreSQL | Free |
 | **LLM** | OpenAI API (GPT-4o, GPT-4o-mini) | $100-200 |

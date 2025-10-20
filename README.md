@@ -28,6 +28,7 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 |-----------|-----------|
 | Frontend | Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, Vercel |
 | Backend | FastAPI, Python 3.11+, Railway |
+| Database ORM | Drizzle ORM (TypeScript/Next.js), SQLAlchemy (Python/FastAPI) |
 | Vector DB | Pinecone (semantic search) |
 | SQL Database | Supabase PostgreSQL |
 | LLM | OpenAI GPT-4o / GPT-4o-mini |

@@ -1,6 +1,6 @@
 # Frontend - Next.js Application
 
-This directory contains the DataPrism frontend built with Next.js 14, TypeScript, shadcn/ui, and Tailwind CSS.
+This directory contains the DataPrism frontend built with Next.js 14, TypeScript, shadcn/ui, Tailwind CSS, and Drizzle ORM.
 
 ## Structure
 
@@ -23,11 +23,16 @@ frontend/
 │   ├── SQLDisplay.tsx
 │   ├── ResultsTable.tsx
 │   └── ContextViewer.tsx
-├── lib/                    # Utilities
+├── drizzle/                # Drizzle ORM
+│   ├── schema.ts          # Database schema definitions
+│   └── migrations/        # Database migrations
+├── lib/
+│   ├── db.ts              # Drizzle database client
 │   ├── api.ts             # Backend API client
 │   └── utils.ts           # Helper functions (includes cn() from shadcn)
 ├── public/                 # Static assets
 ├── components.json         # shadcn/ui configuration
+├── drizzle.config.ts       # Drizzle ORM configuration
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.js
@@ -70,18 +75,76 @@ npx shadcn-ui@latest add select
 npx shadcn-ui@latest add tabs
 ```
 
-4. Set up environment variables:
+4. Install and configure Drizzle ORM:
 ```bash
-cp ../.env.example .env.local
-# Edit .env.local with your backend API URL
+# Install Drizzle ORM and PostgreSQL driver
+npm install drizzle-orm postgres
+npm install -D drizzle-kit
+
+# Generate migrations (after defining schema)
+npx drizzle-kit generate:pg
+
+# Run migrations
+npx drizzle-kit push:pg
 ```
 
-5. Run development server:
+5. Set up environment variables:
+```bash
+cp ../.env.example .env.local
+# Edit .env.local with:
+# - NEXT_PUBLIC_API_URL (backend API)
+# - DATABASE_URL (Supabase PostgreSQL - Transaction Pooler)
+```
+
+6. Run development server:
 ```bash
 npm run dev
 ```
 
 Visit http://localhost:3000
+
+## Database ORM
+
+This project uses **Drizzle ORM** - a TypeScript-first ORM for accessing Supabase PostgreSQL from Next.js.
+
+**Why Drizzle ORM?**
+- ✅ **TypeScript-first** - Full type safety with schema inference
+- ✅ **SQL-like syntax** - Intuitive queries that feel like SQL
+- ✅ **Lightweight** - No heavy runtime, minimal overhead
+- ✅ **Great DX** - Auto-completion, type checking at build time
+- ✅ **Perfect for Next.js 14** - Works seamlessly with Server Components and API routes
+- ✅ **Supabase compatible** - Excellent PostgreSQL support
+
+**Basic Usage Example:**
+```typescript
+// drizzle/schema.ts
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const documents = pgTable('documents', {
+  id: serial('id').primaryKey(),
+  database_name: text('database_name').notNull(),
+  content: text('content').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+});
+
+// lib/db.ts
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+
+const client = postgres(process.env.DATABASE_URL!);
+export const db = drizzle(client);
+
+// Usage in API route or Server Component
+import { db } from '@/lib/db';
+import { documents } from '@/drizzle/schema';
+
+const results = await db.select().from(documents).where(eq(documents.database_name, 'concert_singer'));
+```
+
+**Resources:**
+- [Drizzle ORM Documentation](https://orm.drizzle.team)
+- [PostgreSQL Guide](https://orm.drizzle.team/docs/get-started-postgresql)
+- [Supabase Integration](https://orm.drizzle.team/docs/tutorials/drizzle-with-supabase)
 
 ## UI Components
 

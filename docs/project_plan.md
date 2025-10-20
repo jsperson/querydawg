@@ -44,16 +44,23 @@ This project fills a specific gap in the current text-to-SQL landscape:
    - Relationship explanations and join patterns
    - Query pattern libraries with examples
    - Business glossaries with domain terminology
+   - **Data profiling metadata** (value distributions, cardinalities, ranges, sample data)
 
    *(vs. existing work that generates only short column/table descriptions)*
 
-2. **Dual-Purpose Value Proposition**: Explicitly evaluates documentation as both a means (better SQL) and an end (reusable asset), with hypothesis of significant time reduction compared to manual documentation
+2. **Data-Grounded Semantic Layer**: Combines schema analysis with actual data profiling to generate descriptions grounded in real data:
+   - Categorical columns enriched with actual unique values and frequencies
+   - Numeric columns documented with actual ranges and distributions
+   - Temporal patterns identified from actual date ranges
+   - Enables more accurate and contextual semantic descriptions
 
-3. **Fully Automatic vs Manual**: Unlike App Orchid (99.8% accuracy with manual ontologies) or Wren AI (requires dbt models or manual configuration), DataPrism generates everything from schema alone
+3. **Dual-Purpose Value Proposition**: Explicitly evaluates documentation as both a means (better SQL) and an end (reusable asset), with hypothesis of significant time reduction compared to manual documentation
 
-4. **Open-Source Research**: Reproducible evaluation on Spider 1.0 with cost/accuracy tradeoffs (mini vs full models), filling the gap between proprietary commercial tools and academic papers without implementations
+4. **Fully Automatic vs Manual**: Unlike App Orchid (99.8% accuracy with manual ontologies) or Wren AI (requires dbt models or manual configuration), DataPrism generates everything from schema **and data** alone—no manual curation required
 
-5. **Systematic Comparative Evaluation**: Rigorous before/after testing on standard benchmark with 3-way comparison (baseline, enhanced-mini, enhanced-4o)
+5. **Open-Source Research**: Reproducible evaluation on Spider 1.0 with cost/accuracy tradeoffs (mini vs full models), filling the gap between proprietary commercial tools and academic papers without implementations
+
+6. **Systematic Comparative Evaluation**: Rigorous before/after testing on standard benchmark with 3-way comparison (baseline, enhanced-mini, enhanced-4o)
 
 ### Research Positioning
 
@@ -137,6 +144,13 @@ For each database (e.g., `concert_singer`), the system generates:
 3. **Relationships** - Foreign keys explained narratively, common join patterns
 4. **Query Patterns** - Common question types, example queries with explanations
 5. **Business Glossary** - Business terms, synonyms, domain terminology
+6. **Data Profile & Metadata** - Statistical summaries to enrich semantic understanding:
+   - Row counts per table
+   - Categorical columns: unique value counts, top values with frequencies
+   - Numeric columns: min/max/avg, distribution characteristics
+   - Temporal columns: date ranges, granularity patterns
+   - NULL percentages and data quality indicators
+   - Sample representative values for documentation
 
 ### Storage
 
@@ -146,13 +160,15 @@ Stored as markdown-like text in Supabase, embedded in Pinecone for semantic retr
 CREATE TABLE semantic_layer.documents (
   id UUID PRIMARY KEY,
   database_name TEXT NOT NULL,
-  document_type TEXT NOT NULL,
+  document_type TEXT NOT NULL,  -- overview, table, relationship, pattern, glossary, profile
   title TEXT NOT NULL,
   content TEXT NOT NULL,
-  metadata JSONB,
+  metadata JSONB,  -- Includes data_profile statistics for quick access
   created_at TIMESTAMP DEFAULT NOW()
 );
 ```
+
+**Note:** Data profiling metadata (row counts, unique values, distributions, etc.) is both stored in the `metadata` JSONB field for API access and incorporated into the natural language `content` for LLM context during query generation.
 
 ---
 
@@ -229,19 +245,26 @@ CREATE TABLE semantic_layer.documents (
 **Goal:** Complete documentation for all databases
 
 **Key Tasks:**
+- **Data profiling & metadata extraction** for all databases:
+  - Gather row counts, column statistics (min/max/avg for numeric)
+  - Extract unique values and frequencies for categorical columns
+  - Identify temporal patterns and date ranges
+  - Calculate NULL percentages and data quality metrics
+  - Sample representative values for documentation context
 - Design generation prompts (overview, tables, relationships, patterns, glossary)
   - Build on recent research (arXiv:2502.20657) by extending from short descriptions to comprehensive documentation
   - Implement multi-stage generation: database → tables → columns → relationships → patterns
+  - Incorporate data profile metadata to enrich semantic descriptions
 - Build generation pipeline using GPT-4o-mini/GPT-4o
-- Process all 15-20 databases
+- Process all 20 databases
 - Quality review and refinement (manual spot-checking for hallucinations)
 - Store in Supabase
 
-**Deliverables:** Semantic layers for all databases (5 document types × 15-20 databases = 75-100 documents)
+**Deliverables:** Semantic layers for all databases (6 document types × 20 databases = 120 documents including data profiles)
 
 **Expected Cost:** ~$50-100 (GPT-4o for complex databases, GPT-4o-mini for simpler ones)
 
-**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, DataPrism generates comprehensive documentation including business context, query patterns, and glossaries
+**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, DataPrism generates comprehensive documentation including business context, query patterns, glossaries, **and data profiling metadata** that provides actual value distributions and statistics to ground semantic understanding in real data
 
 ---
 

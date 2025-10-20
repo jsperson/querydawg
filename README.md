@@ -42,22 +42,31 @@ git clone https://github.com/jsperson/dataprism.git
 cd dataprism
 
 # Backend setup
-cd backend
-pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r backend/requirements.txt
 cp .env.example .env
 # Edit .env with your API keys
 
+# Download Spider dataset (104MB, ~2-3 minutes)
+python scripts/download_spider.py
+
+# Test connections
+python scripts/test_connections.py
+
 # Frontend setup
-cd ../frontend
+cd frontend
 npm install
 cp .env.example .env.local
 # Edit .env.local with your API endpoints
 
 # Run locally
 # Terminal 1: Backend
+cd backend
 uvicorn app.main:app --reload
 
 # Terminal 2: Frontend
+cd frontend
 npm run dev
 ```
 
@@ -69,16 +78,23 @@ For detailed setup instructions, database loading, and semantic layer generation
 dataprism/
 ├── backend/          # FastAPI backend
 ├── frontend/         # Next.js frontend
-├── data/            # Spider dataset
+├── data/
+│   └── spider/      # Spider 1.0 dataset (download required - see scripts/)
 ├── docs/            # Documentation
 │   └── project_plan.md  # Complete project plan
 ├── evaluation/      # Evaluation scripts and results
 └── scripts/         # Utility scripts
+    ├── download_spider.py   # Download Spider dataset
+    ├── verify_spider.py     # Verify dataset installation
+    └── test_connections.py  # Test all service connections
 ```
+
+**Note:** The Spider dataset (~140MB) is not included in the repository. Run `python scripts/download_spider.py` to download it, or see [data/spider/DOWNLOAD.md](data/spider/DOWNLOAD.md) for manual instructions.
 
 ## Documentation
 
 - **[Project Plan](docs/project_plan.md)** - Comprehensive 7-week development plan, architecture details, methodology, evaluation framework, and research goals
+- **[Spider Dataset Download](data/spider/DOWNLOAD.md)** - Instructions for downloading and setting up the Spider 1.0 dataset
 - **[Setup Guide](docs/SETUP.md)** - Detailed installation and configuration (to be created)
 - **[API Documentation](docs/API.md)** - Complete API reference (to be created)
 

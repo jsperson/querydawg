@@ -44,8 +44,8 @@
 ---
 
 ### Days 3-4: Data Loading (Oct 18-19)
-- [ ] Download Spider 1.0 dataset
-- [ ] Extract and explore dataset structure
+- [x] Download Spider 1.0 dataset
+- [x] Extract and explore dataset structure
 - [ ] Finalize database selection (15-20 from list)
 - [ ] Set up pgloader or conversion script
 - [ ] Convert SQLite databases to PostgreSQL
@@ -56,8 +56,12 @@
 
 **Selected Databases:** (list here as you select them)
 
-**Status:** Not Started
+**Status:** In Progress (2/9 complete - 22%)
 **Notes:**
+- ✅ Downloaded Spider 1.0 dataset (104MB) from Google Drive
+- ✅ Extracted to data/spider/spider/
+- ✅ Verified dataset contents: 166 databases, 1,034 dev examples, 8,659 training examples
+- ⏳ Next: Select 15-20 databases and convert to PostgreSQL (waiting for Supabase connection)
 
 ---
 
@@ -596,6 +600,19 @@
 - ⏳ AWS outage affecting Supabase database connectivity (confirmed external issue, not configuration)
 - 📝 All installed packages: 54 total including FastAPI, SQLAlchemy, pandas, numpy, pytest
 - ✅ Days 1-2 complete! Ready to proceed to Days 3-4 (Data Loading) once AWS/Supabase recovers
+
+**2025-10-20 - Days 3-4: Spider Dataset Download (Partial)**
+- ✅ Installed gdown package for Google Drive downloads
+- ✅ Downloaded Spider 1.0 dataset (104MB) from Google Drive
+- ✅ Extracted dataset to data/spider/spider/
+- ✅ Verified dataset structure:
+  - 166 databases in SQLite format
+  - 7,000 Spider training examples (140 databases)
+  - 1,659 other training examples (6 databases)
+  - 1,034 dev/test examples (20 databases)
+  - tables.json with metadata for all 166 databases
+- 📊 Each database includes .sqlite file and schema.sql
+- ⏳ Database selection and PostgreSQL conversion pending (waiting for Supabase connection recovery)
 
 ### Week 2 Notes
 

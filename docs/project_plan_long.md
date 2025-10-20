@@ -11,9 +11,9 @@
 **Course:** Data Analytics Seminar (2025FA-BSAD-6873)  
 **Instructor:** Dr. David Cochran  
 **Project Type:** Independent Study  
-**Timeline:** 7 weeks (flexible, with potential for extension)  
-**Start Date:** 20251016 
-**Expected Completion:** [Target Date]  
+**Timeline:** 7 weeks (flexible, with potential for extension)
+**Start Date:** 2025-10-16
+**Expected Completion:** 2025-12-04  
 
 ---
 
@@ -128,9 +128,9 @@ This project addresses a critical challenge in enterprise data democratization: 
 | **Backend** | FastAPI, Railway | $10-15 | Python 3.11+, async/await |
 | **Vector DB** | Pinecone | Free | 100K vectors, 1 index |
 | **SQL Database** | Supabase PostgreSQL | Free | 500MB storage |
-| **LLM** | OpenAI API | ~$100 | GPT-4o-mini + GPT-4o + embeddings |
+| **LLM** | OpenAI API | $100-180 | GPT-4o-mini + GPT-4o + embeddings |
 | **Version Control** | GitHub | Free | MIT License |
-| **Total** | | **~$110-115** | For entire 7-week project |
+| **Total** | | **~$110-195** | For entire 7-week project |
 
 ---
 

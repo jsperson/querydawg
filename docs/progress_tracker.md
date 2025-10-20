@@ -584,22 +584,23 @@
 - ✅ Created .env file with all API keys (OpenAI, Pinecone, Supabase)
 - ✅ Configured DATABASE_URL with Supabase credentials
 
-**2025-10-20 - Days 1-2: Development Environment Setup**
+**2025-10-20 - Days 1-2: Development Environment Setup (Complete)**
 - ✅ Set up Python virtual environment (python3 -m venv venv)
 - ✅ Installed python3.12-venv package (Ubuntu dependency)
 - ✅ Installed all backend dependencies from requirements.txt
 - ✅ Fixed httpx dependency conflict (changed from 0.26.0 to 0.25.2 for Supabase compatibility)
 - ✅ Ran connection test script (scripts/test_connections.py)
-- ✅ Verified 4/5 service connections working correctly:
+- ✅ **ALL 5/5 service connections working correctly:**
   - ✅ Environment Variables: All required vars loaded
   - ✅ OpenAI API: Connected successfully with gpt-4o-mini
   - ✅ Pinecone: Connected to dataprism-sematic index (0 vectors, 1536 dimensions)
-  - ⚠️ Supabase REST API: Partial connection (client works, minor version incompatibility)
-  - ❌ Supabase PostgreSQL: Connection blocked by AWS outage
-- 🔍 Issue identified: db.invnoyuelwobmstjhidr.supabase.co resolves to IPv6 only, network unreachable
-- ⏳ AWS outage affecting Supabase database connectivity (confirmed external issue, not configuration)
+  - ✅ Supabase REST API: Connected (minor version warning, functional)
+  - ✅ Supabase PostgreSQL: Connected successfully via Transaction Pooler (PostgreSQL 17.6)
+- 🔧 **Issue resolved:** Direct Connection (db.xxx.supabase.co:5432) is IPv6-only and doesn't work on IPv4 networks
+- ✅ **Solution:** Switched to Transaction Pooler (aws-1-us-east-2.pooler.supabase.com:6543) which supports IPv4
+- ✅ Fixed URL-encoding for special characters in password (* → %2A)
 - 📝 All installed packages: 54 total including FastAPI, SQLAlchemy, pandas, numpy, pytest
-- ✅ Days 1-2 complete! Ready to proceed to Days 3-4 (Data Loading) once AWS/Supabase recovers
+- 🎉 Days 1-2 complete! Environment fully configured and ready for Days 3-4 (Data Loading)
 
 **2025-10-20 - Days 3-4: Spider Dataset Download (Partial)**
 - ✅ Installed gdown package for Google Drive downloads
@@ -635,9 +636,10 @@
 ### Blockers & Issues
 
 **Active:**
-- **AWS/Supabase Outage (2025-10-20)**: Supabase PostgreSQL connection failing due to AWS infrastructure issues. Database hostname resolves to IPv6 only, causing "Network is unreachable" error. Waiting for AWS/Supabase to resolve. All other services (OpenAI, Pinecone, Supabase REST API) are working correctly.
+- None
 
 **Resolved:**
+- **Supabase IPv6 connection issue (2025-10-20)**: Supabase Direct Connection (db.xxx.supabase.co:5432) is IPv6-only and doesn't work on IPv4 networks. Fixed by switching to Transaction Pooler (aws-1-us-east-2.pooler.supabase.com:6543) which supports IPv4. Also fixed URL-encoding for special characters in password (* → %2A).
 - **httpx version conflict (2025-10-20)**: Supabase 2.3.1 requires httpx<0.26, but requirements.txt specified 0.26.0. Fixed by downgrading to httpx 0.25.2.
 
 ---

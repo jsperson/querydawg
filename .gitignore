@@ -54,12 +54,12 @@ htmlcov/
 
 # Spider dataset (large files)
 data/spider/spider-fixed.zip
-data/spider/spider/database/
-data/spider/spider/*.json
-data/spider/spider/*.sql
+data/spider/database/
+data/spider/*.json
+data/spider/*.sql
 data/spider/**/*.sqlite
 # Keep only the main README
-!data/spider/spider/README.txt
+!data/spider/README.txt
 
 # Temporary files
 *.tmp

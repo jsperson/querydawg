@@ -59,7 +59,7 @@
 **Status:** In Progress (2/9 complete - 22%)
 **Notes:**
 - ✅ Downloaded Spider 1.0 dataset (104MB) from Google Drive
-- ✅ Extracted to data/spider/spider/
+- ✅ Extracted to data/spider/
 - ✅ Verified dataset contents: 166 databases, 1,034 dev examples, 8,659 training examples
 - ⏳ Next: Select 15-20 databases and convert to PostgreSQL (waiting for Supabase connection)
 
@@ -604,7 +604,7 @@
 **2025-10-20 - Days 3-4: Spider Dataset Download (Partial)**
 - ✅ Installed gdown package for Google Drive downloads
 - ✅ Downloaded Spider 1.0 dataset (104MB) from Google Drive
-- ✅ Extracted dataset to data/spider/spider/
+- ✅ Extracted dataset to data/spider/ (fixed nested directory structure)
 - ✅ Verified dataset structure:
   - 166 databases in SQLite format
   - 7,000 Spider training examples (140 databases)

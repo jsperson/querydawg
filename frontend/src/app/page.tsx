@@ -50,6 +50,15 @@ export default function Home() {
     }
   };
 
+  const handleDatabaseChange = (newDatabase: string) => {
+    setSelectedDatabase(newDatabase);
+    // Reset interface when database changes
+    setQuestion('');
+    setSqlResponse(null);
+    setExecuteResponse(null);
+    setError('');
+  };
+
   const handleGenerateSQL = async () => {
     if (!question.trim()) {
       setError('Please enter a question');
@@ -132,7 +141,7 @@ export default function Home() {
                 <label className="text-sm font-medium mb-2 block">Database</label>
                 <Select
                   value={selectedDatabase}
-                  onValueChange={setSelectedDatabase}
+                  onValueChange={handleDatabaseChange}
                   disabled={isLoadingDatabases}
                 >
                   <SelectTrigger>

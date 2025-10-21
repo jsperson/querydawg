@@ -138,6 +138,8 @@ Both connect to the same Supabase PostgreSQL database, enabling flexible data ac
 | **LLM** | OpenAI API (GPT-4o, GPT-4o-mini) | $100-200 |
 | **Total** | | **~$110-215** |
 
+**Note on PostgreSQL Provider:** Currently using Supabase (free tier). If free tier limits are reached, consider migrating to [Xata.io](https://xata.io) as an alternative PostgreSQL provider with generous free tier and similar feature set.
+
 ---
 
 ## Semantic Layer Design

@@ -17,11 +17,14 @@ from app.models.responses import (
     ErrorResponse,
     TextToSQLRequest,
     TextToSQLResponse,
-    SQLMetadata
+    SQLMetadata,
+    ExecuteRequest,
+    ExecuteResponse
 )
 from app.services.database import get_db_service
 from app.services.schema import SchemaExtractorFactory
 from app.services.text_to_sql import BaselineSQLGenerator
+from app.services.executor import SQLExecutor, SQLExecutionError
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -234,6 +237,94 @@ async def generate_baseline_sql(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate SQL: {str(e)}"
+        )
+
+
+@app.post(
+    "/api/execute",
+    response_model=ExecuteResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "Invalid request or dangerous SQL"},
+        401: {"model": ErrorResponse, "description": "Missing API key"},
+        403: {"model": ErrorResponse, "description": "Invalid API key"},
+        404: {"model": ErrorResponse, "description": "Database not found"},
+        500: {"model": ErrorResponse, "description": "SQL execution error"}
+    },
+    tags=["SQL Execution"],
+    summary="Execute SQL query",
+    description="Execute a SELECT query and return results. Only read-only operations are allowed."
+)
+async def execute_sql(
+    request: ExecuteRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """
+    Execute SQL query on specified database
+
+    Only SELECT queries are allowed. INSERT, UPDATE, DELETE, DROP, etc. are blocked.
+
+    Args:
+        request: ExecuteRequest with SQL and database name
+
+    Requires: X-API-Key header
+
+    Returns:
+        ExecuteResponse with query results and metadata
+    """
+    try:
+        # Validate request
+        if not request.sql or not request.sql.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="SQL query cannot be empty"
+            )
+
+        if not request.database or not request.database.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Database name cannot be empty"
+            )
+
+        # Check if database exists
+        db_service = get_db_service()
+        if not db_service.database_exists(request.database):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Database '{request.database}' not found"
+            )
+
+        # Execute SQL query
+        executor = SQLExecutor(
+            database_url=os.getenv('DATABASE_URL'),
+            schema_name=request.database,
+            max_rows=1000,  # Limit results to 1000 rows
+            timeout_seconds=30  # 30 second timeout
+        )
+
+        result = executor.execute(request.sql)
+
+        # Build response
+        return ExecuteResponse(
+            results=result["results"],
+            columns=result["columns"],
+            row_count=result["row_count"],
+            execution_time_ms=result["execution_time_ms"],
+            truncated=result["truncated"],
+            database=request.database
+        )
+
+    except SQLExecutionError as e:
+        # SQL execution or validation errors
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to execute query: {str(e)}"
         )
 
 

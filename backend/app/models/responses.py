@@ -2,7 +2,7 @@
 Pydantic models for API responses
 """
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 
 
@@ -78,3 +78,19 @@ class TextToSQLResponse(BaseModel):
     sql: str
     explanation: str
     metadata: SQLMetadata
+
+
+class ExecuteRequest(BaseModel):
+    """Request for SQL execution"""
+    sql: str
+    database: str
+
+
+class ExecuteResponse(BaseModel):
+    """Response from SQL execution"""
+    results: List[Dict[str, Any]]
+    columns: List[str]
+    row_count: int
+    execution_time_ms: int
+    truncated: bool
+    database: str

@@ -67,7 +67,7 @@ export interface ExecuteRequest {
 }
 
 export interface ExecuteResponse {
-  results: Record<string, any>[];
+  results: Record<string, unknown>[];
   columns: string[];
   row_count: number;
   execution_time_ms: number;

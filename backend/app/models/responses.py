@@ -53,3 +53,28 @@ class SchemaResponse(BaseModel):
     """Database schema response"""
     database: str
     tables: List[TableInfo]
+
+
+class TextToSQLRequest(BaseModel):
+    """Request for text-to-SQL generation"""
+    question: str
+    database: str
+
+
+class SQLMetadata(BaseModel):
+    """Metadata about SQL generation"""
+    tokens_used: int
+    prompt_tokens: int
+    completion_tokens: int
+    cost_usd: float
+    generation_time_ms: int
+    model: str
+    provider: str
+    database: str
+
+
+class TextToSQLResponse(BaseModel):
+    """Response from text-to-SQL generation"""
+    sql: str
+    explanation: str
+    metadata: SQLMetadata

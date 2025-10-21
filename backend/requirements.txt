@@ -14,11 +14,10 @@ psycopg2-binary==2.9.9
 python-dotenv==1.0.1
 
 # === Dependencies below will be added when needed ===
-# Uncomment when implementing text-to-sql endpoints (Week 1 Days 5-6)
+# Text-to-SQL endpoints (Week 1 Days 5-6)
 
 # API Clients
-# openai>=1.10.0
-# httpx>=0.25.2
+openai>=1.10.0
 
 # Uncomment when implementing semantic layer (Week 2-3)
 # pinecone-client>=3.0.2

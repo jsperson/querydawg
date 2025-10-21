@@ -14,10 +14,14 @@ from app.models.responses import (
     HealthResponse,
     DatabaseListResponse,
     SchemaResponse,
-    ErrorResponse
+    ErrorResponse,
+    TextToSQLRequest,
+    TextToSQLResponse,
+    SQLMetadata
 )
 from app.services.database import get_db_service
 from app.services.schema import SchemaExtractorFactory
+from app.services.text_to_sql import BaselineSQLGenerator
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -153,6 +157,83 @@ async def get_schema(database: str, api_key: str = Depends(verify_api_key)):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to extract schema: {str(e)}"
+        )
+
+
+@app.post(
+    "/api/text-to-sql/baseline",
+    response_model=TextToSQLResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+        401: {"model": ErrorResponse, "description": "Missing API key"},
+        403: {"model": ErrorResponse, "description": "Invalid API key"},
+        404: {"model": ErrorResponse, "description": "Database not found"},
+        500: {"model": ErrorResponse, "description": "Internal server error"}
+    },
+    tags=["Text-to-SQL"],
+    summary="Generate SQL (Baseline)",
+    description="Generate SQL query from natural language using schema only (baseline approach)"
+)
+async def generate_baseline_sql(
+    request: TextToSQLRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """
+    Generate SQL query from natural language question using baseline approach
+
+    This endpoint uses only the database schema (no RAG, examples, or history).
+
+    Args:
+        request: TextToSQLRequest with question and database name
+
+    Requires: X-API-Key header
+
+    Returns:
+        TextToSQLResponse with SQL, explanation, and metadata
+    """
+    try:
+        # Validate request
+        if not request.question or not request.question.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Question cannot be empty"
+            )
+
+        if not request.database or not request.database.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Database name cannot be empty"
+            )
+
+        # Check if database exists
+        db_service = get_db_service()
+        if not db_service.database_exists(request.database):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Database '{request.database}' not found"
+            )
+
+        # Generate SQL using baseline generator
+        generator = BaselineSQLGenerator(
+            database_url=os.getenv('DATABASE_URL'),
+            database_name=request.database
+        )
+
+        result = generator.generate_sql(request.question)
+
+        # Build response
+        return TextToSQLResponse(
+            sql=result["sql"],
+            explanation=result["explanation"],
+            metadata=SQLMetadata(**result["metadata"])
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate SQL: {str(e)}"
         )
 
 

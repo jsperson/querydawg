@@ -7,24 +7,26 @@ uvicorn[standard]==0.27.0
 pydantic==2.5.3
 pydantic-settings==2.1.0
 
-# API Clients
-openai==1.10.0
-pinecone-client==3.0.2
-supabase==2.3.1
-
-# Database
+# Database (PostgreSQL)
 psycopg2-binary==2.9.9
-sqlalchemy==2.0.25
 
 # Utilities
 python-dotenv==1.0.1
-httpx==0.25.2
-tenacity==8.2.3
 
-# Data Processing
-pandas==2.1.4
-numpy==1.26.3
+# === Dependencies below will be added when needed ===
+# Uncomment when implementing text-to-sql endpoints (Week 1 Days 5-6)
 
-# Testing (optional but recommended)
-pytest==7.4.4
-pytest-asyncio==0.23.3
+# API Clients
+# openai>=1.10.0
+# httpx>=0.25.2
+
+# Uncomment when implementing semantic layer (Week 2-3)
+# pinecone-client>=3.0.2
+
+# Data Processing (for evaluation - Week 4-5)
+# pandas>=2.1.4
+# numpy>=1.26.3
+
+# Testing
+# pytest>=7.4.4
+# pytest-asyncio>=0.23.3

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { detail: 'Failed to execute SQL' },
       { status: 500 }

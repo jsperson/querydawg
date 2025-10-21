@@ -123,22 +123,24 @@
   - [x] Health check endpoint
   - [x] Database list endpoint
   - [x] API key authentication
-  - [ ] Schema extraction endpoint
-  - [ ] Basic text-to-SQL endpoint (schema only)
-  - [ ] SQL validation function
-  - [ ] Error handling
-- [ ] Build Next.js frontend
-  - [ ] Landing page
-  - [ ] Database selection dropdown
-  - [ ] Question input field
-  - [ ] SQL display component
-  - [ ] Results table component
-- [ ] Connect frontend to backend API
+  - [x] Schema extraction endpoint
+  - [x] Basic text-to-SQL endpoint (schema only)
+  - [x] SQL execution endpoint
+  - [x] Modular LLM architecture
+  - [x] Error handling
+- [x] Build Next.js frontend
+  - [x] Landing page with DataPrism branding
+  - [x] Database selection dropdown
+  - [x] Question input field
+  - [x] SQL display component with metadata badges
+  - [x] Results table component
+  - [x] Loading states and error handling
+- [x] Connect frontend to backend API
 - [x] Deploy backend to Railway
-- [ ] Deploy frontend to Vercel
-- [ ] Test end-to-end flow with sample queries
+- [x] Deploy frontend to Vercel
+- [x] Test end-to-end flow with sample queries
 
-**Status:** In Progress (Backend deployed, 2/7 endpoints complete - 29%)
+**Status:** Complete (100%)
 
 **API Design (Session 2025-10-20):**
 
@@ -270,6 +272,123 @@ curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
 - Environment variables: DATABASE_URL, OPENAI_API_KEY, API_KEY, CORS_ORIGINS
 - Minimal dependencies: FastAPI, Uvicorn, Pydantic, psycopg2-binary, python-dotenv
 - Dependencies deferred: openai, pinecone, pandas (will add when needed)
+
+**Session 2025-10-21: Complete Baseline System Implementation**
+
+**Backend Completion:**
+- ✅ Created modular LLM architecture (backend/app/services/llm/)
+  - Abstract base classes for extensible providers (LLMProvider, LLMResponse)
+  - OpenAI provider implementation with all models (gpt-4o, gpt-4o-mini, o1, etc.)
+  - Task-based configuration system (baseline_sql, enhanced_sql, explanation, error_correction)
+  - Factory pattern for provider creation
+- ✅ Built schema extraction service (backend/app/services/schema.py)
+  - Extracts complete schema from Supabase PostgreSQL
+  - Returns tables, columns, foreign keys, row counts
+  - Schema formatted for prompts
+- ✅ Built baseline text-to-SQL service (backend/app/services/text_to_sql/baseline.py)
+  - Schema-only approach (no examples or semantic layer)
+  - Uses GPT-4o-mini for cost efficiency
+  - Generates SQL with explanation
+  - Tracks tokens, cost, latency
+- ✅ Built SQL executor service (backend/app/services/executor.py)
+  - Safe execution with comprehensive validation
+  - Blocks INSERT, UPDATE, DELETE, DROP, CREATE, ALTER, TRUNCATE
+  - Regex pattern matching for dangerous operations
+  - Configurable limits (1000 rows, 30 second timeout)
+  - Returns results with metadata
+- ✅ Created centralized prompt templates (backend/app/services/llm/prompts.py)
+  - Baseline SQL generation
+  - SQL explanation
+  - Error correction
+  - Schema summarization
+- ✅ Added request/response models (backend/app/models/responses.py)
+- ✅ Created API endpoints:
+  - POST /api/text-to-sql/baseline
+  - POST /api/execute
+  - GET /api/schema/{database}
+- ✅ Tested all endpoints on Railway production
+- ✅ Added openai dependency to requirements.txt
+
+**Frontend Completion:**
+- ✅ Initialized Next.js 14 with TypeScript + Tailwind CSS
+- ✅ Installed and configured shadcn/ui components
+- ✅ Created TypeScript API types matching backend (frontend/src/lib/api-types.ts)
+- ✅ Built API client for backend communication (frontend/src/lib/api.ts)
+- ✅ Created Next.js API routes (server-side proxies to keep API keys secure):
+  - GET /api/databases
+  - GET /api/schema/[database]
+  - POST /api/text-to-sql/baseline
+  - POST /api/execute
+- ✅ Built complete query interface (frontend/src/app/page.tsx):
+  - Database selector dropdown with loading state
+  - Question textarea input
+  - Generate SQL button
+  - SQL display with syntax highlighting (dark code block)
+  - Metadata badges (model, tokens, cost, latency)
+  - Execute SQL button
+  - Results table with responsive design
+  - Error handling and display
+  - Database change resets interface
+- ✅ Fixed gitignore to include frontend/src/lib/ files
+- ✅ Fixed all ESLint errors for Vercel deployment
+- ✅ Deployed to Vercel at https://dataprism.vercel.app
+- ✅ Tested complete end-to-end flow on production
+
+**Testing Results:**
+```bash
+# Test on Vercel production (2025-10-21)
+curl https://dataprism.vercel.app/api/databases
+✅ {"databases":["battle_death","car_1",...19 total...],"count":19}
+
+curl -X POST https://dataprism.vercel.app/api/text-to-sql/baseline \
+  -d '{"question": "Show me the top 5 countries by population", "database": "world_1"}'
+✅ {"sql":"SELECT name, population FROM country ORDER BY population DESC LIMIT 5;",
+    "explanation":"...","metadata":{...}}
+
+curl -X POST https://dataprism.vercel.app/api/execute \
+  -d '{"sql": "SELECT name, population FROM country ORDER BY population DESC LIMIT 5",
+       "database": "world_1"}'
+✅ {"results":[{"name":"China","population":1277558000},
+               {"name":"India","population":1013662000},...],"row_count":5,...}
+```
+
+**Production URLs:**
+- Backend (Railway): https://dataprism-production.up.railway.app
+- Frontend (Vercel): https://dataprism.vercel.app
+
+**Key Architecture Decisions:**
+1. **Modular LLM system** - Easy to add new providers (Together.AI, Groq, Anthropic)
+2. **Task-based configuration** - Different models for different tasks
+3. **Server-side API routes** - API keys stay secure, never exposed to browser
+4. **Schema-only baseline** - No examples, no semantic layer (establishes baseline)
+5. **Security-first SQL execution** - Read-only queries, comprehensive validation
+6. **Cost tracking** - Track tokens and costs for every generation
+
+**Files Created (Backend):**
+- backend/app/services/llm/base.py
+- backend/app/services/llm/openai_provider.py
+- backend/app/services/llm/config.py
+- backend/app/services/llm/prompts.py
+- backend/app/services/schema.py
+- backend/app/services/text_to_sql/baseline.py
+- backend/app/services/executor.py
+
+**Files Created (Frontend):**
+- frontend/src/lib/api-types.ts
+- frontend/src/lib/api.ts
+- frontend/src/app/api/databases/route.ts
+- frontend/src/app/api/schema/[database]/route.ts
+- frontend/src/app/api/text-to-sql/baseline/route.ts
+- frontend/src/app/api/execute/route.ts
+- frontend/src/app/page.tsx (complete UI)
+- frontend/.env.local
+- Plus all shadcn/ui components (button, card, select, table, textarea, badge, input)
+
+**Issues Encountered & Resolved:**
+1. ✅ **Gitignore blocking frontend/src/lib/** - Root .gitignore had lib/ for Python venv, accidentally blocked frontend lib → Added exception for frontend/src/lib/
+2. ✅ **ESLint unused variable errors** - Catch blocks with unused error parameters → Removed parameter or used it
+3. ✅ **ESLint no-explicit-any** - Record<string, any> type → Changed to Record<string, unknown>
+4. ✅ **Vercel deployment protection** - Preview URL required auth → Production URL is public
 
 **Notes:**
 
@@ -719,15 +838,15 @@ curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
 ## Project Summary
 
 ### Overall Progress
-**Weeks Completed:** 0 / 7
-**Current Week:** Week 1 (Days 1-4 foundation complete, ready for Days 5-6)
-**Days into Project:** 5 / 49
-**Current Date:** 2025-10-20
+**Weeks Completed:** 0 / 7 (Week 1 at 86% - only Day 7 remaining)
+**Current Week:** Week 1 (Days 1-6 complete, Day 7 pending)
+**Days into Project:** 6 / 49
+**Current Date:** 2025-10-21
 
 **Week 1 Progress:**
 - ✅ Days 1-2: Infrastructure & Environment Setup (100%)
-- ✅ Days 3-4: Spider Dataset Download & Documentation (100%)
-- ⏳ Days 5-6: Baseline Implementation (0%)
+- ✅ Days 3-4: Spider Dataset Loading & Migration (100%)
+- ✅ Days 5-6: Baseline Implementation & Deployment (100%)
 - ⏳ Day 7: Baseline Evaluation (0%)
 
 ### Budget Tracking
@@ -751,7 +870,11 @@ curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
 | Evaluation questions | 1,034 (full dev set) | 0 | ⏳ Week 6 |
 
 ### Deliverables Checklist
-- [ ] Working application deployed (Week 1-5)
+- [x] Working baseline application deployed (Week 1) **✅ Complete**
+  - [x] Backend deployed on Railway (https://dataprism-production.up.railway.app)
+  - [x] Frontend deployed on Vercel (https://dataprism.vercel.app)
+  - [x] Complete text-to-SQL flow working end-to-end
+  - [x] 19 Spider databases loaded and accessible
 - [ ] Semantic layers for 20 databases with data profiling (Week 2)
 - [ ] Evaluation on 1,034 dev questions - full Spider dev set (Week 6)
 - [ ] Technical summary document (8-12 pages) (Week 7)
@@ -873,5 +996,5 @@ curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
 
 ---
 
-**Last Updated:** 2025-10-20
-**Next Review:** [Date]
+**Last Updated:** 2025-10-21
+**Next Review:** 2025-10-22 (Week 1 Day 7 - Baseline Evaluation)

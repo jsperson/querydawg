@@ -18,7 +18,7 @@ export async function GET() {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (_error) {
+  } catch {
     return NextResponse.json(
       { detail: 'Failed to fetch databases' },
       { status: 500 }

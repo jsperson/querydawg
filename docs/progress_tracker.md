@@ -136,6 +136,95 @@
 - [ ] Test end-to-end flow with sample queries
 
 **Status:** Not Started
+
+**API Design (Session 2025-10-20):**
+
+**Design Decisions:**
+1. ✅ Separate `/api/text-to-sql` and `/api/execute` endpoints (enables logging, user review, regeneration)
+2. ✅ No schema caching initially - query PostgreSQL each time (can optimize later)
+3. ✅ Non-streaming responses with ProgressStepper UI component for visual feedback
+4. ✅ Separate baseline/enhanced endpoints - frontend calls independently (no comparison endpoint)
+5. ✅ No rate limiting or usage tracking initially (focus on core functionality)
+6. ✅ Simple API key authentication via `X-API-Key` header (protect OpenAI costs)
+
+**API Endpoints:**
+
+```
+Authentication: X-API-Key header required on all endpoints (except /health)
+
+GET  /api/health                      # Health check, version info
+GET  /api/databases                   # List available databases
+GET  /api/schema/{database}           # Get complete database schema
+POST /api/text-to-sql/baseline        # Generate SQL using schema only
+POST /api/text-to-sql/enhanced        # Generate SQL with semantic layer (Week 2-3)
+POST /api/execute                     # Execute SQL and return results
+
+# Week 2-3 additions:
+GET  /api/semantic/{database}         # Get semantic layer documents
+POST /api/semantic/search             # Search semantic layer with vector search
+```
+
+**Request/Response Schemas:**
+
+```typescript
+// POST /api/text-to-sql/baseline or /enhanced
+Request: {
+  database: string;      // e.g., "world_1"
+  question: string;      // Natural language question
+}
+
+Response: {
+  sql: string;           // Generated SQL query
+  explanation?: string;  // Optional explanation of the query
+  tokens_used: number;   // OpenAI tokens consumed
+  cost_usd: number;      // Estimated cost in USD
+  generation_time_ms: number;
+}
+
+// POST /api/execute
+Request: {
+  database: string;      // e.g., "world_1"
+  sql: string;          // SQL query to execute
+}
+
+Response: {
+  columns: string[];     // Column names
+  rows: any[][];        // Result rows
+  row_count: number;     // Number of rows returned
+  execution_time_ms: number;
+}
+
+// GET /api/databases
+Response: {
+  databases: string[];   // List of available database names
+}
+
+// GET /api/schema/{database}
+Response: {
+  database: string;
+  tables: [
+    {
+      name: string;
+      columns: [
+        {
+          name: string;
+          type: string;
+          nullable: boolean;
+          primary_key: boolean;
+        }
+      ];
+      foreign_keys: [...];
+      row_count: number;
+    }
+  ];
+}
+```
+
+**Frontend UX:**
+- ProgressStepper component from chathero (~/source/chathero/components/ProgressStepper.tsx)
+- Phases: "Extracting Schema" → "Generating SQL" → "Validating SQL"
+- Shows spinner for active phase, checkmark when complete, can expand for details
+
 **Notes:**
 
 ---

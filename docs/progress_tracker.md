@@ -119,7 +119,10 @@
 ---
 
 ### Days 5-6: Baseline Implementation (Oct 20-21)
-- [ ] Build FastAPI backend structure
+- [x] Build FastAPI backend structure
+  - [x] Health check endpoint
+  - [x] Database list endpoint
+  - [x] API key authentication
   - [ ] Schema extraction endpoint
   - [ ] Basic text-to-SQL endpoint (schema only)
   - [ ] SQL validation function
@@ -131,11 +134,11 @@
   - [ ] SQL display component
   - [ ] Results table component
 - [ ] Connect frontend to backend API
-- [ ] Deploy backend to Railway
+- [x] Deploy backend to Railway
 - [ ] Deploy frontend to Vercel
 - [ ] Test end-to-end flow with sample queries
 
-**Status:** Not Started
+**Status:** In Progress (Backend deployed, 2/7 endpoints complete - 29%)
 
 **API Design (Session 2025-10-20):**
 
@@ -224,6 +227,49 @@ Response: {
 - ProgressStepper component from chathero (~/source/chathero/components/ProgressStepper.tsx)
 - Phases: "Extracting Schema" → "Generating SQL" → "Validating SQL"
 - Shows spinner for active phase, checkmark when complete, can expand for details
+
+**Railway Deployment (Session 2025-10-21):**
+
+**Completed:**
+- ✅ Created FastAPI backend with health and databases endpoints
+- ✅ Implemented API key authentication via X-API-Key header
+- ✅ Created database service for Supabase PostgreSQL operations
+- ✅ Configured Railway deployment with nixpacks
+- ✅ Resolved deployment issues:
+  - PEP 668 externally-managed-environment error (solved with venv)
+  - Dependency conflicts (simplified requirements.txt to minimal set)
+  - Port routing (configured explicit port 8000)
+- ✅ Successfully deployed to Railway
+- ✅ Tested production endpoints
+
+**Deployment URL:** https://dataprism-production.up.railway.app
+
+**Test Results:**
+```bash
+# Health check (no auth)
+curl https://dataprism-production.up.railway.app/api/health
+✅ {"status":"healthy","version":"0.1.0","timestamp":"2025-10-21T15:50:53.216226"}
+
+# Databases list (with API key)
+curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
+  https://dataprism-production.up.railway.app/api/databases
+✅ {"databases":["battle_death","car_1",...19 total...],"count":19}
+```
+
+**Files Created:**
+- `backend/app/main.py` - FastAPI application with health and databases endpoints
+- `backend/app/auth.py` - API key authentication
+- `backend/app/models/responses.py` - Pydantic response models
+- `backend/app/services/database.py` - Database service for Supabase
+- `nixpacks.toml` - Railway build configuration
+- `.railwayignore` - Deployment exclusions
+- `DEPLOYMENT.md` - Complete deployment guide
+
+**Configuration:**
+- Auto-deployment enabled on push to main branch
+- Environment variables: DATABASE_URL, OPENAI_API_KEY, API_KEY, CORS_ORIGINS
+- Minimal dependencies: FastAPI, Uvicorn, Pydantic, psycopg2-binary, python-dotenv
+- Dependencies deferred: openai, pinecone, pandas (will add when needed)
 
 **Notes:**
 

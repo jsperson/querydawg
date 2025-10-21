@@ -43,7 +43,7 @@ export default function Home() {
         setSelectedDatabase(response.databases[0]);
       }
       setError('');
-    } catch (err) {
+    } catch {
       setError('Failed to load databases');
     } finally {
       setIsLoadingDatabases(false);
@@ -80,8 +80,8 @@ export default function Home() {
         database: selectedDatabase,
       });
       setSqlResponse(response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate SQL');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to generate SQL');
     } finally {
       setIsGenerating(false);
     }
@@ -107,8 +107,8 @@ export default function Home() {
         database: selectedDatabase,
       });
       setExecuteResponse(response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to execute SQL');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to execute SQL');
     } finally {
       setIsExecuting(false);
     }

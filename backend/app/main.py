@@ -10,8 +10,14 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth import verify_api_key
-from app.models.responses import HealthResponse, DatabaseListResponse, ErrorResponse
+from app.models.responses import (
+    HealthResponse,
+    DatabaseListResponse,
+    SchemaResponse,
+    ErrorResponse
+)
 from app.services.database import get_db_service
+from app.services.schema import SchemaExtractorFactory
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -93,6 +99,60 @@ async def get_databases(api_key: str = Depends(verify_api_key)):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to retrieve databases: {str(e)}"
+        )
+
+
+@app.get(
+    "/api/schema/{database}",
+    response_model=SchemaResponse,
+    responses={
+        401: {"model": ErrorResponse, "description": "Missing API key"},
+        403: {"model": ErrorResponse, "description": "Invalid API key"},
+        404: {"model": ErrorResponse, "description": "Database not found"},
+        500: {"model": ErrorResponse, "description": "Internal server error"}
+    },
+    tags=["Database"],
+    summary="Get database schema",
+    description="Extract complete schema for a specific database. Requires API key authentication."
+)
+async def get_schema(database: str, api_key: str = Depends(verify_api_key)):
+    """
+    Extract complete database schema including tables, columns, and foreign keys
+
+    Args:
+        database: Database name (e.g., 'world_1', 'car_1')
+
+    Requires: X-API-Key header
+
+    Returns:
+        SchemaResponse with database schema information
+    """
+    try:
+        # Check if database exists
+        db_service = get_db_service()
+        if not db_service.database_exists(database):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Database '{database}' not found"
+            )
+
+        # Extract schema using factory
+        extractor = SchemaExtractorFactory.create(
+            db_type='postgresql',
+            connection_string=os.getenv('DATABASE_URL'),
+            schema_name=database
+        )
+
+        schema = extractor.extract_full_schema()
+
+        return SchemaResponse(**schema)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to extract schema: {str(e)}"
         )
 
 

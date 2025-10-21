@@ -97,6 +97,7 @@ dataprism/
 ## Documentation
 
 - **[Project Plan](docs/project_plan.md)** - Comprehensive 7-week development plan, architecture details, methodology, evaluation framework, and research goals
+- **[Deployment Guide](DEPLOYMENT.md)** - Step-by-step guide for deploying to Railway (backend) and Vercel (frontend)
 - **[Spider Dataset Download](data/spider/DOWNLOAD.md)** - Instructions for downloading and setting up the Spider 1.0 dataset
 - **[Setup Guide](docs/SETUP.md)** - Detailed installation and configuration (to be created)
 - **[API Documentation](docs/API.md)** - Complete API reference (to be created)

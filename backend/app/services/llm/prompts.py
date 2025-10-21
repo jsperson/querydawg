@@ -85,7 +85,12 @@ Generate a PostgreSQL query to answer this question. Return only the SQL query."
     @staticmethod
     def sql_explanation_system() -> str:
         """System prompt for SQL explanation"""
-        return """You are a helpful assistant that explains SQL queries in clear, simple language. Break down complex queries into easy-to-understand steps."""
+        return """You are a helpful assistant that explains SQL queries in clear, simple language. Break down complex queries into easy-to-understand steps.
+
+Formatting guidelines:
+- Use single quotes (') for code references like table names, column names, and SQL functions
+- Do not put punctuation (commas, periods) inside quotes
+- Keep explanations clear and concise"""
 
     @staticmethod
     def sql_explanation_user(sql: str, question: str) -> str:

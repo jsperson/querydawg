@@ -118,11 +118,21 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">DataPrism</h1>
-          <p className="text-lg text-muted-foreground">
-            Natural Language to SQL - Baseline Demo
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">DataPrism</h1>
+            <p className="text-lg text-muted-foreground">
+              Natural Language to SQL - Baseline Demo
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href="/admin/semantic"
+              className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-medium transition-colors"
+            >
+              Semantic Layer Admin
+            </a>
+          </div>
         </div>
 
         {/* Main Content */}

@@ -63,8 +63,8 @@ DATABASES_ALL = [
     "real_estate_properties",
 ]
 
-# TEST: Load remaining 9 databases (indices 11-19, excluding wta_1 at index 6)
-DATABASES = DATABASES_ALL[11:20]
+# Load all 20 databases
+DATABASES = DATABASES_ALL
 
 SPIDER_DB_PATH = project_root / "data" / "spider" / "database"
 SQL_OUTPUT_PATH = project_root / "data" / "spider" / "migrations"
@@ -588,6 +588,7 @@ def main():
     parser = argparse.ArgumentParser(description="Load Spider databases into Supabase PostgreSQL")
     parser.add_argument("--sql-only", action="store_true", help="Generate SQL files without executing")
     parser.add_argument("--dry-run", action="store_true", help="Preview migration without making changes")
+    parser.add_argument("--clean", action="store_true", help="Drop all existing schemas before loading (non-interactive)")
     args = parser.parse_args()
 
     print("=" * 80)
@@ -621,10 +622,10 @@ def main():
             sys.exit(1)
 
     # Ask user if they want to clean the database
-    clean_database = False
+    clean_database = args.clean  # Use --clean flag if provided
     databases_to_migrate = DATABASES
 
-    if not args.sql_only and not args.dry_run and pg_conn:
+    if not args.sql_only and not args.dry_run and pg_conn and not args.clean:
         print("⚠️  Do you want to empty the database before loading?")
         print("   YES: Drop all existing schemas and reload everything")
         print("   NO:  Only load databases that don't exist yet")
@@ -641,6 +642,9 @@ def main():
             else:
                 print("Please answer 'yes' or 'no'")
 
+        print()
+    elif args.clean:
+        print("🧹 --clean flag set: Will drop all existing schemas")
         print()
 
     # Clean existing schemas (DROP CASCADE) if requested

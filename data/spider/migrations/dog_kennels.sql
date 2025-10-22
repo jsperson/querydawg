@@ -1,5 +1,5 @@
 -- Migration SQL for dog_kennels
--- Generated: 2025-10-20T17:40:52.408063
+-- Generated: 2025-10-22T10:48:43.842714
 -- Source: /home/developer/source/dataprism/data/spider/database/dog_kennels/dog_kennels.sqlite
 
 -- Create schema

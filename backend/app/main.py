@@ -25,6 +25,7 @@ from app.services.database import get_db_service
 from app.services.schema import SchemaExtractorFactory
 from app.services.text_to_sql import BaselineSQLGenerator
 from app.services.executor import SQLExecutor, SQLExecutionError
+from app.routers import semantic
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -51,6 +52,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(semantic.router)
 
 
 @app.get(

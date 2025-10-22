@@ -1,5 +1,5 @@
 -- Migration SQL for car_1
--- Generated: 2025-10-20T17:40:25.399454
+-- Generated: 2025-10-22T10:48:11.887963
 -- Source: /home/developer/source/dataprism/data/spider/database/car_1/car_1.sqlite
 
 -- Create schema

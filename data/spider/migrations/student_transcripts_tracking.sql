@@ -1,5 +1,5 @@
 -- Migration SQL for student_transcripts_tracking
--- Generated: 2025-10-20T20:06:20.431266
+-- Generated: 2025-10-22T10:49:35.282339
 -- Source: /home/developer/source/dataprism/data/spider/database/student_transcripts_tracking/student_transcripts_tracking.sqlite
 
 -- Create schema

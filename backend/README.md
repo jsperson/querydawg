@@ -2,26 +2,36 @@
 
 This directory contains the DataPrism backend API built with FastAPI.
 
+**Status:** Week 1 Complete - Baseline text-to-SQL system functional
+
+## Architecture
+
+The backend uses a **modular LLM architecture** that supports multiple AI providers through a common interface, making it easy to switch between OpenAI, Anthropic, Ollama, or add new providers.
+
 ## Structure
 
 ```
 backend/
 ├── app/
-│   ├── main.py              # FastAPI application entry point
-│   ├── routers/             # API endpoints
-│   │   ├── schema.py        # Schema extraction
-│   │   ├── semantic.py      # Semantic layer generation/retrieval
-│   │   ├── sql.py           # Text-to-SQL generation
-│   │   └── evaluate.py      # Evaluation endpoints
-│   ├── services/            # Core business logic
-│   │   ├── openai_service.py    # OpenAI API integration
-│   │   ├── pinecone_service.py  # Vector search
-│   │   ├── supabase_service.py  # Database operations
-│   │   └── generator.py         # Semantic layer generation
-│   └── models/              # Pydantic models
-├── requirements.txt         # Python dependencies
-├── .env                     # Environment variables (not in git)
-└── Dockerfile              # (Optional) Container configuration
+│   ├── main.py                    # FastAPI application entry point
+│   ├── config.py                  # Environment configuration management
+│   ├── llm/                       # Modular LLM architecture
+│   │   ├── base.py                # Base LLM interface (ABC)
+│   │   ├── openai_llm.py          # OpenAI GPT-4 implementation
+│   │   ├── anthropic_llm.py       # Anthropic Claude implementation
+│   │   └── ollama_llm.py          # Ollama local LLM implementation
+│   ├── database/                  # Database operations
+│   │   ├── schema_extractor.py    # Extract schema from SQLite DBs
+│   │   └── sql_executor.py        # Safe SQL execution with limits
+│   └── routers/                   # API endpoints
+│       ├── databases.py           # List available databases
+│       ├── schema.py              # Get database schema
+│       ├── text_to_sql.py         # Generate SQL from natural language
+│       └── execute.py             # Execute SQL queries
+├── requirements.txt               # Python dependencies
+├── .env                           # Environment variables (not in git)
+├── railway.toml                   # Railway deployment config
+└── .railwayignore                # Railway deployment exclusions
 ```
 
 ## Setup
@@ -61,14 +71,25 @@ Once running, visit:
 - `GET /api/health` - Health check (no auth required)
 - `GET /` - Root endpoint with API info
 
-### Database
-- `GET /api/databases` - List available Spider databases (requires X-API-Key)
+### Database Operations
+- `GET /api/databases` - List available Spider databases
+- `GET /api/schema/{database}` - Get detailed schema for a database (tables, columns, foreign keys, row counts)
 
-### Coming Soon
-- `GET /api/schema/{database}` - Get database schema
-- `POST /api/text-to-sql/baseline` - Generate SQL (baseline)
-- `POST /api/text-to-sql/enhanced` - Generate SQL (enhanced with semantic layer)
-- `POST /api/execute` - Execute SQL query
+### Text-to-SQL Generation
+- `POST /api/text-to-sql/baseline` - Generate SQL from natural language (schema-only, no semantic layer)
+  - Request: `{"question": "...", "database": "..."}`
+  - Response: SQL, explanation, metadata (tokens, cost, generation time)
+
+### Query Execution
+- `POST /api/execute` - Execute SQL query with safety limits
+  - Request: `{"sql": "...", "database": "..."}`
+  - Response: Results, column names, row count, execution time
+  - Safety: Read-only, 1000 row limit, 30 second timeout
+
+### Planned (Week 2+)
+- `POST /api/text-to-sql/enhanced` - Generate SQL with semantic layer enhancement
+- `POST /api/semantic/generate` - Generate semantic layer for a database
+- `GET /api/semantic/{database}` - Retrieve semantic layer documentation
 
 ## Authentication
 
@@ -83,18 +104,30 @@ Set `API_KEY` in your `.env` file.
 
 ## Deployment
 
-### Railway (Production)
+### Railway (Production-Ready)
 
-Deployed to Railway automatically when pushed to GitHub (main branch).
+The backend is configured for Railway deployment and can be activated on-demand.
 
-**Configuration**:
+**Configuration Files**:
 - `railway.toml` - Deployment configuration
 - `.railwayignore` - Files to exclude from deployment
+- Environment variables configured in Railway dashboard
 
-**Setup Railway**:
-1. See [DEPLOYMENT.md](../DEPLOYMENT.md) for complete setup guide
-2. Connect GitHub repository to Railway
-3. Configure environment variables in Railway dashboard
-4. Railway will auto-deploy on push to `main`
+**Setup**:
+1. See [DEPLOYMENT.md](../DEPLOYMENT.md) for complete deployment guide
+2. Railway project: `dataprism-production`
+3. Auto-deploys from GitHub `main` branch when active
+4. Cold start: ~3 seconds for first request after idle
 
-**Railway URL**: `https://your-project.up.railway.app`
+**Production URL** (when active): `https://dataprism-production.up.railway.app`
+
+**Key Features**:
+- Automatic HTTPS
+- Environment variable management
+- GitHub integration for CI/CD
+- Health check monitoring at `/api/health`
+- API documentation at `/docs` and `/redoc`
+
+### Local Development
+
+For local testing, databases are stored in `../data/spider/database/` as SQLite files. The application automatically detects and loads all `.sqlite` files from this directory.

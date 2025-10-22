@@ -1,5 +1,5 @@
 -- Migration SQL for cre_Doc_Template_Mgt
--- Generated: 2025-10-20T17:40:50.552531
+-- Generated: 2025-10-22T10:48:41.528942
 -- Source: /home/developer/source/dataprism/data/spider/database/cre_Doc_Template_Mgt/cre_Doc_Template_Mgt.sqlite
 
 -- Create schema

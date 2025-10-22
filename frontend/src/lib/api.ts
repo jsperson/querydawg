@@ -10,6 +10,13 @@ import {
   TextToSQLResponse,
   ExecuteRequest,
   ExecuteResponse,
+  GenerateSemanticLayerRequest,
+  SemanticLayerResponse,
+  ViewPromptRequest,
+  ViewPromptResponse,
+  SemanticLayerListItem,
+  CustomInstructionsRequest,
+  CustomInstructionsResponse,
 } from './api-types';
 
 const API_BASE = '/api';
@@ -58,6 +65,62 @@ export const api = {
    */
   executeSQL: (request: ExecuteRequest) =>
     fetchAPI<ExecuteResponse>('/execute', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  // Semantic Layer APIs
+  /**
+   * Generate semantic layer for a database
+   */
+  generateSemanticLayer: (request: GenerateSemanticLayerRequest) =>
+    fetchAPI<SemanticLayerResponse>('/semantic/generate', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  /**
+   * View prompt without generating
+   */
+  viewPrompt: (request: ViewPromptRequest) =>
+    fetchAPI<ViewPromptResponse>('/semantic/prompt', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  /**
+   * Get semantic layer for a database
+   */
+  getSemanticLayer: (database: string, version?: string) => {
+    const params = version ? `?version=${version}` : '';
+    return fetchAPI<SemanticLayerResponse>(`/semantic/${database}${params}`);
+  },
+
+  /**
+   * List all semantic layers
+   */
+  listSemanticLayers: () =>
+    fetchAPI<SemanticLayerListItem[]>('/semantic'),
+
+  /**
+   * Delete semantic layer for a database
+   */
+  deleteSemanticLayer: (database: string) =>
+    fetchAPI<{ message: string }>(`/semantic/${database}`, {
+      method: 'DELETE',
+    }),
+
+  /**
+   * Get custom instructions
+   */
+  getCustomInstructions: () =>
+    fetchAPI<CustomInstructionsResponse>('/semantic/instructions'),
+
+  /**
+   * Set custom instructions
+   */
+  setCustomInstructions: (request: CustomInstructionsRequest) =>
+    fetchAPI<{ message: string }>('/semantic/instructions', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

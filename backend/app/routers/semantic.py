@@ -1,0 +1,266 @@
+"""
+Semantic Layer API endpoints.
+"""
+
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+
+from ..config import get_settings
+from ..llm.openai_llm import OpenAILLM
+from ..services.semantic_layer_generator import SemanticLayerGenerator
+from ..database.metadata_store import MetadataStore, get_metadata_store
+from ..dependencies import verify_api_key
+
+
+router = APIRouter(prefix="/api/semantic", tags=["semantic"])
+
+
+# Pydantic models
+class GenerateRequest(BaseModel):
+    database: str
+    custom_instructions: Optional[str] = None
+    anonymize: bool = True
+    sample_rows: int = 10
+
+
+class PromptRequest(BaseModel):
+    database: str
+    custom_instructions: Optional[str] = None
+    anonymize: bool = True
+    sample_rows: int = 10
+
+
+class CustomInstructionsRequest(BaseModel):
+    instructions: str
+
+
+class SemanticLayerResponse(BaseModel):
+    database: str
+    semantic_layer: Dict[str, Any]
+    metadata: Dict[str, Any]
+    prompt_used: Optional[str] = None
+
+
+class SemanticLayerListItem(BaseModel):
+    id: str
+    database_name: str
+    version: str
+    created_at: str
+    llm_model: str
+
+
+# Dependency to get metadata store
+def get_metadata_store_instance() -> MetadataStore:
+    settings = get_settings()
+    return get_metadata_store(
+        settings.supabase_url,
+        settings.supabase_service_role_key
+    )
+
+
+@router.post("/generate", response_model=SemanticLayerResponse)
+async def generate_semantic_layer(
+    request: GenerateRequest,
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    Generate a semantic layer for a database.
+
+    Extracts schema and sample data from Supabase,
+    uses LLM to generate semantic documentation, and stores back in Supabase.
+    """
+    settings = get_settings()
+
+    try:
+        # Initialize LLM
+        llm = OpenAILLM(
+            api_key=settings.openai_api_key,
+            model=settings.llm_model
+        )
+
+        # Get custom instructions (from request or stored)
+        custom_instructions = request.custom_instructions
+        if not custom_instructions:
+            custom_instructions = metadata_store.get_custom_instructions()
+
+        # Generate semantic layer (using Supabase PostgreSQL as source)
+        generator = SemanticLayerGenerator(
+            llm=llm,
+            database_url=settings.database_url,  # PostgreSQL connection string
+            custom_instructions=custom_instructions,
+            sample_rows=request.sample_rows
+        )
+
+        result = generator.generate(
+            database_name=request.database,  # Schema name in Supabase
+            anonymize=request.anonymize,
+            save_prompt=True
+        )
+
+        # Save to Supabase metadata store
+        metadata_store.save_semantic_layer(
+            database_name=request.database,
+            semantic_layer=result["semantic_layer"],
+            metadata=result["metadata"],
+            prompt_used=result.get("prompt_used")
+        )
+
+        return SemanticLayerResponse(
+            database=request.database,
+            semantic_layer=result["semantic_layer"],
+            metadata=result["metadata"],
+            prompt_used=result.get("prompt_used")
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating semantic layer: {str(e)}"
+        )
+
+
+@router.get("/{database}", response_model=SemanticLayerResponse)
+async def get_semantic_layer(
+    database: str,
+    version: Optional[str] = None,
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    Retrieve a semantic layer from Supabase.
+
+    Returns the latest version by default, or a specific version if provided.
+    """
+    result = metadata_store.get_semantic_layer(database, version)
+
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Semantic layer not found for database: {database}"
+        )
+
+    return SemanticLayerResponse(
+        database=result["database_name"],
+        semantic_layer=result["semantic_layer"],
+        metadata=result["metadata"],
+        prompt_used=result.get("prompt_used")
+    )
+
+
+@router.get("/", response_model=List[SemanticLayerListItem])
+async def list_semantic_layers(
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    List all semantic layers stored in Supabase.
+
+    Returns metadata only (not full semantic layer content).
+    """
+    layers = metadata_store.list_semantic_layers()
+
+    return [
+        SemanticLayerListItem(
+            id=layer["id"],
+            database_name=layer["database_name"],
+            version=layer["version"],
+            created_at=layer["created_at"],
+            llm_model=layer["metadata"].get("llm_model", "unknown")
+        )
+        for layer in layers
+    ]
+
+
+@router.post("/prompt", response_model=Dict[str, str])
+async def get_generation_prompt(
+    request: PromptRequest,
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    Get the prompt that would be used to generate a semantic layer.
+
+    Does NOT actually generate - just shows what would be sent to the LLM.
+    Useful for verifying no dataset-specific information is leaked.
+    """
+    settings = get_settings()
+
+    try:
+        # Initialize LLM
+        llm = OpenAILLM(
+            api_key=settings.openai_api_key,
+            model=settings.llm_model
+        )
+
+        # Get custom instructions
+        custom_instructions = request.custom_instructions
+        if not custom_instructions:
+            custom_instructions = metadata_store.get_custom_instructions()
+
+        # Generate semantic layer (with prompt) from Supabase PostgreSQL
+        generator = SemanticLayerGenerator(
+            llm=llm,
+            database_url=settings.database_url,  # PostgreSQL connection string
+            custom_instructions=custom_instructions,
+            sample_rows=request.sample_rows
+        )
+
+        result = generator.generate(
+            database_name=request.database,  # Schema name in Supabase
+            anonymize=request.anonymize,
+            save_prompt=True
+        )
+
+        return {
+            "database": request.database,
+            "prompt": result["prompt_used"],
+            "prompt_length": str(len(result["prompt_used"])),
+            "anonymized": str(request.anonymize)
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating prompt: {str(e)}"
+        )
+
+
+@router.delete("/{database}")
+async def delete_semantic_layer(
+    database: str,
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """Delete semantic layer(s) for a database."""
+    success = metadata_store.delete_semantic_layer(database)
+
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No semantic layers found for database: {database}"
+        )
+
+    return {"message": f"Deleted semantic layers for {database}"}
+
+
+@router.get("/instructions/get", response_model=Dict[str, str])
+async def get_custom_instructions(
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """Get stored custom instructions for semantic layer generation."""
+    instructions = metadata_store.get_custom_instructions()
+    return {"instructions": instructions}
+
+
+@router.post("/instructions/set")
+async def set_custom_instructions(
+    request: CustomInstructionsRequest,
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """Set custom instructions for semantic layer generation."""
+    metadata_store.save_custom_instructions(request.instructions)
+    return {"message": "Custom instructions saved"}

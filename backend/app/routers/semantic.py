@@ -188,7 +188,7 @@ async def get_generation_prompt(
     settings = get_settings()
 
     try:
-        # Initialize LLM
+        # Initialize LLM (not used, but required by generator)
         llm = OpenAILLM(
             api_key=settings.openai_api_key,
             model=settings.llm_model
@@ -199,7 +199,7 @@ async def get_generation_prompt(
         if not custom_instructions:
             custom_instructions = metadata_store.get_custom_instructions()
 
-        # Generate semantic layer (with prompt) from Supabase PostgreSQL
+        # Build prompt only (does NOT call LLM)
         generator = SemanticLayerGenerator(
             llm=llm,
             database_url=settings.database_url,  # PostgreSQL connection string
@@ -207,23 +207,22 @@ async def get_generation_prompt(
             sample_rows=request.sample_rows
         )
 
-        result = generator.generate(
+        result = generator.build_prompt_only(
             database_name=request.database,  # Schema name in Supabase
-            anonymize=request.anonymize,
-            save_prompt=True
+            anonymize=request.anonymize
         )
 
         return {
-            "database": request.database,
-            "prompt": result["prompt_used"],
-            "prompt_length": str(len(result["prompt_used"])),
-            "anonymized": str(request.anonymize)
+            "database": result["database"],
+            "prompt": result["prompt"],
+            "prompt_length": str(result["prompt_length"]),
+            "anonymized": str(result["anonymized"])
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Error generating prompt: {str(e)}"
+            detail=f"Error building prompt: {str(e)}"
         )
 
 

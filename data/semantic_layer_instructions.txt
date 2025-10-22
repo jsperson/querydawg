@@ -1,0 +1,10 @@
+CUSTOM INSTRUCTIONS FOR SEMANTIC LAYER GENERATION:
+
+1. Focus on practical query patterns that business users would ask
+2. Include 3-5 common queries per table showing real-world use cases
+3. For numeric columns, always suggest relevant aggregation patterns (SUM, AVG, COUNT, etc.)
+4. Identify and document at least 3 business synonyms per important column
+5. In relationships, explain the business meaning (e.g., "A customer places orders" not just "foreign key")
+6. Include data quality notes if you observe patterns in the samples (nulls, missing data, etc.)
+7. Generate query guidelines that help avoid common pitfalls for this type of data
+8. Keep descriptions concise but informative (1-2 sentences per item)

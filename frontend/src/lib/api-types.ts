@@ -78,3 +78,58 @@ export interface ExecuteResponse {
 export interface ErrorResponse {
   detail: string;
 }
+
+// Semantic Layer Types
+export interface SemanticLayerMetadata {
+  generated_at: string;
+  generator_version: string;
+  llm_provider: string;
+  llm_model: string;
+  anonymized: boolean;
+  sample_rows_per_table: number;
+  custom_instructions_used: boolean;
+}
+
+export interface SemanticLayerResponse {
+  database: string;
+  semantic_layer: Record<string, unknown>;
+  metadata: SemanticLayerMetadata;
+  prompt_used?: string;
+}
+
+export interface GenerateSemanticLayerRequest {
+  database: string;
+  custom_instructions?: string;
+  anonymize?: boolean;
+  sample_rows?: number;
+}
+
+export interface ViewPromptRequest {
+  database: string;
+  custom_instructions?: string;
+  anonymize?: boolean;
+  sample_rows?: number;
+}
+
+export interface ViewPromptResponse {
+  database: string;
+  prompt: string;
+  prompt_length: string;
+  anonymized: string;
+}
+
+export interface SemanticLayerListItem {
+  id: string;
+  database_name: string;
+  version: string;
+  created_at: string;
+  llm_model: string;
+}
+
+export interface CustomInstructionsRequest {
+  instructions: string;
+}
+
+export interface CustomInstructionsResponse {
+  instructions: string;
+}

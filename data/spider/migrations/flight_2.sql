@@ -1,5 +1,5 @@
 -- Migration SQL for flight_2
--- Generated: 2025-10-20T17:40:55.090337
+-- Generated: 2025-10-22T10:48:47.216689
 -- Source: /home/developer/source/dataprism/data/spider/database/flight_2/flight_2.sqlite
 
 -- Create schema

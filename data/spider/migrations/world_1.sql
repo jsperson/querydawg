@@ -1,5 +1,5 @@
 -- Migration SQL for world_1
--- Generated: 2025-10-20T17:37:55.359372
+-- Generated: 2025-10-22T10:45:02.753172
 -- Source: /home/developer/source/dataprism/data/spider/database/world_1/world_1.sqlite
 
 -- Create schema

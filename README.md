@@ -2,6 +2,10 @@
 
 A cloud-native text-to-SQL system that uses automatically generated natural language semantic layers to improve SQL query generation accuracy.
 
+**📊 Current Status:** Week 1 Complete - Baseline system functional with 19 Spider databases
+
+**Note:** Production deployment can be activated on-demand via Vercel (frontend) and Railway (backend) when needed for testing or demonstration.
+
 ## What is DataPrism?
 
 DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconnect between how databases are structured (technical schemas) and how business users think about data (business language).
@@ -13,7 +17,30 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 - **Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
 - **Side-by-Side Comparison**: Compare baseline (schema-only) vs enhanced (with semantic layer) performance in real-time
 - **Spider Benchmark Evaluation**: Rigorous testing on the industry-standard Spider 1.0 dataset
-- **Production-Ready**: Cloud-deployed on Vercel (frontend) and Railway (backend)
+- **Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
+
+## Current Features (Week 1 - Baseline Complete)
+
+**Backend (FastAPI):**
+- Modular LLM architecture supporting multiple providers (OpenAI, Anthropic, Ollama)
+- Database schema extraction from 19 Spider databases
+- Text-to-SQL generation with GPT-4o-mini (baseline)
+- SQL query execution with safety limits
+- Cost and performance tracking
+
+**Frontend (Next.js 14):**
+- Modern UI with shadcn/ui components and Tailwind CSS
+- Database selector with 19 Spider datasets
+- Natural language query interface
+- Real-time SQL generation with explanation
+- Interactive result display with execution metrics
+- Cost and token usage tracking
+
+**Infrastructure:**
+- 19 Spider databases loaded locally (SQLite)
+- RESTful API with OpenAPI documentation
+- Environment-based configuration
+- Ready for cloud deployment (Vercel + Railway)
 
 ## Expected Results
 
@@ -79,17 +106,52 @@ For detailed setup instructions, database loading, and semantic layer generation
 
 ```
 dataprism/
-├── backend/          # FastAPI backend
-├── frontend/         # Next.js frontend
+├── backend/                    # FastAPI backend
+│   ├── app/
+│   │   ├── main.py            # FastAPI application entry
+│   │   ├── config.py          # Configuration management
+│   │   ├── llm/               # Modular LLM architecture
+│   │   │   ├── base.py        # Base LLM interface
+│   │   │   ├── openai_llm.py  # OpenAI implementation
+│   │   │   ├── anthropic_llm.py  # Anthropic implementation
+│   │   │   └── ollama_llm.py  # Ollama implementation
+│   │   ├── database/          # Database operations
+│   │   │   ├── schema_extractor.py  # Schema extraction
+│   │   │   └── sql_executor.py      # SQL execution
+│   │   └── routers/           # API endpoints
+│   │       ├── databases.py   # Database listing
+│   │       ├── schema.py      # Schema retrieval
+│   │       ├── text_to_sql.py # SQL generation
+│   │       └── execute.py     # Query execution
+│   └── requirements.txt       # Python dependencies
+├── frontend/                  # Next.js 14 frontend
+│   ├── src/
+│   │   ├── app/              # App router
+│   │   │   ├── page.tsx      # Main query interface
+│   │   │   ├── layout.tsx    # Root layout
+│   │   │   └── api/          # API route handlers
+│   │   ├── components/ui/    # shadcn/ui components
+│   │   └── lib/
+│   │       ├── api.ts        # API client
+│   │       └── api-types.ts  # TypeScript types
+│   └── package.json          # Node dependencies
 ├── data/
-│   └── spider/      # Spider 1.0 dataset (download required - see scripts/)
-├── docs/            # Documentation
-│   └── project_plan.md  # Complete project plan
-├── evaluation/      # Evaluation scripts and results
-└── scripts/         # Utility scripts
-    ├── download_spider.py   # Download Spider dataset
-    ├── verify_spider.py     # Verify dataset installation
-    └── test_connections.py  # Test all service connections
+│   └── spider/               # Spider 1.0 dataset (200 databases)
+│       ├── database/         # SQLite database files
+│       ├── train_spider.json # Training questions
+│       ├── train_others.json # Additional training data
+│       └── dev.json          # Development/test questions
+├── docs/
+│   ├── project_plan.md       # Complete 7-week project plan
+│   ├── progress_tracker.md   # Weekly progress tracking
+│   └── SETUP.md             # Detailed setup guide (planned)
+├── evaluation/               # Evaluation scripts (planned)
+├── scripts/                  # Utility scripts
+│   ├── download_spider.py    # Download Spider dataset
+│   ├── verify_spider.py      # Verify dataset installation
+│   ├── load_spider_databases.py  # Load databases to Supabase
+│   └── test_connections.py   # Test all service connections
+└── DEPLOYMENT.md             # Deployment guide
 ```
 
 **Note:** The Spider dataset (~140MB) is not included in the repository. Run `python scripts/download_spider.py` to download it, or see [data/spider/DOWNLOAD.md](data/spider/DOWNLOAD.md) for manual instructions.

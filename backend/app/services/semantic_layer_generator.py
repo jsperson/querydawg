@@ -112,6 +112,46 @@ class SemanticLayerGenerator:
 
         return result
 
+    def build_prompt_only(
+        self,
+        database_name: str,
+        anonymize: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Build the prompt without calling the LLM.
+
+        Useful for previewing what will be sent to the LLM before generation.
+
+        Args:
+            database_name: Name of the database schema in Supabase (e.g., 'world_1')
+            anonymize: If True, use anonymous database name in prompt
+
+        Returns:
+            Dictionary containing the prompt and metadata
+        """
+        # Extract schema from Supabase
+        schema_info = self.schema_extractor.extract_schema(database_name)
+
+        # Sample data from each table in Supabase
+        sample_data = self.schema_extractor.sample_all_tables(
+            database_name,
+            limit=self.sample_rows
+        )
+
+        # Build prompt
+        prompt = self._build_prompt(
+            database_name=database_name if not anonymize else "database_unknown",
+            schema_info=schema_info,
+            sample_data=sample_data
+        )
+
+        return {
+            "database": database_name,
+            "prompt": prompt,
+            "prompt_length": len(prompt),
+            "anonymized": anonymize
+        }
+
     def _build_prompt(
         self,
         database_name: str,

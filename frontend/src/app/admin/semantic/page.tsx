@@ -27,7 +27,6 @@ export default function SemanticLayerAdmin() {
   const [isLoadingDatabases, setIsLoadingDatabases] = useState(true);
   const [isViewingPrompt, setIsViewingPrompt] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoadingLayers, setIsLoadingLayers] = useState(false);
   const [error, setError] = useState<string>('');
 
   // Load databases and existing layers on mount
@@ -55,13 +54,10 @@ export default function SemanticLayerAdmin() {
 
   const loadExistingLayers = async () => {
     try {
-      setIsLoadingLayers(true);
       const layers = await api.listSemanticLayers();
       setExistingLayers(layers);
     } catch {
       // Silently fail - not critical
-    } finally {
-      setIsLoadingLayers(false);
     }
   };
 

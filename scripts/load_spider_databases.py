@@ -316,6 +316,40 @@ def get_row_count(sqlite_conn: sqlite3.Connection, table_name: str) -> int:
     return cursor.fetchone()[0]
 
 
+def convert_integer_date(value: int) -> Optional[str]:
+    """
+    Convert integer date (e.g., 20000101) to PostgreSQL DATE format (2000-01-01).
+
+    Args:
+        value: Integer date in YYYYMMDD format
+
+    Returns:
+        Date string in YYYY-MM-DD format, or None if invalid
+    """
+    try:
+        if value is None:
+            return None
+
+        # Convert to string and parse YYYYMMDD
+        date_str = str(value)
+
+        # Handle different formats
+        if len(date_str) == 8:  # YYYYMMDD
+            year = date_str[0:4]
+            month = date_str[4:6]
+            day = date_str[6:8]
+            return f"{year}-{month}-{day}"
+        elif len(date_str) == 6:  # YYMMDD
+            year = f"20{date_str[0:2]}"  # Assume 2000s
+            month = date_str[2:4]
+            day = date_str[4:6]
+            return f"{year}-{month}-{day}"
+        else:
+            return None
+    except:
+        return None
+
+
 def clean_text_value(value: str) -> str:
     """
     Clean text value to handle encoding issues.
@@ -413,12 +447,16 @@ def migrate_database(
             if max_lengths:
                 table_max_lengths[table_name] = max_lengths
 
+        # Store column schemas for later use in data migration
+        table_schemas = {}
+
         # Process each table
         for table_name in table_names:
             stats["tables"] += 1
 
             # Get schema
             columns = get_table_schema(sqlite_conn, table_name)
+            table_schemas[table_name] = columns  # Store for data migration
 
             # Get scanned max lengths for this table
             max_lengths = table_max_lengths.get(table_name, {})
@@ -500,15 +538,22 @@ def migrate_database(
 
                 # Execute data migration if not sql-only mode
                 if not sql_only and not dry_run and pg_conn:
-                    # Clean rows to handle encoding issues
+                    # Get column types for this table
+                    col_types = {col["name"]: col["type"] for col in table_schemas[table_name]}
+
+                    # Clean rows to handle encoding issues and type conversions
                     cleaned_rows = []
                     for row in rows:
                         cleaned_row = []
                         for i, val in enumerate(row):
                             col_name = columns[i]
+                            col_type = col_types.get(col_name, "").lower()
 
+                            # Handle DATE columns - convert integer dates to proper format
+                            if "date" in col_type and isinstance(val, int):
+                                cleaned_row.append(convert_integer_date(val))
                             # SPECIAL CASE FIX: car_1.car_makers.Country - convert TEXT to INTEGER
-                            if db_name == "car_1" and table_name == "car_makers" and col_name == "Country":
+                            elif db_name == "car_1" and table_name == "car_makers" and col_name == "Country":
                                 # Convert string number to integer
                                 cleaned_row.append(int(val) if val else None)
                             elif isinstance(val, str):

@@ -300,7 +300,7 @@ export default function ComparePage() {
             <CardHeader>
               <CardTitle>Ask a Question</CardTitle>
               <CardDescription>
-                Select a database and ask a question. We'll generate and execute SQL using both baseline (schema only) and enhanced (schema + semantic layer) approaches.
+                Select a database and ask a question. We&apos;ll generate and execute SQL using both baseline (schema only) and enhanced (schema + semantic layer) approaches.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

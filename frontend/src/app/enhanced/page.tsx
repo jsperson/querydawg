@@ -1,29 +1,24 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { api } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { QueryNavigation } from '@/components/QueryNavigation';
+import type { TextToSQLResponse, ExecuteResponse } from '@/lib/api-types';
 
-export default function Home() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to compare page
-    router.push('/compare');
-  }, [router]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Redirecting to comparison mode...</p>
-      </div>
-    </div>
-  );
-}
-
-// Old single-mode page code - moved to /baseline
-/*
-export default function Home() {
+export default function EnhancedPage() {
   // State
   const [databases, setDatabases] = useState<string[]>([]);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
@@ -81,7 +76,7 @@ export default function Home() {
     setExecuteResponse(null);
 
     try {
-      const response = await api.generateSQL({
+      const response = await api.generateSQLEnhanced({
         question: question.trim(),
         database: selectedDatabase,
       });
@@ -128,7 +123,7 @@ export default function Home() {
           <div>
             <h1 className="text-4xl font-bold mb-2">DataPrism</h1>
             <p className="text-lg text-muted-foreground">
-              Natural Language to SQL - Baseline Demo
+              Natural Language to SQL - Enhanced Mode
             </p>
           </div>
           <div className="flex gap-2">
@@ -141,6 +136,9 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Navigation */}
+        <QueryNavigation />
+
         {/* Main Content */}
         <div className="grid gap-6">
           {/* Input Section */}
@@ -148,7 +146,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Ask a Question</CardTitle>
               <CardDescription>
-                Select a database and ask a question in natural language
+                Select a database and ask a question in natural language. Uses schema + semantic layer (GPT-4o).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -208,7 +206,19 @@ export default function Home() {
           {sqlResponse && (
             <Card>
               <CardHeader>
-                <CardTitle>Generated SQL</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  Generated SQL
+                  {sqlResponse.metadata.has_semantic_layer && (
+                    <Badge variant="default" className="bg-green-600">
+                      Semantic Layer Used
+                    </Badge>
+                  )}
+                  {!sqlResponse.metadata.has_semantic_layer && (
+                    <Badge variant="secondary">
+                      No Semantic Layer
+                    </Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   {sqlResponse.explanation}
                 </CardDescription>

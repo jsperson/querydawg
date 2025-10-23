@@ -9,19 +9,40 @@ export async function GET() {
       headers: {
         'X-API-Key': API_KEY,
       },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       const error = await response.json();
-      return NextResponse.json(error, { status: response.status });
+      return NextResponse.json(error, {
+        status: response.status,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      });
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    });
   } catch {
     return NextResponse.json(
       { detail: 'Failed to fetch databases' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      }
     );
   }
 }

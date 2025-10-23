@@ -102,6 +102,7 @@ export interface GenerateSemanticLayerRequest {
   custom_instructions?: string;
   anonymize?: boolean;
   sample_rows?: number;
+  connection_name?: string;
 }
 
 export interface ViewPromptRequest {
@@ -120,6 +121,7 @@ export interface ViewPromptResponse {
 
 export interface SemanticLayerListItem {
   id: string;
+  connection_name: string;
   database_name: string;
   version: string;
   created_at: string;

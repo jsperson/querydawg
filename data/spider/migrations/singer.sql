@@ -1,5 +1,5 @@
 -- Migration SQL for singer
--- Generated: 2025-10-20T20:20:02.022562
+-- Generated: 2025-10-22T12:09:50.547701
 -- Source: /home/developer/source/dataprism/data/spider/database/singer/singer.sqlite
 
 -- Create schema

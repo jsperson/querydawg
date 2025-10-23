@@ -22,6 +22,7 @@ class GenerateRequest(BaseModel):
     custom_instructions: Optional[str] = None
     anonymize: bool = True
     sample_rows: int = 10
+    connection_name: str = "Supabase"
 
 
 class PromptRequest(BaseModel):
@@ -44,6 +45,7 @@ class SemanticLayerResponse(BaseModel):
 
 class SemanticLayerListItem(BaseModel):
     id: str
+    connection_name: str
     database_name: str
     version: str
     created_at: str
@@ -70,10 +72,18 @@ async def generate_semantic_layer(
 
     Extracts schema and sample data from Supabase,
     uses LLM to generate semantic documentation, and stores back in Supabase.
+
+    Automatically deletes any existing semantic layers for this database before creating new one.
     """
     settings = get_settings()
 
     try:
+        # Delete existing semantic layers for this database
+        metadata_store.delete_semantic_layer(
+            database_name=request.database,
+            connection_name=request.connection_name
+        )
+
         # Initialize LLM
         llm = OpenAILLM(
             api_key=settings.openai_api_key,
@@ -104,7 +114,8 @@ async def generate_semantic_layer(
             database_name=request.database,
             semantic_layer=result["semantic_layer"],
             metadata=result["metadata"],
-            prompt_used=result.get("prompt_used")
+            prompt_used=result.get("prompt_used"),
+            connection_name=request.connection_name
         )
 
         return SemanticLayerResponse(
@@ -125,6 +136,7 @@ async def generate_semantic_layer(
 async def get_semantic_layer(
     database: str,
     version: Optional[str] = None,
+    connection_name: str = "Supabase",
     _: str = Depends(verify_api_key),
     metadata_store: MetadataStore = Depends(get_metadata_store_instance)
 ):
@@ -133,12 +145,16 @@ async def get_semantic_layer(
 
     Returns the latest version by default, or a specific version if provided.
     """
-    result = metadata_store.get_semantic_layer(database, version)
+    result = metadata_store.get_semantic_layer(
+        database,
+        version,
+        connection_name
+    )
 
     if not result:
         raise HTTPException(
             status_code=404,
-            detail=f"Semantic layer not found for database: {database}"
+            detail=f"Semantic layer not found for database: {database} (connection: {connection_name})"
         )
 
     return SemanticLayerResponse(
@@ -164,6 +180,7 @@ async def list_semantic_layers(
     return [
         SemanticLayerListItem(
             id=layer["id"],
+            connection_name=layer.get("connection_name", "Supabase"),
             database_name=layer["database_name"],
             version=layer["version"],
             created_at=layer["created_at"],
@@ -229,19 +246,38 @@ async def get_generation_prompt(
 @router.delete("/{database}")
 async def delete_semantic_layer(
     database: str,
+    connection_name: str = "Supabase",
     _: str = Depends(verify_api_key),
     metadata_store: MetadataStore = Depends(get_metadata_store_instance)
 ):
     """Delete semantic layer(s) for a database."""
-    success = metadata_store.delete_semantic_layer(database)
+    success = metadata_store.delete_semantic_layer(
+        database,
+        connection_name
+    )
 
     if not success:
         raise HTTPException(
             status_code=404,
-            detail=f"No semantic layers found for database: {database}"
+            detail=f"No semantic layers found for database: {database} (connection: {connection_name})"
         )
 
-    return {"message": f"Deleted semantic layers for {database}"}
+    return {"message": f"Deleted semantic layers for {database} ({connection_name})"}
+
+
+@router.get("/status", response_model=Dict[str, List[str]])
+async def get_databases_with_semantic_layers(
+    connection_name: str = "Supabase",
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    Get list of databases that have semantic layers.
+
+    Returns database names with existing semantic layers for status indicators.
+    """
+    databases = metadata_store.get_databases_with_semantic_layers(connection_name)
+    return {"databases": databases}
 
 
 @router.get("/instructions/get", response_model=Dict[str, str])

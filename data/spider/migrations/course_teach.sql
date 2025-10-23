@@ -1,5 +1,5 @@
 -- Migration SQL for course_teach
--- Generated: 2025-10-20T20:20:01.297600
+-- Generated: 2025-10-22T12:09:49.751859
 -- Source: /home/developer/source/dataprism/data/spider/database/course_teach/course_teach.sqlite
 
 -- Create schema

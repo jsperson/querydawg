@@ -1,5 +1,5 @@
 -- Migration SQL for battle_death
--- Generated: 2025-10-20T20:20:03.183403
+-- Generated: 2025-10-22T12:09:51.841173
 -- Source: /home/developer/source/dataprism/data/spider/database/battle_death/battle_death.sqlite
 
 -- Create schema

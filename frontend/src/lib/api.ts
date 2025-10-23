@@ -124,4 +124,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(request),
     }),
+
+  /**
+   * Get databases that have semantic layers
+   */
+  getDatabasesWithSemanticLayers: (connectionName: string = 'Supabase') =>
+    fetchAPI<{ databases: string[] }>(`/semantic/status?connection_name=${connectionName}`),
 };

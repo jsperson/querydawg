@@ -28,7 +28,8 @@ class MetadataStore:
         database_name: str,
         semantic_layer: Dict[str, Any],
         metadata: Dict[str, Any],
-        prompt_used: Optional[str] = None
+        prompt_used: Optional[str] = None,
+        connection_name: str = "Supabase"
     ) -> str:
         """
         Save a semantic layer to Supabase.
@@ -38,11 +39,13 @@ class MetadataStore:
             semantic_layer: The semantic layer JSON object
             metadata: Generation metadata (LLM model, timestamp, etc.)
             prompt_used: Optional prompt that was used for generation
+            connection_name: Name of the connection (e.g., "Supabase", "PostgreSQL")
 
         Returns:
             ID of the saved semantic layer
         """
         data = {
+            "connection_name": connection_name,
             "database_name": database_name,
             "semantic_layer": semantic_layer,
             "metadata": metadata,
@@ -57,7 +60,8 @@ class MetadataStore:
     def get_semantic_layer(
         self,
         database_name: str,
-        version: Optional[str] = None
+        version: Optional[str] = None,
+        connection_name: str = "Supabase"
     ) -> Optional[Dict[str, Any]]:
         """
         Retrieve a semantic layer from Supabase.
@@ -65,12 +69,16 @@ class MetadataStore:
         Args:
             database_name: Name of the database
             version: Optional specific version. If None, returns latest.
+            connection_name: Name of the connection (e.g., "Supabase", "PostgreSQL")
 
         Returns:
             Semantic layer data or None if not found
         """
-        query = self.client.table("semantic_layers").select("*").eq(
-            "database_name", database_name
+        query = (
+            self.client.table("semantic_layers")
+            .select("*")
+            .eq("connection_name", connection_name)
+            .eq("database_name", database_name)
         )
 
         if version:
@@ -93,18 +101,23 @@ class MetadataStore:
         """
         result = (
             self.client.table("semantic_layers")
-            .select("id, database_name, version, created_at, metadata")
-            .order("database_name")
+            .select("id, connection_name, database_name, version, created_at, metadata")
+            .order("connection_name, database_name")
             .execute()
         )
         return result.data
 
-    def delete_semantic_layer(self, database_name: str) -> bool:
+    def delete_semantic_layer(
+        self,
+        database_name: str,
+        connection_name: str = "Supabase"
+    ) -> bool:
         """
         Delete semantic layer(s) for a database.
 
         Args:
             database_name: Name of the database
+            connection_name: Name of the connection (e.g., "Supabase", "PostgreSQL")
 
         Returns:
             True if deleted, False if not found
@@ -112,6 +125,7 @@ class MetadataStore:
         result = (
             self.client.table("semantic_layers")
             .delete()
+            .eq("connection_name", connection_name)
             .eq("database_name", database_name)
             .execute()
         )
@@ -151,6 +165,29 @@ class MetadataStore:
         # Upsert (insert or update)
         self.client.table("settings").upsert(data, on_conflict="key").execute()
 
+    def get_databases_with_semantic_layers(
+        self,
+        connection_name: str = "Supabase"
+    ) -> List[str]:
+        """
+        Get list of database names that have semantic layers.
+
+        Args:
+            connection_name: Name of the connection to filter by
+
+        Returns:
+            List of database names with semantic layers
+        """
+        result = (
+            self.client.table("semantic_layers")
+            .select("database_name")
+            .eq("connection_name", connection_name)
+            .execute()
+        )
+
+        # Return unique database names
+        return list(set(row["database_name"] for row in result.data))
+
     def initialize_schema(self) -> None:
         """
         Initialize the Supabase schema for metadata storage.
@@ -162,6 +199,7 @@ class MetadataStore:
         -- Semantic Layers table
         CREATE TABLE IF NOT EXISTS semantic_layers (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            connection_name TEXT NOT NULL DEFAULT 'Supabase',
             database_name TEXT NOT NULL,
             version TEXT NOT NULL DEFAULT '1.0.0',
             semantic_layer JSONB NOT NULL,
@@ -170,13 +208,13 @@ class MetadataStore:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-            -- Constraints
-            UNIQUE(database_name, version)
+            -- Constraints (connection_name + database_name + version must be unique)
+            UNIQUE(connection_name, database_name, version)
         );
 
         -- Index for faster lookups
-        CREATE INDEX IF NOT EXISTS idx_semantic_layers_database
-            ON semantic_layers(database_name);
+        CREATE INDEX IF NOT EXISTS idx_semantic_layers_connection_database
+            ON semantic_layers(connection_name, database_name);
         CREATE INDEX IF NOT EXISTS idx_semantic_layers_created
             ON semantic_layers(created_at DESC);
 

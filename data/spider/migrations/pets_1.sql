@@ -1,5 +1,5 @@
 -- Migration SQL for pets_1
--- Generated: 2025-10-20T20:17:22.273391
+-- Generated: 2025-10-22T12:09:45.874811
 -- Source: /home/developer/source/dataprism/data/spider/database/pets_1/pets_1.sqlite
 
 -- Create schema

@@ -1,5 +1,5 @@
 -- Migration SQL for poker_player
--- Generated: 2025-10-20T20:19:58.518000
+-- Generated: 2025-10-22T12:09:47.044896
 -- Source: /home/developer/source/dataprism/data/spider/database/poker_player/poker_player.sqlite
 
 -- Create schema

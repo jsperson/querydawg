@@ -13,59 +13,54 @@ import type {
   SemanticLayerListItem,
 } from '@/lib/api-types';
 
+interface DatabaseStatus {
+  name: string;
+  hasLayer: boolean;
+  layerInfo?: SemanticLayerListItem;
+  isGenerating: boolean;
+  lastResult?: SemanticLayerResponse | Error;
+}
+
 export default function SemanticLayerAdmin() {
-  // State
-  const [databases, setDatabases] = useState<string[]>([]);
-  const [databasesWithLayers, setDatabasesWithLayers] = useState<Set<string>>(new Set());
+  const [databases, setDatabases] = useState<DatabaseStatus[]>([]);
   const [selectedDatabases, setSelectedDatabases] = useState<Set<string>>(new Set());
   const [customInstructions, setCustomInstructions] = useState<string>('');
   const [anonymize, setAnonymize] = useState<boolean>(true);
   const [sampleRows, setSampleRows] = useState<number>(10);
   const [promptResponse, setPromptResponse] = useState<ViewPromptResponse | null>(null);
-  const [generationResults, setGenerationResults] = useState<Map<string, SemanticLayerResponse | Error>>(new Map());
-  const [generatingDatabases, setGeneratingDatabases] = useState<Set<string>>(new Set());
-  const [existingLayers, setExistingLayers] = useState<SemanticLayerListItem[]>([]);
   const [isLoadingDatabases, setIsLoadingDatabases] = useState(true);
   const [isViewingPrompt, setIsViewingPrompt] = useState(false);
   const [error, setError] = useState<string>('');
   const connectionName = 'Supabase';
 
-  // Load databases and existing layers on mount
   useEffect(() => {
     loadDatabases();
-    loadDatabasesWithLayers();
-    loadExistingLayers();
     loadCustomInstructions();
   }, []);
 
   const loadDatabases = async () => {
     try {
       setIsLoadingDatabases(true);
-      const response = await api.getDatabases();
-      setDatabases(response.databases);
+      const [dbResponse, layers] = await Promise.all([
+        api.getDatabases(),
+        api.listSemanticLayers(),
+      ]);
+
+      const layerMap = new Map(layers.map(l => [l.database_name, l]));
+
+      const statusList: DatabaseStatus[] = dbResponse.databases.map(name => ({
+        name,
+        hasLayer: layerMap.has(name),
+        layerInfo: layerMap.get(name),
+        isGenerating: false,
+      }));
+
+      setDatabases(statusList);
       setError('');
-    } catch {
+    } catch (err) {
       setError('Failed to load databases');
     } finally {
       setIsLoadingDatabases(false);
-    }
-  };
-
-  const loadDatabasesWithLayers = async () => {
-    try {
-      const response = await api.getDatabasesWithSemanticLayers(connectionName);
-      setDatabasesWithLayers(new Set(response.databases));
-    } catch {
-      // Silently fail - not critical
-    }
-  };
-
-  const loadExistingLayers = async () => {
-    try {
-      const layers = await api.listSemanticLayers();
-      setExistingLayers(layers);
-    } catch {
-      // Silently fail - not critical
     }
   };
 
@@ -94,7 +89,7 @@ export default function SemanticLayerAdmin() {
     if (selectedDatabases.size === databases.length) {
       setSelectedDatabases(new Set());
     } else {
-      setSelectedDatabases(new Set(databases));
+      setSelectedDatabases(new Set(databases.map(d => d.name)));
     }
   };
 
@@ -104,13 +99,10 @@ export default function SemanticLayerAdmin() {
       return;
     }
 
-    // Use first selected database for prompt preview
     const firstDatabase = Array.from(selectedDatabases)[0];
-
     setError('');
     setIsViewingPrompt(true);
     setPromptResponse(null);
-    setGenerationResults(new Map());
 
     try {
       const response = await api.viewPrompt({
@@ -133,12 +125,30 @@ export default function SemanticLayerAdmin() {
       return;
     }
 
+    // Check for existing layers
+    const existingLayers = Array.from(selectedDatabases).filter(db =>
+      databases.find(d => d.name === db)?.hasLayer
+    );
+
+    if (existingLayers.length > 0) {
+      const message = existingLayers.length === 1
+        ? `${existingLayers[0]} already has a semantic layer. Generating will replace it.`
+        : `The following databases already have semantic layers:\n${existingLayers.join(', ')}\n\nGenerating will replace them.`;
+
+      if (!window.confirm(`${message}\n\nDo you want to continue?`)) {
+        return;
+      }
+    }
+
     setError('');
     setPromptResponse(null);
-    setGenerationResults(new Map());
-    setGeneratingDatabases(new Set(selectedDatabases));
 
-    const results = new Map<string, SemanticLayerResponse | Error>();
+    // Mark selected databases as generating
+    setDatabases(prev => prev.map(d => ({
+      ...d,
+      isGenerating: selectedDatabases.has(d.name),
+      lastResult: selectedDatabases.has(d.name) ? undefined : d.lastResult,
+    })));
 
     // Generate for each selected database sequentially
     for (const database of Array.from(selectedDatabases)) {
@@ -150,20 +160,25 @@ export default function SemanticLayerAdmin() {
           sample_rows: sampleRows,
           connection_name: connectionName,
         });
-        results.set(database, response);
-      } catch (error) {
-        results.set(database, error instanceof Error ? error : new Error('Unknown error'));
-      }
 
-      // Update results after each completion
-      setGenerationResults(new Map(results));
+        // Update this database's status
+        setDatabases(prev => prev.map(d =>
+          d.name === database
+            ? { ...d, isGenerating: false, hasLayer: true, lastResult: response }
+            : d
+        ));
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error('Unknown error');
+        setDatabases(prev => prev.map(d =>
+          d.name === database
+            ? { ...d, isGenerating: false, lastResult: err }
+            : d
+        ));
+      }
     }
 
-    setGeneratingDatabases(new Set());
-
-    // Reload status and layers
-    await loadDatabasesWithLayers();
-    await loadExistingLayers();
+    // Reload to get updated layer info
+    await loadDatabases();
   };
 
   const handleSaveInstructions = async () => {
@@ -176,8 +191,20 @@ export default function SemanticLayerAdmin() {
     }
   };
 
-  const hasLayer = (database: string) => databasesWithLayers.has(database);
-  const isGenerating = (database: string) => generatingDatabases.has(database);
+  const handleDelete = async (database: string) => {
+    if (!window.confirm(`Delete semantic layer for ${database}?`)) {
+      return;
+    }
+
+    try {
+      await api.deleteSemanticLayer(database);
+      await loadDatabases();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to delete');
+    }
+  };
+
+  const generatingCount = databases.filter(d => d.isGenerating).length;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
@@ -209,62 +236,12 @@ export default function SemanticLayerAdmin() {
           {/* Configuration Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Configuration</CardTitle>
+              <CardTitle>Generation Options</CardTitle>
               <CardDescription>
-                Select databases and configure generation options
+                Configure settings for semantic layer generation
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Database Multi-Select */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-medium">
-                    Databases ({selectedDatabases.size} selected)
-                  </label>
-                  <Button
-                    onClick={toggleSelectAll}
-                    variant="outline"
-                    size="sm"
-                    disabled={isLoadingDatabases}
-                  >
-                    {selectedDatabases.size === databases.length ? 'Deselect All' : 'Select All'}
-                  </Button>
-                </div>
-
-                {isLoadingDatabases ? (
-                  <div className="text-sm text-muted-foreground">Loading databases...</div>
-                ) : (
-                  <div className="border rounded-md p-3 max-h-64 overflow-y-auto space-y-2">
-                    {databases.map((db) => (
-                      <label
-                        key={db}
-                        className="flex items-center space-x-3 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                      >
-                        <Checkbox
-                          checked={selectedDatabases.has(db)}
-                          onCheckedChange={() => toggleDatabase(db)}
-                          disabled={isGenerating(db)}
-                        />
-                        <span className="flex-1 font-mono text-sm">{db}</span>
-                        {isGenerating(db) ? (
-                          <Badge variant="secondary" className="text-xs">
-                            Generating...
-                          </Badge>
-                        ) : hasLayer(db) ? (
-                          <Badge variant="default" className="text-xs">
-                            ✓ Has Layer
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs">
-                            No Layer
-                          </Badge>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {/* Options */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -309,9 +286,97 @@ export default function SemanticLayerAdmin() {
                   Save as Default Instructions
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Databases Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Databases ({selectedDatabases.size} selected)</CardTitle>
+                  <CardDescription>
+                    Select databases to generate semantic layers
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={toggleSelectAll}
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoadingDatabases}
+                >
+                  {selectedDatabases.size === databases.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingDatabases ? (
+                <div className="text-sm text-muted-foreground">Loading databases...</div>
+              ) : (
+                <div className="space-y-2">
+                  {databases.map((db) => (
+                    <div
+                      key={db.name}
+                      className="flex items-center gap-3 p-3 border rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                    >
+                      <Checkbox
+                        checked={selectedDatabases.has(db.name)}
+                        onCheckedChange={() => toggleDatabase(db.name)}
+                        disabled={db.isGenerating}
+                      />
+                      <span className="flex-1 font-mono text-sm font-medium">{db.name}</span>
+
+                      {/* Status Badge */}
+                      {db.isGenerating ? (
+                        <Badge variant="secondary" className="text-xs">
+                          Generating...
+                        </Badge>
+                      ) : db.hasLayer ? (
+                        <Badge variant="default" className="text-xs">
+                          Has Layer
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs">
+                          No Layer
+                        </Badge>
+                      )}
+
+                      {/* Result Badge */}
+                      {db.lastResult && (
+                        <Badge
+                          variant={db.lastResult instanceof Error ? "destructive" : "default"}
+                          className="text-xs"
+                        >
+                          {db.lastResult instanceof Error ? "Failed" : "Success"}
+                        </Badge>
+                      )}
+
+                      {/* Action Buttons */}
+                      {db.hasLayer && !db.isGenerating && (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.location.href = `/admin/semantic/view?db=${db.name}`}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(db.name)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-4">
                 <Button
                   onClick={handleViewPrompt}
                   disabled={isViewingPrompt || selectedDatabases.size === 0}
@@ -322,61 +387,23 @@ export default function SemanticLayerAdmin() {
                 </Button>
                 <Button
                   onClick={handleGenerate}
-                  disabled={generatingDatabases.size > 0 || selectedDatabases.size === 0}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
                   className="flex-1"
                 >
-                  {generatingDatabases.size > 0
-                    ? `Generating (${generatingDatabases.size}/${selectedDatabases.size})...`
+                  {generatingCount > 0
+                    ? `Generating (${generatingCount}/${selectedDatabases.size})...`
                     : `Generate for ${selectedDatabases.size} Database(s)`}
                 </Button>
               </div>
 
               {/* Error Display */}
               {error && (
-                <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+                <div className="mt-4 bg-destructive/10 text-destructive px-4 py-3 rounded-md">
                   {error}
                 </div>
               )}
             </CardContent>
           </Card>
-
-          {/* Generation Results */}
-          {generationResults.size > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Generation Results</CardTitle>
-                <CardDescription>
-                  {generationResults.size} database(s) processed
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {Array.from(generationResults.entries()).map(([database, result]) => (
-                    <div
-                      key={database}
-                      className="border rounded-md p-4"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono font-medium">{database}</span>
-                        {result instanceof Error ? (
-                          <Badge variant="destructive">Failed</Badge>
-                        ) : (
-                          <Badge variant="default">Success</Badge>
-                        )}
-                      </div>
-                      {result instanceof Error ? (
-                        <div className="text-sm text-destructive">{result.message}</div>
-                      ) : (
-                        <div className="text-sm text-muted-foreground">
-                          Generated using {result.metadata.llm_model}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Prompt Output */}
           {promptResponse && (
@@ -395,39 +422,6 @@ export default function SemanticLayerAdmin() {
                   <Badge variant={promptResponse.anonymized === 'True' ? 'default' : 'secondary'}>
                     {promptResponse.anonymized === 'True' ? 'Anonymized' : 'Not Anonymized'}
                   </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Existing Layers */}
-          {existingLayers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Existing Semantic Layers</CardTitle>
-                <CardDescription>
-                  {existingLayers.length} layer(s) stored
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {existingLayers.map((layer) => (
-                    <div
-                      key={layer.id}
-                      className="flex items-center justify-between p-3 border rounded-md"
-                    >
-                      <div>
-                        <div className="font-medium font-mono">{layer.database_name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {layer.llm_model} • {new Date(layer.created_at).toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Badge variant="outline">{layer.connection_name}</Badge>
-                        <Badge variant="outline">{layer.version}</Badge>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </CardContent>
             </Card>

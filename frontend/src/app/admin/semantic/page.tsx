@@ -196,11 +196,31 @@ export default function SemanticLayerAdmin() {
       return;
     }
 
+    setError('');
+
+    // Optimistically update UI to show deletion in progress
+    setDatabases(prev => prev.map(d =>
+      d.name === database ? { ...d, isGenerating: true } : d
+    ));
+
     try {
-      await api.deleteSemanticLayer(database, connectionName);
+      const result = await api.deleteSemanticLayer(database, connectionName);
+      console.log('Delete result:', result);
+
+      // Force reload from server to get fresh state
       await loadDatabases();
+
+      // Show success message briefly
+      const successMsg = `Successfully deleted semantic layer for ${database}`;
+      setError('');
+      alert(successMsg);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to delete');
+      console.error('Delete error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Failed to delete';
+      setError(errorMsg);
+
+      // Reload to restore correct state
+      await loadDatabases();
     }
   };
 

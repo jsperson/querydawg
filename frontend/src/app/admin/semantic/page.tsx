@@ -219,12 +219,7 @@ export default function SemanticLayerAdmin() {
       databases.find(d => d.name === db)?.hasLayer
     );
 
-    if (toDelete.length === 0) {
-      setError('No semantic layers to delete in selection');
-      return;
-    }
-
-    // Delete sequentially
+    // Delete sequentially (silently skip if no layers to delete)
     for (const database of toDelete) {
       try {
         await api.deleteSemanticLayer(database, connectionName);

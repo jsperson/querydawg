@@ -43,7 +43,7 @@ export const api = {
    * Get list of available databases
    */
   getDatabases: () =>
-    fetchAPI<DatabaseListResponse>('/databases'),
+    fetchAPI<DatabaseListResponse>(`/databases?_t=${Date.now()}`),
 
   /**
    * Get schema for a specific database
@@ -100,7 +100,7 @@ export const api = {
    * List all semantic layers
    */
   listSemanticLayers: () =>
-    fetchAPI<SemanticLayerListItem[]>('/semantic'),
+    fetchAPI<SemanticLayerListItem[]>(`/semantic?_t=${Date.now()}`),
 
   /**
    * Delete semantic layer for a database

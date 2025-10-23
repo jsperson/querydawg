@@ -78,12 +78,6 @@ async def generate_semantic_layer(
     settings = get_settings()
 
     try:
-        # Delete existing semantic layers for this database
-        metadata_store.delete_semantic_layer(
-            database_name=request.database,
-            connection_name=request.connection_name
-        )
-
         # Initialize LLM
         llm = OpenAILLM(
             api_key=settings.openai_api_key,
@@ -107,6 +101,12 @@ async def generate_semantic_layer(
             database_name=request.database,  # Schema name in Supabase
             anonymize=request.anonymize,
             save_prompt=True
+        )
+
+        # Delete existing semantic layers for this database (only after successful generation)
+        metadata_store.delete_semantic_layer(
+            database_name=request.database,
+            connection_name=request.connection_name
         )
 
         # Save to Supabase metadata store

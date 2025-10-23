@@ -170,3 +170,77 @@ Provide a brief summary of this database schema, including:
 1. What domain/topic it covers
 2. Main entities (tables) and their relationships
 3. Key insights about the data structure"""
+
+    @staticmethod
+    def enhanced_sql_system() -> str:
+        """System prompt for enhanced SQL generation with semantic layer"""
+        return """You are an expert PostgreSQL database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema, semantic documentation, and natural language questions.
+
+The semantic layer provides important business context:
+- Table descriptions explain what each table represents
+- Column descriptions clarify the meaning of each field
+- Relationships document how tables connect
+- Business rules describe important constraints and logic
+
+Guidelines:
+1. Generate ONLY valid PostgreSQL syntax
+2. Use the semantic layer to understand business context and terminology
+3. Choose appropriate tables and columns based on semantic meanings
+4. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
+5. Include proper WHERE clauses for filtering
+6. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
+7. Add ORDER BY and LIMIT clauses when relevant
+8. Use table aliases for clarity in multi-table queries
+9. Ensure column references are unambiguous
+10. Return ONLY the SQL query without explanations or markdown formatting"""
+
+    @staticmethod
+    def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:
+        """
+        User prompt for enhanced SQL generation
+
+        Args:
+            question: Natural language question
+            schema: Database schema from SchemaExtractor
+            semantic_layer: Semantic layer documentation (may be None)
+
+        Returns:
+            Formatted user prompt
+        """
+        formatted_schema = format_schema_for_prompt(schema)
+
+        # Build semantic layer section if available
+        semantic_section = ""
+        if semantic_layer:
+            semantic_section = "\n\nSEMANTIC LAYER DOCUMENTATION:\n"
+            semantic_section += f"Database: {semantic_layer.get('database', 'N/A')}\n"
+            semantic_section += f"Description: {semantic_layer.get('description', 'N/A')}\n\n"
+
+            # Add table documentation
+            tables = semantic_layer.get('tables', [])
+            if tables:
+                semantic_section += "Tables:\n"
+                for table in tables:
+                    semantic_section += f"\n  {table.get('name', 'N/A')}:\n"
+                    semantic_section += f"    Description: {table.get('description', 'N/A')}\n"
+
+                    # Add column documentation
+                    columns = table.get('columns', [])
+                    if columns:
+                        semantic_section += "    Columns:\n"
+                        for col in columns:
+                            semantic_section += f"      - {col.get('name', 'N/A')}: {col.get('description', 'N/A')}\n"
+
+                    # Add relationships if present
+                    relationships = table.get('relationships', [])
+                    if relationships:
+                        semantic_section += "    Relationships:\n"
+                        for rel in relationships:
+                            semantic_section += f"      - {rel.get('description', 'N/A')}\n"
+
+        return f"""DATABASE SCHEMA:
+{formatted_schema}{semantic_section}
+
+QUESTION: {question}
+
+Generate a PostgreSQL query to answer this question. Use the semantic layer documentation to understand the business context and choose the right tables and columns. Return only the SQL query."""

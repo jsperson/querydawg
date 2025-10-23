@@ -71,6 +71,7 @@ class SQLMetadata(BaseModel):
     model: str
     provider: str
     database: str
+    has_semantic_layer: bool = False  # Whether semantic layer was used (enhanced mode only)
 
 
 class TextToSQLResponse(BaseModel):

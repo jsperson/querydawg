@@ -17,7 +17,6 @@ export default function ViewSemanticLayer() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingLayer, setIsLoadingLayer] = useState(false);
   const [error, setError] = useState<string>('');
-  const connectionName = 'Supabase';
 
   useEffect(() => {
     loadSemanticLayers();
@@ -52,70 +51,77 @@ export default function ViewSemanticLayer() {
     }
   };
 
-  const renderSemanticLayer = (layer: any) => {
+  const renderSemanticLayer = (layer: Record<string, unknown>) => {
+    const tables = layer.tables as Array<Record<string, unknown>> | undefined;
     return (
       <div className="space-y-4">
-        {layer.tables?.map((table: any, idx: number) => (
+        {tables?.map((table, idx: number) => (
           <Card key={idx}>
             <CardHeader>
-              <CardTitle className="text-lg font-mono">{table.name}</CardTitle>
-              <CardDescription>{table.description}</CardDescription>
+              <CardTitle className="text-lg font-mono">{String(table.name)}</CardTitle>
+              <CardDescription>{String(table.description)}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Columns */}
-              {table.columns && table.columns.length > 0 && (
+              {table.columns && Array.isArray(table.columns) && table.columns.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-2">Columns</h4>
                   <div className="space-y-2">
-                    {table.columns.map((col: any, colIdx: number) => (
-                      <div
-                        key={colIdx}
-                        className="border-l-2 border-primary/20 pl-3 py-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <code className="font-mono text-sm font-semibold">{col.name}</code>
-                          <Badge variant="outline" className="text-xs">
-                            {col.type}
-                          </Badge>
-                          {col.primary_key && (
-                            <Badge variant="default" className="text-xs">
-                              PK
+                    {table.columns.map((col: unknown, colIdx: number) => {
+                      const column = col as Record<string, unknown>;
+                      return (
+                        <div
+                          key={colIdx}
+                          className="border-l-2 border-primary/20 pl-3 py-1"
+                        >
+                          <div className="flex items-center gap-2">
+                            <code className="font-mono text-sm font-semibold">{String(column.name)}</code>
+                            <Badge variant="outline" className="text-xs">
+                              {String(column.type)}
                             </Badge>
-                          )}
+                            {column.primary_key && (
+                              <Badge variant="default" className="text-xs">
+                                PK
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {String(column.description)}
+                          </p>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {col.description}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Foreign Keys */}
-              {table.foreign_keys && table.foreign_keys.length > 0 && (
+              {table.foreign_keys && Array.isArray(table.foreign_keys) && table.foreign_keys.length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-2">Foreign Keys</h4>
                   <div className="space-y-1">
-                    {table.foreign_keys.map((fk: any, fkIdx: number) => (
-                      <div key={fkIdx} className="text-sm">
-                        <code className="font-mono">{fk.column}</code>
-                        {' → '}
-                        <code className="font-mono">
-                          {fk.referenced_table}.{fk.referenced_column}
-                        </code>
-                      </div>
-                    ))}
+                    {table.foreign_keys.map((fk: unknown, fkIdx: number) => {
+                      const foreignKey = fk as Record<string, unknown>;
+                      return (
+                        <div key={fkIdx} className="text-sm">
+                          <code className="font-mono">{String(foreignKey.column)}</code>
+                          {' → '}
+                          <code className="font-mono">
+                            {String(foreignKey.referenced_table)}.{String(foreignKey.referenced_column)}
+                          </code>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Sample Values */}
-              {table.sample_values && Object.keys(table.sample_values).length > 0 && (
+              {table.sample_values && typeof table.sample_values === 'object' && table.sample_values !== null && Object.keys(table.sample_values).length > 0 && (
                 <div>
                   <h4 className="font-semibold mb-2">Sample Values</h4>
                   <div className="bg-muted p-3 rounded-md space-y-1 max-h-40 overflow-y-auto">
-                    {Object.entries(table.sample_values).map(([column, values]: [string, any]) => (
+                    {Object.entries(table.sample_values as Record<string, unknown>).map(([column, values]) => (
                       <div key={column} className="text-sm">
                         <span className="font-mono font-semibold">{column}:</span>{' '}
                         <span className="text-muted-foreground">

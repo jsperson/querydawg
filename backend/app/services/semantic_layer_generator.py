@@ -80,7 +80,7 @@ class SemanticLayerGenerator:
 
         response = self.llm.generate(
             prompt=prompt,
-            system_message="You are a database documentation expert specializing in creating comprehensive, business-friendly database documentation."
+            system_message="You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems. Your documentation helps LLMs accurately translate natural language questions into SQL queries."
         )
 
         # Parse JSON response
@@ -176,13 +176,25 @@ class SemanticLayerGenerator:
         samples_text = self._format_samples(sample_data)
 
         # Build full prompt
-        prompt = f"""You are a database documentation expert. Generate a comprehensive semantic layer for this database.
+        prompt = f"""You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.
 
-INSTRUCTIONS:
-- Use your general domain knowledge to infer meaning (e.g., what "population" typically means, common business patterns)
-- DO NOT research or reference this specific database or dataset
-- Base your analysis ONLY on the schema structure and sample data provided below
-- Generate a complete semantic layer in JSON format following the schema provided
+YOUR TASK:
+Generate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.
+
+CRITICAL CONSTRAINTS:
+- Base your analysis ONLY on the provided schema structure and sample data below
+- DO NOT research or reference external information about this specific database
+- Use your general domain knowledge to infer meaning (e.g., what "population" typically means in databases)
+- Reason about business patterns from the schema structure itself
+
+ANALYSIS APPROACH:
+Think step-by-step before generating output:
+1. Domain identification: What business domain does this database serve?
+2. Entity analysis: What are the main business objects being tracked?
+3. Relationship mapping: How do these entities relate to each other?
+4. Column semantics: What business concept does each column represent?
+5. Query patterns: What questions would users typically ask?
+6. Ambiguities: What might confuse an LLM during text-to-SQL translation?
 
 {self.custom_instructions}
 
@@ -196,69 +208,110 @@ SAMPLE DATA:
 
 OUTPUT FORMAT:
 Generate a JSON object with this structure:
+
 {{
   "database": "{database_name}",
   "version": "1.0.0",
   "generated_at": "{datetime.utcnow().isoformat()}",
-  "domain": "string - inferred business domain (e.g., Geography, E-commerce, Healthcare)",
-  "description": "string - high-level database purpose based on tables and data",
+
+  "overview": {{
+    "domain": "string - inferred business domain (e.g., E-commerce, Healthcare)",
+    "purpose": "string - what this database is used for in plain English",
+    "key_entities": ["string - main business objects tracked"],
+    "typical_questions": ["string - common questions users ask about this data"]
+  }},
 
   "tables": [
     {{
       "name": "string - technical table name",
+      "row_count": number,
       "business_name": "string - human-friendly name",
-      "description": "string - what this table represents",
-      "primary_use_cases": ["string - common query patterns"],
+      "purpose": "string - what this table represents in business terms",
+      "primary_key": "string - primary key column(s)",
 
       "columns": [
         {{
           "name": "string - technical column name",
+          "type": "string - SQL data type",
+          "nullable": boolean,
           "business_name": "string - human-friendly name",
-          "description": "string - what this column means",
-          "data_type": "string - SQL data type",
-          "sample_values": ["values from sample data"],
-          "synonyms": ["string - alternative names"],
-          "common_filters": ["string - typical WHERE conditions"],
-          "aggregation_patterns": ["string - common aggregations if numeric"]
+          "business_meaning": "string - what this represents in plain English",
+          "synonyms": ["string - 3-5 alternate terms users might use"],
+          "sample_values": ["values from sample data provided"],
+          "typical_filters": ["string - common WHERE clause patterns"],
+          "aggregations": ["string - common aggregation patterns if numeric/date"],
+          "value_constraints": "string - any known constraints or ranges"
         }}
       ],
 
       "relationships": [
         {{
           "type": "foreign_key",
-          "to_table": "string",
-          "to_column": "string",
-          "description": "string - what this relationship means",
-          "cardinality": "string - one-to-many, many-to-one, etc."
+          "column": "string",
+          "references_table": "string",
+          "references_column": "string",
+          "business_meaning": "string - what this relationship represents",
+          "cardinality": "string - one-to-many, many-to-one, etc.",
+          "join_pattern": "string - typical SQL join syntax",
+          "common_uses": ["string - when users would query across these tables"]
         }}
       ],
 
-      "common_queries": [
+      "common_query_patterns": [
         {{
-          "question": "string - natural language question",
-          "description": "string - query pattern explanation",
-          "involves_tables": ["string - other tables in join"]
+          "question": "string - natural language question users ask",
+          "explanation": "string - how to query this table to answer it",
+          "involves_joins": ["string - other tables typically joined"]
         }}
       ]
     }}
   ],
 
-  "cross_table_insights": [
+  "cross_table_patterns": [
     {{
-      "description": "string - important multi-table patterns",
-      "tables": ["string"],
-      "use_case": "string"
+      "pattern_type": "string - e.g., 'monthly revenue aggregation'",
+      "example_question": "string - natural language question",
+      "tables_involved": ["string"],
+      "typical_structure": "string - general SQL pattern",
+      "key_considerations": ["string - gotchas or important details"]
     }}
   ],
 
-  "domain_terminology": {{
-    "term": "definition - domain-specific terms"
-  }},
+  "domain_glossary": [
+    {{
+      "business_term": "string - term users would use",
+      "technical_mapping": "string - which table.column represents this",
+      "definition": "string - clear definition",
+      "synonyms": ["string - alternate phrasings"],
+      "example_usage": "string - how users would reference this in questions"
+    }}
+  ],
+
+  "ambiguities": [
+    {{
+      "issue": "string - potential confusion for text-to-SQL",
+      "example": "string - ambiguous user question",
+      "clarification": "string - how to resolve it",
+      "affected_elements": ["string - table.column references"]
+    }}
+  ],
 
   "query_guidelines": [
-    "string - best practices for querying this database"
+    "string - best practices for querying this database",
+    "string - common pitfalls to avoid",
+    "string - performance considerations"
   ]
 }}
+
+QUALITY REQUIREMENTS:
+- Business language: Write for non-technical users
+- Completeness: Cover all tables and meaningful columns
+- Specificity: Be concrete (e.g., "customer's shipping address" not just "address")
+- Rich synonyms: Include 3-5 alternate terms for each key concept
+- Realistic examples: Provide 2-3 actual sample values from the data
+- Query context: Explain how each element is commonly queried
+- Clear relationships: State the business meaning of every foreign key
+- Pattern variety: Identify 5-10 common query patterns for this domain
 
 Generate ONLY the JSON object, no additional text or markdown formatting.
 """

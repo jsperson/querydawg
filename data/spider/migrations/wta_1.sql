@@ -1,5 +1,5 @@
 -- Migration SQL for wta_1
--- Generated: 2025-10-20T16:17:25.623039
+-- Generated: 2025-10-22T19:25:42.699296
 -- Source: /home/developer/source/dataprism/data/spider/database/wta_1/wta_1.sqlite
 
 -- Create schema

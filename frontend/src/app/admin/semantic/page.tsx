@@ -192,28 +192,13 @@ export default function SemanticLayerAdmin() {
   };
 
   const handleDelete = async (database: string) => {
-    if (!window.confirm(`Delete semantic layer for ${database}?`)) {
-      return;
-    }
-
     setError('');
 
-    // Optimistically update UI to show deletion in progress
-    setDatabases(prev => prev.map(d =>
-      d.name === database ? { ...d, isGenerating: true } : d
-    ));
-
     try {
-      const result = await api.deleteSemanticLayer(database, connectionName);
-      console.log('Delete result:', result);
+      await api.deleteSemanticLayer(database, connectionName);
 
       // Force reload from server to get fresh state
       await loadDatabases();
-
-      // Show success message briefly
-      const successMsg = `Successfully deleted semantic layer for ${database}`;
-      setError('');
-      alert(successMsg);
     } catch (error) {
       console.error('Delete error:', error);
       const errorMsg = error instanceof Error ? error.message : 'Failed to delete';
@@ -222,6 +207,73 @@ export default function SemanticLayerAdmin() {
       // Reload to restore correct state
       await loadDatabases();
     }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedDatabases.size === 0) return;
+
+    setError('');
+
+    // Get databases with layers from selected set
+    const toDelete = Array.from(selectedDatabases).filter(db =>
+      databases.find(d => d.name === db)?.hasLayer
+    );
+
+    if (toDelete.length === 0) {
+      setError('No semantic layers to delete in selection');
+      return;
+    }
+
+    // Delete sequentially
+    for (const database of toDelete) {
+      try {
+        await api.deleteSemanticLayer(database, connectionName);
+      } catch (error) {
+        console.error(`Delete error for ${database}:`, error);
+      }
+    }
+
+    // Reload all databases to get fresh state
+    await loadDatabases();
+  };
+
+  const handleGenerateSingle = async (database: string) => {
+    setError('');
+    setPromptResponse(null);
+
+    // Mark this database as generating
+    setDatabases(prev => prev.map(d => ({
+      ...d,
+      isGenerating: d.name === database,
+      lastResult: d.name === database ? undefined : d.lastResult,
+    })));
+
+    try {
+      const response = await api.generateSemanticLayer({
+        database,
+        custom_instructions: customInstructions || undefined,
+        anonymize,
+        sample_rows: sampleRows,
+        connection_name: connectionName,
+      });
+
+      // Update this database's status
+      setDatabases(prev => prev.map(d =>
+        d.name === database
+          ? { ...d, isGenerating: false, hasLayer: true, lastResult: response }
+          : d
+      ));
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      setDatabases(prev => prev.map(d =>
+        d.name === database
+          ? { ...d, isGenerating: false, lastResult: err }
+          : d
+      ));
+    }
+
+    // Reload to get updated layer info
+    await loadDatabases();
   };
 
   const generatingCount = databases.filter(d => d.isGenerating).length;
@@ -372,22 +424,34 @@ export default function SemanticLayerAdmin() {
                       )}
 
                       {/* Action Buttons */}
-                      {db.hasLayer && !db.isGenerating && (
+                      {!db.isGenerating && (
                         <div className="flex gap-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.location.href = `/admin/semantic/view?db=${db.name}`}
+                            onClick={() => handleGenerateSingle(db.name)}
+                            disabled={db.isGenerating}
                           >
-                            View
+                            Generate
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(db.name)}
-                          >
-                            Delete
-                          </Button>
+                          {db.hasLayer && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.location.href = `/admin/semantic/view?db=${db.name}`}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDelete(db.name)}
+                              >
+                                Delete
+                              </Button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
@@ -396,23 +460,28 @@ export default function SemanticLayerAdmin() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-2 mt-4">
+              <div className="grid grid-cols-3 gap-2 mt-4">
                 <Button
                   onClick={handleViewPrompt}
                   disabled={isViewingPrompt || selectedDatabases.size === 0}
                   variant="outline"
-                  className="flex-1"
                 >
                   {isViewingPrompt ? 'Loading Prompt...' : 'View Prompt'}
                 </Button>
                 <Button
                   onClick={handleGenerate}
                   disabled={generatingCount > 0 || selectedDatabases.size === 0}
-                  className="flex-1"
                 >
                   {generatingCount > 0
                     ? `Generating (${generatingCount}/${selectedDatabases.size})...`
-                    : `Generate for ${selectedDatabases.size} Database(s)`}
+                    : `Generate Selected`}
+                </Button>
+                <Button
+                  onClick={handleDeleteSelected}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
+                  variant="destructive"
+                >
+                  Delete Selected
                 </Button>
               </div>
 

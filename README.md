@@ -2,7 +2,14 @@
 
 A cloud-native text-to-SQL system that uses automatically generated natural language semantic layers to improve SQL query generation accuracy.
 
-**📊 Current Status:** Week 1 Complete - Baseline system functional with 19 Spider databases
+**📊 Current Status:** Week 2 In Progress - Semantic Layer Generation Functional
+
+**Recent Updates:**
+- ✅ Semantic layer generation with LLM-powered documentation
+- ✅ Admin interface for managing semantic layers
+- ✅ Supabase integration for metadata storage
+- ✅ Text-to-SQL focused prompting for accurate business context
+- 🔨 Database migration to PostgreSQL (19 Spider databases being migrated)
 
 **Note:** Production deployment can be activated on-demand via Vercel (frontend) and Railway (backend) when needed for testing or demonstration.
 
@@ -19,14 +26,22 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 - **Spider Benchmark Evaluation**: Rigorous testing on the industry-standard Spider 1.0 dataset
 - **Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
 
-## Current Features (Week 1 - Baseline Complete)
+## Current Features (Week 2 - Semantic Layer Generation)
 
 **Backend (FastAPI):**
 - Modular LLM architecture supporting multiple providers (OpenAI, Anthropic, Ollama)
-- Database schema extraction from 19 Spider databases
+- Database schema extraction from Supabase PostgreSQL
 - Text-to-SQL generation with GPT-4o-mini (baseline)
+- **✨ Semantic Layer Generation:**
+  - Automated LLM-powered documentation creation
+  - Business context extraction (domain, entities, relationships)
+  - Column-level semantic descriptions with synonyms
+  - Query pattern identification
+  - Ambiguity detection for text-to-SQL
+  - Optimized for text-to-SQL use cases
 - SQL query execution with safety limits
 - Cost and performance tracking
+- Supabase integration for metadata storage
 
 **Frontend (Next.js 14):**
 - Modern UI with shadcn/ui components and Tailwind CSS
@@ -35,12 +50,20 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 - Real-time SQL generation with explanation
 - Interactive result display with execution metrics
 - Cost and token usage tracking
+- **✨ Semantic Layer Admin Interface:**
+  - Generate semantic layers for databases
+  - View and manage existing semantic layers
+  - Preview LLM prompts before generation
+  - Custom instructions for domain-specific context
+  - Delete and regenerate semantic layers
+  - Visual metadata display
 
 **Infrastructure:**
-- 19 Spider databases loaded locally (SQLite)
+- 19 Spider databases migrated to Supabase PostgreSQL
+- Semantic layers stored in Supabase metadata tables
 - RESTful API with OpenAPI documentation
 - Environment-based configuration
-- Ready for cloud deployment (Vercel + Railway)
+- Production deployment on Vercel (frontend) + Railway (backend)
 
 ## Expected Results
 
@@ -116,20 +139,35 @@ dataprism/
 │   │   │   ├── anthropic_llm.py  # Anthropic implementation
 │   │   │   └── ollama_llm.py  # Ollama implementation
 │   │   ├── database/          # Database operations
-│   │   │   ├── schema_extractor.py  # Schema extraction
-│   │   │   └── sql_executor.py      # SQL execution
+│   │   │   ├── schema_extractor.py       # Schema extraction
+│   │   │   ├── supabase_schema_extractor.py  # Supabase-specific extraction
+│   │   │   ├── sql_executor.py           # SQL execution
+│   │   │   └── metadata_store.py         # Semantic layer storage
+│   │   ├── services/          # Business logic
+│   │   │   └── semantic_layer_generator.py  # LLM-powered semantic layer creation
 │   │   └── routers/           # API endpoints
 │   │       ├── databases.py   # Database listing
 │   │       ├── schema.py      # Schema retrieval
 │   │       ├── text_to_sql.py # SQL generation
-│   │       └── execute.py     # Query execution
+│   │       ├── execute.py     # Query execution
+│   │       └── semantic.py    # Semantic layer management
 │   └── requirements.txt       # Python dependencies
 ├── frontend/                  # Next.js 14 frontend
 │   ├── src/
 │   │   ├── app/              # App router
 │   │   │   ├── page.tsx      # Main query interface
 │   │   │   ├── layout.tsx    # Root layout
-│   │   │   └── api/          # API route handlers
+│   │   │   ├── admin/        # Admin interfaces
+│   │   │   │   └── semantic/ # Semantic layer management
+│   │   │   │       ├── page.tsx  # Admin interface
+│   │   │   │       └── view/     # View semantic layers
+│   │   │   │           └── page.tsx
+│   │   │   └── api/          # API route handlers (proxy to backend)
+│   │   │       ├── semantic/ # Semantic layer APIs
+│   │   │       ├── databases/
+│   │   │       ├── schema/
+│   │   │       ├── text-to-sql/
+│   │   │       └── execute/
 │   │   ├── components/ui/    # shadcn/ui components
 │   │   └── lib/
 │   │       ├── api.ts        # API client

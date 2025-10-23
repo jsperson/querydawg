@@ -1,7 +1,7 @@
 """
 Prompt templates for different LLM tasks
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 
 def format_schema_for_prompt(schema: Dict[str, Any]) -> str:

@@ -184,12 +184,18 @@ export default function SemanticLayerAdmin() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <a
               href="/"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               ← Back to Query Interface
+            </a>
+            <a
+              href="/admin/semantic/view"
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              View Semantic Layers →
             </a>
           </div>
           <h1 className="text-4xl font-bold mb-2">Semantic Layer Admin</h1>

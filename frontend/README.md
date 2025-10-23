@@ -2,7 +2,7 @@
 
 This directory contains the DataPrism frontend built with Next.js 14 (App Router), TypeScript, and shadcn/ui.
 
-**Status:** Week 1 Complete - Baseline query interface functional
+**Status:** Week 2 In Progress - Semantic Layer Admin Interface Complete
 
 ## Tech Stack
 
@@ -21,6 +21,11 @@ frontend/
 │   │   ├── layout.tsx            # Root layout with fonts
 │   │   ├── page.tsx              # Main query interface
 │   │   ├── globals.css           # Global styles + Tailwind
+│   │   ├── admin/                # Admin interfaces
+│   │   │   └── semantic/         # Semantic layer management
+│   │   │       ├── page.tsx      # Generation interface
+│   │   │       └── view/
+│   │   │           └── page.tsx  # View semantic layers
 │   │   └── api/                  # Server-side API routes (proxies to backend)
 │   │       ├── databases/
 │   │       │   └── route.ts      # List databases
@@ -30,8 +35,18 @@ frontend/
 │   │       ├── text-to-sql/
 │   │       │   └── baseline/
 │   │       │       └── route.ts  # Generate SQL
-│   │       └── execute/
-│   │           └── route.ts      # Execute SQL queries
+│   │       ├── execute/
+│   │       │   └── route.ts      # Execute SQL queries
+│   │       └── semantic/         # Semantic layer APIs
+│   │           ├── route.ts      # List semantic layers
+│   │           ├── [database]/
+│   │           │   └── route.ts  # Get/delete semantic layer
+│   │           ├── generate/
+│   │           │   └── route.ts  # Generate semantic layer
+│   │           ├── prompt/
+│   │           │   └── route.ts  # Preview prompt
+│   │           └── instructions/
+│   │               └── route.ts  # Custom instructions
 │   ├── components/
 │   │   └── ui/                   # shadcn/ui components
 │   │       ├── button.tsx
@@ -39,7 +54,8 @@ frontend/
 │   │       ├── select.tsx
 │   │       ├── table.tsx
 │   │       ├── textarea.tsx
-│   │       └── badge.tsx
+│   │       ├── badge.tsx
+│   │       └── checkbox.tsx
 │   └── lib/
 │       ├── api.ts                # Backend API client
 │       ├── api-types.ts          # TypeScript types matching backend
@@ -55,7 +71,8 @@ frontend/
 
 ## Features
 
-### Current (Week 1)
+### Current (Week 2)
+**Query Interface:**
 - **Database Selection:** Dropdown with 19 Spider databases
 - **Natural Language Input:** Textarea for questions
 - **SQL Generation:** Real-time generation with GPT-4o-mini
@@ -67,7 +84,17 @@ frontend/
 - **Loading States:** Visual feedback during API calls
 - **Error Handling:** User-friendly error messages
 
-### Planned (Week 2+)
+**Semantic Layer Admin Interface:**
+- **Database Management:** View all databases with semantic layer status
+- **Batch Generation:** Generate semantic layers for multiple databases at once
+- **Custom Instructions:** Add domain-specific context for generation
+- **Prompt Preview:** View LLM prompt before generation
+- **Generation Options:** Configure sample rows and anonymization
+- **View Semantic Layers:** Browse generated semantic layers
+- **Delete & Regenerate:** Manage existing semantic layers
+- **Real-time Feedback:** Visual status updates during generation
+
+### Planned (Week 3+)
 - **Side-by-Side Comparison:** Baseline vs Enhanced with semantic layer
 - **Database Schema Viewer:** Interactive schema exploration
 - **Query History:** Save and revisit previous queries

@@ -55,15 +55,17 @@ export default function ViewSemanticLayer() {
     const tables = layer.tables as Array<Record<string, unknown>> | undefined;
     return (
       <div className="space-y-4">
-        {tables?.map((table, idx: number) => (
+        {tables?.map((tableData, idx: number): JSX.Element => {
+          const table = tableData as Record<string, unknown>;
+          return (
           <Card key={idx}>
             <CardHeader>
               <CardTitle className="text-lg font-mono">{String(table.name)}</CardTitle>
               <CardDescription>{String(table.description)}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Columns */}
-              {table.columns && Array.isArray(table.columns) && table.columns.length > 0 && (
+              <>
+              {table.columns && Array.isArray(table.columns) && table.columns.length > 0 ? (
                 <div>
                   <h4 className="font-semibold mb-2">Columns</h4>
                   <div className="space-y-2">
@@ -79,11 +81,11 @@ export default function ViewSemanticLayer() {
                             <Badge variant="outline" className="text-xs">
                               {String(column.type)}
                             </Badge>
-                            {column.primary_key && (
+                            {column.primary_key ? (
                               <Badge variant="default" className="text-xs">
                                 PK
                               </Badge>
-                            )}
+                            ) : null}
                           </div>
                           <p className="text-sm text-muted-foreground mt-1">
                             {String(column.description)}
@@ -93,10 +95,9 @@ export default function ViewSemanticLayer() {
                     })}
                   </div>
                 </div>
-              )}
+              ) : null}
 
-              {/* Foreign Keys */}
-              {table.foreign_keys && Array.isArray(table.foreign_keys) && table.foreign_keys.length > 0 && (
+              {table.foreign_keys && Array.isArray(table.foreign_keys) && table.foreign_keys.length > 0 ? (
                 <div>
                   <h4 className="font-semibold mb-2">Foreign Keys</h4>
                   <div className="space-y-1">
@@ -114,10 +115,9 @@ export default function ViewSemanticLayer() {
                     })}
                   </div>
                 </div>
-              )}
+              ) : null}
 
-              {/* Sample Values */}
-              {table.sample_values && typeof table.sample_values === 'object' && table.sample_values !== null && Object.keys(table.sample_values).length > 0 && (
+              {table.sample_values && typeof table.sample_values === 'object' && table.sample_values !== null && Object.keys(table.sample_values).length > 0 ? (
                 <div>
                   <h4 className="font-semibold mb-2">Sample Values</h4>
                   <div className="bg-muted p-3 rounded-md space-y-1 max-h-40 overflow-y-auto">
@@ -131,10 +131,12 @@ export default function ViewSemanticLayer() {
                     ))}
                   </div>
                 </div>
-              )}
+              ) : null}
+              </>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -203,7 +205,7 @@ export default function ViewSemanticLayer() {
           </Card>
 
           {/* Semantic Layer Display */}
-          {isLoadingLayer && (
+          {isLoadingLayer ? (
             <Card>
               <CardContent className="py-8">
                 <div className="text-center text-muted-foreground">
@@ -211,9 +213,9 @@ export default function ViewSemanticLayer() {
                 </div>
               </CardContent>
             </Card>
-          )}
+          ) : null}
 
-          {selectedLayer && !isLoadingLayer && (
+          {selectedLayer && !isLoadingLayer ? (
             <>
               {/* Metadata */}
               <Card>
@@ -272,7 +274,7 @@ export default function ViewSemanticLayer() {
               </Card>
 
               {/* Prompt Used (if available) */}
-              {selectedLayer.prompt_used && (
+              {selectedLayer.prompt_used ? (
                 <Card>
                   <CardHeader>
                     <CardTitle>Prompt Used</CardTitle>
@@ -286,9 +288,9 @@ export default function ViewSemanticLayer() {
                     </pre>
                   </CardContent>
                 </Card>
-              )}
+              ) : null}
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </main>

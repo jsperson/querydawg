@@ -52,10 +52,19 @@ export const api = {
     fetchAPI<SchemaResponse>(`/schema/${database}`),
 
   /**
-   * Generate SQL from natural language question
+   * Generate SQL from natural language question (baseline)
    */
   generateSQL: (request: TextToSQLRequest) =>
     fetchAPI<TextToSQLResponse>('/text-to-sql/baseline', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  /**
+   * Generate SQL from natural language question (enhanced with semantic layer)
+   */
+  generateSQLEnhanced: (request: TextToSQLRequest) =>
+    fetchAPI<TextToSQLResponse>('/text-to-sql/enhanced', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

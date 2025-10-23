@@ -53,6 +53,7 @@ export interface SQLMetadata {
   model: string;
   provider: string;
   database: string;
+  has_semantic_layer?: boolean;
 }
 
 export interface TextToSQLResponse {

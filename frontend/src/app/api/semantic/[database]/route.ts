@@ -38,13 +38,15 @@ export async function GET(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { database: string } }
 ) {
   try {
     const { database } = params;
+    const { searchParams } = new URL(request.url);
+    const connectionName = searchParams.get('connection_name') || 'Supabase';
 
-    const response = await fetch(`${BACKEND_URL}/api/semantic/${database}`, {
+    const response = await fetch(`${BACKEND_URL}/api/semantic/${database}?connection_name=${connectionName}`, {
       method: 'DELETE',
       headers: {
         'X-API-Key': API_KEY,

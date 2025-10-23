@@ -105,8 +105,8 @@ export const api = {
   /**
    * Delete semantic layer for a database
    */
-  deleteSemanticLayer: (database: string) =>
-    fetchAPI<{ message: string }>(`/semantic/${database}`, {
+  deleteSemanticLayer: (database: string, connectionName: string = 'Supabase') =>
+    fetchAPI<{ message: string }>(`/semantic/${database}?connection_name=${connectionName}`, {
       method: 'DELETE',
     }),
 

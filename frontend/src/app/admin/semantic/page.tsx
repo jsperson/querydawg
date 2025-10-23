@@ -197,7 +197,7 @@ export default function SemanticLayerAdmin() {
     }
 
     try {
-      await api.deleteSemanticLayer(database);
+      await api.deleteSemanticLayer(database, connectionName);
       await loadDatabases();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to delete');

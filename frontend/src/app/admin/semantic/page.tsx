@@ -57,7 +57,7 @@ export default function SemanticLayerAdmin() {
 
       setDatabases(statusList);
       setError('');
-    } catch (err) {
+    } catch {
       setError('Failed to load databases');
     } finally {
       setIsLoadingDatabases(false);

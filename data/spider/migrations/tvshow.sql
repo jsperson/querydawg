@@ -1,5 +1,5 @@
 -- Migration SQL for tvshow
--- Generated: 2025-10-20T20:18:43.303302
+-- Generated: 2025-10-22T12:09:42.281632
 -- Source: /home/developer/source/dataprism/data/spider/database/tvshow/tvshow.sqlite
 
 -- Create schema

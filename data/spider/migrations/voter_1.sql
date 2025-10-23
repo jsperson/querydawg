@@ -1,5 +1,5 @@
 -- Migration SQL for voter_1
--- Generated: 2025-10-20T20:20:04.040375
+-- Generated: 2025-10-22T12:09:52.765877
 -- Source: /home/developer/source/dataprism/data/spider/database/voter_1/voter_1.sqlite
 
 -- Create schema

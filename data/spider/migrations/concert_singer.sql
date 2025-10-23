@@ -1,5 +1,5 @@
 -- Migration SQL for concert_singer
--- Generated: 2025-10-20T20:17:21.122227
+-- Generated: 2025-10-22T12:09:44.868005
 -- Source: /home/developer/source/dataprism/data/spider/database/concert_singer/concert_singer.sqlite
 
 -- Create schema

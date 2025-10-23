@@ -1,5 +1,5 @@
 -- Migration SQL for museum_visit
--- Generated: 2025-10-20T20:20:02.523315
+-- Generated: 2025-10-22T12:09:51.122198
 -- Source: /home/developer/source/dataprism/data/spider/database/museum_visit/museum_visit.sqlite
 
 -- Create schema

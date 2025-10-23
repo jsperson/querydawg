@@ -1,5 +1,5 @@
 -- Migration SQL for real_estate_properties
--- Generated: 2025-10-20T20:20:12.162161
+-- Generated: 2025-10-22T12:10:01.062098
 -- Source: /home/developer/source/dataprism/data/spider/database/real_estate_properties/real_estate_properties.sqlite
 
 -- Create schema

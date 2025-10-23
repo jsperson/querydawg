@@ -1,5 +1,5 @@
 -- Migration SQL for orchestra
--- Generated: 2025-10-20T20:19:58.929623
+-- Generated: 2025-10-22T12:09:47.455815
 -- Source: /home/developer/source/dataprism/data/spider/database/orchestra/orchestra.sqlite
 
 -- Create schema

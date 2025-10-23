@@ -552,6 +552,9 @@ def migrate_database(
                             # Handle DATE columns - convert integer dates to proper format
                             if "date" in col_type and isinstance(val, int):
                                 cleaned_row.append(convert_integer_date(val))
+                            # Handle INTEGER/BIGINT columns - convert empty strings to NULL
+                            elif ("int" in col_type or "serial" in col_type) and val == "":
+                                cleaned_row.append(None)
                             # SPECIAL CASE FIX: car_1.car_makers.Country - convert TEXT to INTEGER
                             elif db_name == "car_1" and table_name == "car_makers" and col_name == "Country":
                                 # Convert string number to integer

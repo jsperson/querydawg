@@ -1,11 +1,11 @@
 # Future Work and Research Extensions
-## DataPrism: Natural Language Semantic Layer for Text-to-SQL
+## QueryDawg: Natural Language Semantic Layer for Text-to-SQL
 
 ---
 
 ## Overview
 
-This document outlines potential extensions and future research directions for the DataPrism project. These ideas emerged during project planning and development but extend beyond the scope of a 7-week independent study. They represent valuable opportunities for continued research, publication, or PhD work.
+This document outlines potential extensions and future research directions for the QueryDawg project. These ideas emerged during project planning and development but extend beyond the scope of a 7-week independent study. They represent valuable opportunities for continued research, publication, or PhD work.
 
 ---
 

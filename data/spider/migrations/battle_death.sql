@@ -1,6 +1,6 @@
 -- Migration SQL for battle_death
 -- Generated: 2025-10-22T12:09:51.841173
--- Source: /home/developer/source/dataprism/data/spider/database/battle_death/battle_death.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/battle_death/battle_death.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS battle_death;

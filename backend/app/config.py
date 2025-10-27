@@ -1,5 +1,5 @@
 """
-Configuration management for DataPrism backend.
+Configuration management for QueryDawg backend.
 """
 
 import os
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     """Application settings from environment variables."""
 
     # API Configuration
-    api_key: str = os.getenv("API_KEY", "dev-dataprism-api-key-2024")
+    api_key: str = os.getenv("API_KEY", "dev-querydawg-api-key-2024")
     environment: str = os.getenv("ENVIRONMENT", "development")
 
     # LLM Configuration

@@ -1,5 +1,5 @@
 /**
- * API client for DataPrism backend
+ * API client for QueryDawg backend
  * Uses Next.js API routes as proxy to keep API keys secure
  */
 

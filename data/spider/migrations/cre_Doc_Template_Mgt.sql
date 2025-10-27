@@ -1,6 +1,6 @@
 -- Migration SQL for cre_Doc_Template_Mgt
 -- Generated: 2025-10-22T10:48:41.528942
--- Source: /home/developer/source/dataprism/data/spider/database/cre_Doc_Template_Mgt/cre_Doc_Template_Mgt.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/cre_Doc_Template_Mgt/cre_Doc_Template_Mgt.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS cre_Doc_Template_Mgt;

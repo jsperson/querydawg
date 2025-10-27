@@ -1,6 +1,6 @@
 -- Migration SQL for flight_2
 -- Generated: 2025-10-22T10:48:47.216689
--- Source: /home/developer/source/dataprism/data/spider/database/flight_2/flight_2.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/flight_2/flight_2.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS flight_2;

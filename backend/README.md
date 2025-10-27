@@ -1,6 +1,6 @@
 # Backend - FastAPI Application
 
-This directory contains the DataPrism backend API built with FastAPI.
+This directory contains the QueryDawg backend API built with FastAPI.
 
 **Status:** Week 1 Complete - Baseline text-to-SQL system functional
 
@@ -115,11 +115,11 @@ The backend is configured for Railway deployment and can be activated on-demand.
 
 **Setup**:
 1. See [DEPLOYMENT.md](../DEPLOYMENT.md) for complete deployment guide
-2. Railway project: `dataprism-production`
+2. Railway project: `querydawg-production`
 3. Auto-deploys from GitHub `main` branch when active
 4. Cold start: ~3 seconds for first request after idle
 
-**Production URL** (when active): `https://dataprism-production.up.railway.app`
+**Production URL** (when active): `https://querydawg-production.up.railway.app`
 
 **Key Features**:
 - Automatic HTTPS

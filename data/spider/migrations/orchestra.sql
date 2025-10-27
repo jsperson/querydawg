@@ -1,6 +1,6 @@
 -- Migration SQL for orchestra
 -- Generated: 2025-10-22T12:09:47.455815
--- Source: /home/developer/source/dataprism/data/spider/database/orchestra/orchestra.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/orchestra/orchestra.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS orchestra;

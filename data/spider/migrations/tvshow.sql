@@ -1,6 +1,6 @@
 -- Migration SQL for tvshow
 -- Generated: 2025-10-22T12:09:42.281632
--- Source: /home/developer/source/dataprism/data/spider/database/tvshow/tvshow.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/tvshow/tvshow.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS tvshow;

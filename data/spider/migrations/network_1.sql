@@ -1,6 +1,6 @@
 -- Migration SQL for network_1
 -- Generated: 2025-10-22T12:09:43.460158
--- Source: /home/developer/source/dataprism/data/spider/database/network_1/network_1.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/network_1/network_1.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS network_1;

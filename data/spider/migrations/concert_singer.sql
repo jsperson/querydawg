@@ -1,6 +1,6 @@
 -- Migration SQL for concert_singer
 -- Generated: 2025-10-22T12:09:44.868005
--- Source: /home/developer/source/dataprism/data/spider/database/concert_singer/concert_singer.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/concert_singer/concert_singer.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS concert_singer;

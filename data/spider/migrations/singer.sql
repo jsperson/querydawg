@@ -1,6 +1,6 @@
 -- Migration SQL for singer
 -- Generated: 2025-10-22T12:09:50.547701
--- Source: /home/developer/source/dataprism/data/spider/database/singer/singer.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/singer/singer.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS singer;

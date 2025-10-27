@@ -1,6 +1,6 @@
 -- Migration SQL for course_teach
 -- Generated: 2025-10-22T12:09:49.751859
--- Source: /home/developer/source/dataprism/data/spider/database/course_teach/course_teach.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/course_teach/course_teach.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS course_teach;

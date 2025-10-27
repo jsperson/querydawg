@@ -1,4 +1,4 @@
-# Docker Container Setup for DataPrism
+# Docker Container Setup for QueryDawg
 
 This document provides the Docker configuration needed for development.
 
@@ -31,8 +31,8 @@ docker run -it \
   -p 3000:3000 \
   -p 3001:3001 \
   -p 8888:8888 \
-  -v $(pwd):/home/developer/source/dataprism \
-  -w /home/developer/source/dataprism \
+  -v $(pwd):/home/developer/source/querydawg \
+  -w /home/developer/source/querydawg \
   --env-file .env \
   your-image-name
 ```
@@ -42,8 +42,8 @@ docker run -it \
 docker run -it \
   -p 8000:8000 \
   -p 3000:3000 \
-  -v $(pwd):/home/developer/source/dataprism \
-  -w /home/developer/source/dataprism \
+  -v $(pwd):/home/developer/source/querydawg \
+  -w /home/developer/source/querydawg \
   --env-file .env \
   your-image-name
 ```
@@ -58,17 +58,17 @@ Create `docker-compose.yml` in project root:
 version: '3.8'
 
 services:
-  dataprism-dev:
+  querydawg-dev:
     image: your-image-name
-    container_name: dataprism-dev
+    container_name: querydawg-dev
     ports:
       - "8000:8000"  # FastAPI backend
       - "3000:3000"  # Next.js frontend
       - "3001:3001"  # Next.js backup
       - "8888:8888"  # Jupyter notebook
     volumes:
-      - .:/home/developer/source/dataprism
-    working_dir: /home/developer/source/dataprism
+      - .:/home/developer/source/querydawg
+    working_dir: /home/developer/source/querydawg
     env_file:
       - .env
     stdin_open: true
@@ -78,7 +78,7 @@ services:
 **Usage:**
 ```bash
 docker-compose up -d
-docker-compose exec dataprism-dev bash
+docker-compose exec querydawg-dev bash
 ```
 
 ---

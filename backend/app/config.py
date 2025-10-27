@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     # Database Configuration (for Spider databases - local for now)
     spider_db_path: Path = Path(os.getenv("SPIDER_DATA_PATH", "data/spider/database"))
 
+    # Pinecone Configuration (Vector Database for semantic search)
+    pinecone_api_key: str = os.getenv("PINECONE_API_KEY", "")
+    pinecone_environment: str = os.getenv("PINECONE_ENVIRONMENT", "")
+    pinecone_index_name: str = os.getenv("PINECONE_INDEX_NAME", "querydawg-sematic")
+
     # CORS Configuration
     cors_origins: str = os.getenv(
         "CORS_ORIGINS",

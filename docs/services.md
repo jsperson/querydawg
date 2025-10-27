@@ -53,12 +53,12 @@ This document tracks all external services, accounts, and configurations for the
 
 ### ✅ Pinecone (Vector Database)
 - **Account:** Created
-- **Index Name:** querydawg-sematic
+- **Index Name:** querydawg-semantic
 - **Environment:** aped-4627-b74a
 - **Dimensions:** 1536 (for OpenAI text-embedding-3-small)
 - **Metric:** cosine
 - **Vector Type:** dense
-- **Host:** https://querydawg-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
+- **Host:** https://querydawg-semantic-01blwrk.svc.aped-4627-b74a.pinecone.io
 - **Status:** Active
 - **Cost:** Free tier (100K vectors, 1 index)
 
@@ -213,7 +213,7 @@ Quick links for managing services:
 
 **Pinecone Connection Issues:**
 - Verify API key is correct
-- Check index name matches: `querydawg-sematic`
+- Check index name matches: `querydawg-semantic`
 - Ensure host URL is correct
 
 **OpenAI Rate Limits:**

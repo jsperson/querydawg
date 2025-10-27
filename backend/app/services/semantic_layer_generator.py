@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
-from ..llm.base import BaseLLM
+from .llm.base import LLMProvider
 from ..database.supabase_schema_extractor import SupabaseSchemaExtractor
 
 
@@ -21,7 +21,7 @@ class SemanticLayerGenerator:
 
     def __init__(
         self,
-        llm: BaseLLM,
+        llm: LLMProvider,
         database_url: str,
         custom_instructions: Optional[str] = None,
         sample_rows: int = 10
@@ -30,7 +30,7 @@ class SemanticLayerGenerator:
         Initialize the semantic layer generator.
 
         Args:
-            llm: LLM instance to use for generation
+            llm: LLM provider instance to use for generation
             database_url: Supabase PostgreSQL connection string
             custom_instructions: Optional custom instructions to add to prompt
             sample_rows: Number of sample rows to extract per table
@@ -78,17 +78,17 @@ class SemanticLayerGenerator:
         print(f"Generating semantic layer for {database_name}...")
         print(f"Prompt length: {len(prompt)} characters")
 
-        response = self.llm.generate(
-            prompt=prompt,
-            system_message="You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems. Your documentation helps LLMs accurately translate natural language questions into SQL queries."
+        llm_response = self.llm.generate(
+            system_prompt="You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems. Your documentation helps LLMs accurately translate natural language questions into SQL queries.",
+            user_prompt=prompt
         )
 
         # Parse JSON response
         try:
-            semantic_layer = json.loads(response)
+            semantic_layer = json.loads(llm_response.content)
         except json.JSONDecodeError as e:
             print(f"Error parsing LLM response as JSON: {e}")
-            print(f"Response: {response[:500]}...")
+            print(f"Response: {llm_response.content[:500]}...")
             raise
 
         # Add metadata
@@ -98,8 +98,11 @@ class SemanticLayerGenerator:
             "metadata": {
                 "generated_at": datetime.utcnow().isoformat(),
                 "generator_version": "1.0.0",
-                "llm_provider": self.llm.provider,
-                "llm_model": self.llm.model,
+                "llm_provider": llm_response.provider,
+                "llm_model": llm_response.model,
+                "tokens_used": llm_response.tokens_used,
+                "cost_usd": llm_response.cost_usd,
+                "generation_time_ms": llm_response.generation_time_ms,
                 "anonymized": anonymize,
                 "sample_rows_per_table": self.sample_rows,
                 "custom_instructions_used": bool(self.custom_instructions)

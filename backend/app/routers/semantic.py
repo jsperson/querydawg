@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 from ..config import get_settings
-from ..llm.openai_llm import OpenAILLM
+from ..services.llm.config import LLMConfig
 from ..services.semantic_layer_generator import SemanticLayerGenerator
 from ..database.metadata_store import MetadataStore, get_metadata_store
 from ..dependencies import verify_api_key
@@ -98,11 +98,8 @@ async def generate_semantic_layer(
     settings = get_settings()
 
     try:
-        # Initialize LLM
-        llm = OpenAILLM(
-            api_key=settings.openai_api_key,
-            model=settings.llm_model
-        )
+        # Initialize LLM provider for semantic layer generation
+        llm = LLMConfig.get_provider_for_task("semantic_layer")
 
         # Get custom instructions (from request or stored)
         custom_instructions = request.custom_instructions
@@ -225,11 +222,8 @@ async def get_generation_prompt(
     settings = get_settings()
 
     try:
-        # Initialize LLM (not used, but required by generator)
-        llm = OpenAILLM(
-            api_key=settings.openai_api_key,
-            model=settings.llm_model
-        )
+        # Initialize LLM provider (not used for generation, only for building prompt)
+        llm = LLMConfig.get_provider_for_task("semantic_layer")
 
         # Get custom instructions
         custom_instructions = request.custom_instructions

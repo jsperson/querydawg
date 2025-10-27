@@ -47,6 +47,13 @@ class LLMConfig:
             "temperature": 0.0,
             "max_tokens": 500,
             "description": "Summarize database schema"
+        },
+        "semantic_layer": {
+            "provider": "openai",
+            "model": "gpt-4o",
+            "temperature": 0.0,
+            "max_tokens": 4000,
+            "description": "Generate semantic layer documentation for databases"
         }
     }
 

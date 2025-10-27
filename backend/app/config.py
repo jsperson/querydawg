@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     # Pinecone Configuration (Vector Database for semantic search)
     pinecone_api_key: str = os.getenv("PINECONE_API_KEY", "")
     pinecone_environment: str = os.getenv("PINECONE_ENVIRONMENT", "")
-    pinecone_index_name: str = os.getenv("PINECONE_INDEX_NAME", "querydawg-sematic")
+    pinecone_index_name: str = os.getenv("PINECONE_INDEX_NAME", "querydawg-semantic")
 
     # CORS Configuration
     cors_origins: str = os.getenv(

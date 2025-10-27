@@ -116,7 +116,7 @@ try:
     # List indexes
     indexes = pc.list_indexes()
 
-    index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-sematic")
+    index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-semantic")
 
     # Check if our index exists
     index_names = [idx.name for idx in indexes]

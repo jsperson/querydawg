@@ -25,7 +25,7 @@
 **Status:** Complete (11/11 complete - 100%)
 **Notes:**
 - ✅ Supabase URL: https://invnoyuelwobmstjhidr.supabase.co
-- ✅ Pinecone Host: https://querydawg-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
+- ✅ Pinecone Host: https://querydawg-semantic-01blwrk.svc.aped-4627-b74a.pinecone.io
 - ✅ OpenAI API key obtained and configured
 - ✅ Pinecone API key obtained and configured
 - ✅ Supabase API keys (anon + service_role) obtained and configured
@@ -939,7 +939,7 @@ curl -X POST https://querydawg.vercel.app/api/execute \
 **2025-10-16 - Days 1-2: Infrastructure Setup (Complete)**
 - ✅ All major service accounts created (Railway, Vercel, Supabase, Pinecone, OpenAI)
 - ✅ Supabase project: https://invnoyuelwobmstjhidr.supabase.co
-- ✅ Pinecone index created: querydawg-sematic (1536 dimensions, cosine metric)
+- ✅ Pinecone index created: querydawg-semantic (1536 dimensions, cosine metric)
 - ✅ Created railway.toml for deployment configuration
 - ✅ Created .env.example template with all service configurations
 - ✅ Created docs/services.md for permanent service documentation
@@ -958,7 +958,7 @@ curl -X POST https://querydawg.vercel.app/api/execute \
 - ✅ **ALL 5/5 service connections working correctly:**
   - ✅ Environment Variables: All required vars loaded
   - ✅ OpenAI API: Connected successfully with gpt-4o-mini
-  - ✅ Pinecone: Connected to querydawg-sematic index (0 vectors, 1536 dimensions)
+  - ✅ Pinecone: Connected to querydawg-semantic index (0 vectors, 1536 dimensions)
   - ✅ Supabase REST API: Connected (minor version warning, functional)
   - ✅ Supabase PostgreSQL: Connected successfully via Transaction Pooler (PostgreSQL 17.6)
 - 🔧 **Issue resolved:** Direct Connection (db.xxx.supabase.co:5432) is IPv6-only and doesn't work on IPv4 networks

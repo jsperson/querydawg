@@ -29,7 +29,7 @@ def main():
     openai_api_key = os.getenv("OPENAI_API_KEY")
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
     pinecone_environment = os.getenv("PINECONE_ENVIRONMENT")
-    pinecone_index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-sematic")
+    pinecone_index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-semantic")
     database_url = os.getenv("DATABASE_URL")
 
     # Validate environment variables

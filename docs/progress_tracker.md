@@ -1,4 +1,4 @@
-# DataPrism Project Progress Tracker
+# QueryDawg Project Progress Tracker
 **Start Date:** 2025-10-16
 **Expected Completion:** 2025-12-04
 **Duration:** 7 weeks
@@ -25,7 +25,7 @@
 **Status:** Complete (11/11 complete - 100%)
 **Notes:**
 - ✅ Supabase URL: https://invnoyuelwobmstjhidr.supabase.co
-- ✅ Pinecone Host: https://dataprism-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
+- ✅ Pinecone Host: https://querydawg-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
 - ✅ OpenAI API key obtained and configured
 - ✅ Pinecone API key obtained and configured
 - ✅ Supabase API keys (anon + service_role) obtained and configured
@@ -129,7 +129,7 @@
   - [x] Modular LLM architecture
   - [x] Error handling
 - [x] Build Next.js frontend
-  - [x] Landing page with DataPrism branding
+  - [x] Landing page with QueryDawg branding
   - [x] Database selection dropdown
   - [x] Question input field
   - [x] SQL display component with metadata badges
@@ -244,17 +244,17 @@ Response: {
 - ✅ Successfully deployed to Railway
 - ✅ Tested production endpoints
 
-**Deployment URL:** https://dataprism-production.up.railway.app
+**Deployment URL:** https://querydawg-production.up.railway.app
 
 **Test Results:**
 ```bash
 # Health check (no auth)
-curl https://dataprism-production.up.railway.app/api/health
+curl https://querydawg-production.up.railway.app/api/health
 ✅ {"status":"healthy","version":"0.1.0","timestamp":"2025-10-21T15:50:53.216226"}
 
 # Databases list (with API key)
-curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
-  https://dataprism-production.up.railway.app/api/databases
+curl -H "X-API-Key: prod-querydawg-railway-2024-secure" \
+  https://querydawg-production.up.railway.app/api/databases
 ✅ {"databases":["battle_death","car_1",...19 total...],"count":19}
 ```
 
@@ -331,21 +331,21 @@ curl -H "X-API-Key: prod-dataprism-railway-2024-secure" \
   - Database change resets interface
 - ✅ Fixed gitignore to include frontend/src/lib/ files
 - ✅ Fixed all ESLint errors for Vercel deployment
-- ✅ Deployed to Vercel at https://dataprism.vercel.app
+- ✅ Deployed to Vercel at https://querydawg.vercel.app
 - ✅ Tested complete end-to-end flow on production
 
 **Testing Results:**
 ```bash
 # Test on Vercel production (2025-10-21)
-curl https://dataprism.vercel.app/api/databases
+curl https://querydawg.vercel.app/api/databases
 ✅ {"databases":["battle_death","car_1",...19 total...],"count":19}
 
-curl -X POST https://dataprism.vercel.app/api/text-to-sql/baseline \
+curl -X POST https://querydawg.vercel.app/api/text-to-sql/baseline \
   -d '{"question": "Show me the top 5 countries by population", "database": "world_1"}'
 ✅ {"sql":"SELECT name, population FROM country ORDER BY population DESC LIMIT 5;",
     "explanation":"...","metadata":{...}}
 
-curl -X POST https://dataprism.vercel.app/api/execute \
+curl -X POST https://querydawg.vercel.app/api/execute \
   -d '{"sql": "SELECT name, population FROM country ORDER BY population DESC LIMIT 5",
        "database": "world_1"}'
 ✅ {"results":[{"name":"China","population":1277558000},
@@ -353,8 +353,8 @@ curl -X POST https://dataprism.vercel.app/api/execute \
 ```
 
 **Production URLs:**
-- Backend (Railway): https://dataprism-production.up.railway.app
-- Frontend (Vercel): https://dataprism.vercel.app
+- Backend (Railway): https://querydawg-production.up.railway.app
+- Frontend (Vercel): https://querydawg.vercel.app
 
 **Key Architecture Decisions:**
 1. **Modular LLM system** - Easy to add new providers (Together.AI, Groq, Anthropic)
@@ -919,8 +919,8 @@ curl -X POST https://dataprism.vercel.app/api/execute \
 
 ### Deliverables Checklist
 - [x] Working baseline application deployed (Week 1) **✅ Complete**
-  - [x] Backend deployed on Railway (https://dataprism-production.up.railway.app)
-  - [x] Frontend deployed on Vercel (https://dataprism.vercel.app)
+  - [x] Backend deployed on Railway (https://querydawg-production.up.railway.app)
+  - [x] Frontend deployed on Vercel (https://querydawg.vercel.app)
   - [x] Complete text-to-SQL flow working end-to-end
   - [x] 19 Spider databases loaded and accessible
 - [ ] Semantic layers for 20 databases with data profiling (Week 2)
@@ -939,7 +939,7 @@ curl -X POST https://dataprism.vercel.app/api/execute \
 **2025-10-16 - Days 1-2: Infrastructure Setup (Complete)**
 - ✅ All major service accounts created (Railway, Vercel, Supabase, Pinecone, OpenAI)
 - ✅ Supabase project: https://invnoyuelwobmstjhidr.supabase.co
-- ✅ Pinecone index created: dataprism-sematic (1536 dimensions, cosine metric)
+- ✅ Pinecone index created: querydawg-sematic (1536 dimensions, cosine metric)
 - ✅ Created railway.toml for deployment configuration
 - ✅ Created .env.example template with all service configurations
 - ✅ Created docs/services.md for permanent service documentation
@@ -958,7 +958,7 @@ curl -X POST https://dataprism.vercel.app/api/execute \
 - ✅ **ALL 5/5 service connections working correctly:**
   - ✅ Environment Variables: All required vars loaded
   - ✅ OpenAI API: Connected successfully with gpt-4o-mini
-  - ✅ Pinecone: Connected to dataprism-sematic index (0 vectors, 1536 dimensions)
+  - ✅ Pinecone: Connected to querydawg-sematic index (0 vectors, 1536 dimensions)
   - ✅ Supabase REST API: Connected (minor version warning, functional)
   - ✅ Supabase PostgreSQL: Connected successfully via Transaction Pooler (PostgreSQL 17.6)
 - 🔧 **Issue resolved:** Direct Connection (db.xxx.supabase.co:5432) is IPv6-only and doesn't work on IPv4 networks

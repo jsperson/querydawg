@@ -1,5 +1,5 @@
 """
-DataPrism FastAPI Application
+QueryDawg FastAPI Application
 Main entry point for the backend API
 """
 import os
@@ -37,7 +37,7 @@ VERSION = "0.1.0"
 
 # Create FastAPI application
 app = FastAPI(
-    title="DataPrism API",
+    title="QueryDawg API",
     description="Text-to-SQL system with baseline and enhanced generation",
     version=VERSION,
     docs_url="/docs",

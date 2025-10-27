@@ -31,7 +31,7 @@ This project addresses a critical challenge in enterprise data democratization: 
 - **Commercial semantic layers** (AtScale, App Orchid, Wren AI) demonstrate dramatic accuracy improvements (20% → 92.5% for AtScale; 94.8% → 99.8% for App Orchid) but require **manual ontology creation** per database
 - **Recent academic work** (Feb 2025, arXiv:2502.20657) on automatic database description generation produces only **limited-scope descriptions** (under 20 words per column, under 100 words per table)
 - **Open-source tools** (Vanna AI) use RAG for text-to-SQL but require **manual training data** (example queries, documentation)
-- **DataPrism** is among the first open-source systems to auto-generate **comprehensive** semantic documentation including database overviews, detailed descriptions, relationship explanations, query patterns, and business glossaries—fully automatically from schema alone
+- **QueryDawg** is among the first open-source systems to auto-generate **comprehensive** semantic documentation including database overviews, detailed descriptions, relationship explanations, query patterns, and business glossaries—fully automatically from schema alone
 
 **Measurable Objectives:**
 1. Achieve **60-75% execution accuracy** on Spider benchmark (vs. 40-50% baseline-estimated)
@@ -489,7 +489,7 @@ Selected for diversity and complexity:
 
 **Expected Cost:** ~$50-100 for semantic layer generation (GPT-4o for complex databases, GPT-4o-mini for simpler ones)
 
-**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, DataPrism generates comprehensive documentation including business context, query patterns, and glossaries
+**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, QueryDawg generates comprehensive documentation including business context, query patterns, and glossaries
 
 ---
 
@@ -1297,18 +1297,18 @@ Alternative considerations:
 If you use this work in your research or project, please cite:
 
 ```bibtex
-@mastersproject{person2025dataprism,
-  title={DataPrism: Natural Language Semantic Layer for Text-to-SQL},
+@mastersproject{person2025querydawg,
+  title={QueryDawg: Natural Language Semantic Layer for Text-to-SQL},
   author={Person, Jason Scott},
   year={2025},
   school={Newman University},
   type={Independent Study Project},
-  url={https://github.com/jsperson/dataprism}
+  url={https://github.com/jsperson/querydawg}
 }
 ```
 
 **Plain text citation:**
-Person, J. S. (2025). *DataPrism: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
+Person, J. S. (2025). *QueryDawg: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
 
 ---
 

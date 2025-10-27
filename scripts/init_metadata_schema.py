@@ -17,7 +17,7 @@ from app.database.metadata_store import MetadataStore
 
 def main():
     print("\n" + "=" * 80)
-    print("DATAPRISM METADATA SCHEMA INITIALIZATION")
+    print("QUERYDAWG METADATA SCHEMA INITIALIZATION")
     print("=" * 80)
     print("\nThis schema creates tables for storing:")
     print("  - Semantic layers (generated database documentation)")

@@ -1,7 +1,7 @@
-# DataPrism Services Configuration
+# QueryDawg Services Configuration
 **Last Updated:** 2025-10-16
 
-This document tracks all external services, accounts, and configurations for the DataPrism project.
+This document tracks all external services, accounts, and configurations for the QueryDawg project.
 
 ---
 
@@ -9,7 +9,7 @@ This document tracks all external services, accounts, and configurations for the
 
 ### ✅ Railway (Backend Hosting)
 - **Account:** Created
-- **Project:** dataprism-backend
+- **Project:** querydawg-backend
 - **URL:** [To be added after deployment]
 - **Status:** Connected to GitHub repository
 - **Configuration:** `railway.toml` in repo root
@@ -29,7 +29,7 @@ This document tracks all external services, accounts, and configurations for the
 
 ### ✅ Supabase (PostgreSQL Database)
 - **Account:** Created
-- **Project Name:** dataprism
+- **Project Name:** querydawg
 - **Project ID:** invnoyuelwobmstjhidr
 - **Project URL:** https://invnoyuelwobmstjhidr.supabase.co
 - **Database Host:** db.invnoyuelwobmstjhidr.supabase.co
@@ -53,12 +53,12 @@ This document tracks all external services, accounts, and configurations for the
 
 ### ✅ Pinecone (Vector Database)
 - **Account:** Created
-- **Index Name:** dataprism-sematic
+- **Index Name:** querydawg-sematic
 - **Environment:** aped-4627-b74a
 - **Dimensions:** 1536 (for OpenAI text-embedding-3-small)
 - **Metric:** cosine
 - **Vector Type:** dense
-- **Host:** https://dataprism-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
+- **Host:** https://querydawg-sematic-01blwrk.svc.aped-4627-b74a.pinecone.io
 - **Status:** Active
 - **Cost:** Free tier (100K vectors, 1 index)
 
@@ -213,7 +213,7 @@ Quick links for managing services:
 
 **Pinecone Connection Issues:**
 - Verify API key is correct
-- Check index name matches: `dataprism-sematic`
+- Check index name matches: `querydawg-sematic`
 - Ensure host URL is correct
 
 **OpenAI Rate Limits:**

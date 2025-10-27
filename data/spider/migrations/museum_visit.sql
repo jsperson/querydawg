@@ -1,6 +1,6 @@
 -- Migration SQL for museum_visit
 -- Generated: 2025-10-22T12:09:51.122198
--- Source: /home/developer/source/dataprism/data/spider/database/museum_visit/museum_visit.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/museum_visit/museum_visit.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS museum_visit;

@@ -1,4 +1,4 @@
-# DataPrism: Natural Language Semantic Layer for Text-to-SQL
+# QueryDawg: Natural Language Semantic Layer for Text-to-SQL
 
 A cloud-native text-to-SQL system that uses automatically generated natural language semantic layers to improve SQL query generation accuracy.
 
@@ -13,9 +13,9 @@ A cloud-native text-to-SQL system that uses automatically generated natural lang
 
 **Note:** Production deployment can be activated on-demand via Vercel (frontend) and Railway (backend) when needed for testing or demonstration.
 
-## What is DataPrism?
+## What is QueryDawg?
 
-DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconnect between how databases are structured (technical schemas) and how business users think about data (business language).
+QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconnect between how databases are structured (technical schemas) and how business users think about data (business language).
 
 **The Solution:** Automatically generated natural language documentation that describes databases in business terms—including column purposes, synonyms, relationships, and common query patterns. This "semantic layer" enables more accurate SQL generation while simultaneously serving as valuable documentation.
 
@@ -90,8 +90,8 @@ DataPrism addresses a critical gap in text-to-SQL systems: the semantic disconne
 
 ```bash
 # Clone repository
-git clone https://github.com/jsperson/dataprism.git
-cd dataprism
+git clone https://github.com/jsperson/querydawg.git
+cd querydawg
 
 # Backend setup
 python3 -m venv venv
@@ -128,7 +128,7 @@ For detailed setup instructions, database loading, and semantic layer generation
 ## Project Structure
 
 ```
-dataprism/
+querydawg/
 ├── backend/                    # FastAPI backend
 │   ├── app/
 │   │   ├── main.py            # FastAPI application entry
@@ -219,18 +219,18 @@ MIT License - See [LICENSE](LICENSE) file for details.
 If you use this work in your research or project, please cite:
 
 ```bibtex
-@mastersproject{person2025dataprism,
-  title={DataPrism: Natural Language Semantic Layer for Text-to-SQL},
+@mastersproject{person2025querydawg,
+  title={QueryDawg: Natural Language Semantic Layer for Text-to-SQL},
   author={Person, Jason Scott},
   year={2025},
   school={Newman University},
   type={Independent Study Project},
-  url={https://github.com/jsperson/dataprism}
+  url={https://github.com/jsperson/querydawg}
 }
 ```
 
 **Plain text citation:**
-Person, J. S. (2025). *DataPrism: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
+Person, J. S. (2025). *QueryDawg: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
 
 ## Author
 

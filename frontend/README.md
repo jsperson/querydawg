@@ -1,6 +1,6 @@
 # Frontend - Next.js Application
 
-This directory contains the DataPrism frontend built with Next.js 14 (App Router), TypeScript, and shadcn/ui.
+This directory contains the QueryDawg frontend built with Next.js 14 (App Router), TypeScript, and shadcn/ui.
 
 **Status:** Week 2 In Progress - Semantic Layer Admin Interface Complete
 
@@ -171,7 +171,7 @@ The frontend is configured for Vercel deployment and can be activated on-demand.
 2. Vercel auto-deploys (if connected)
 3. Environment variables configured in Vercel dashboard
 
-**Production URL** (when active): `https://dataprism.vercel.app`
+**Production URL** (when active): `https://querydawg.vercel.app`
 
 **Environment Variables (Vercel Dashboard):**
 - `NEXT_PUBLIC_BACKEND_URL` - Railway backend URL

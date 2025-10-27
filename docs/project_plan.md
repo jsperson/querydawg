@@ -1,4 +1,4 @@
-# DataPrism: Natural Language Semantic Layer for Text-to-SQL
+# QueryDawg: Natural Language Semantic Layer for Text-to-SQL
 ## 7-Week Independent Study Project Plan
 
 ---
@@ -37,7 +37,7 @@ This project fills a specific gap in the current text-to-SQL landscape:
 - **Recent academic work** (Feb 2025) on automatic database description generation produces only **limited-scope descriptions** (under 20 words per column, under 100 words per table)
 - **Open-source tools** (Vanna AI) use RAG for text-to-SQL but require **manual training data** (example queries, documentation)
 
-### What's Novel in DataPrism
+### What's Novel in QueryDawg
 1. **Comprehensive Automatic Generation**: Among the first open-source systems to auto-generate complete semantic documentation including:
    - Database overviews with business context
    - Detailed table and column descriptions
@@ -56,7 +56,7 @@ This project fills a specific gap in the current text-to-SQL landscape:
 
 3. **Dual-Purpose Value Proposition**: Explicitly evaluates documentation as both a means (better SQL) and an end (reusable asset), with hypothesis of significant time reduction compared to manual documentation
 
-4. **Fully Automatic vs Manual**: Unlike App Orchid (99.8% accuracy with manual ontologies) or Wren AI (requires dbt models or manual configuration), DataPrism generates everything from schema **and data** alone—no manual curation required
+4. **Fully Automatic vs Manual**: Unlike App Orchid (99.8% accuracy with manual ontologies) or Wren AI (requires dbt models or manual configuration), QueryDawg generates everything from schema **and data** alone—no manual curation required
 
 5. **Open-Source Research**: Reproducible evaluation on Spider 1.0 with cost/accuracy tradeoffs (mini vs full models), filling the gap between proprietary commercial tools and academic papers without implementations
 
@@ -273,7 +273,7 @@ CREATE TABLE semantic_layer.documents (
 
 **Expected Cost:** ~$50-100 (GPT-4o for complex databases, GPT-4o-mini for simpler ones)
 
-**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, DataPrism generates comprehensive documentation including business context, query patterns, glossaries, **and data profiling metadata** that provides actual value distributions and statistics to ground semantic understanding in real data
+**Key Differentiator:** Unlike existing work that generates <20 word column descriptions, QueryDawg generates comprehensive documentation including business context, query patterns, glossaries, **and data profiling metadata** that provides actual value distributions and statistics to ground semantic understanding in real data
 
 ---
 
@@ -492,7 +492,7 @@ While commercial products demonstrate that semantic layers dramatically improve 
 ## Repository Structure
 
 ```
-dataprism/
+querydawg/
 ├── backend/              # FastAPI backend
 │   ├── app/
 │   │   ├── main.py
@@ -522,18 +522,18 @@ MIT License - Encourages adoption, contribution, and academic/commercial use.
 If you use this work in your research or project, please cite:
 
 ```bibtex
-@mastersproject{person2025dataprism,
-  title={DataPrism: Natural Language Semantic Layer for Text-to-SQL},
+@mastersproject{person2025querydawg,
+  title={QueryDawg: Natural Language Semantic Layer for Text-to-SQL},
   author={Person, Jason Scott},
   year={2025},
   school={Newman University},
   type={Independent Study Project},
-  url={https://github.com/jsperson/dataprism}
+  url={https://github.com/jsperson/querydawg}
 }
 ```
 
 **Plain text citation:**
-Person, J. S. (2025). *DataPrism: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
+Person, J. S. (2025). *QueryDawg: Natural Language Semantic Layer for Text-to-SQL*. Independent Study Project, Newman University.
 
 ---
 

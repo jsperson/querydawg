@@ -1,6 +1,6 @@
 -- Migration SQL for car_1
 -- Generated: 2025-10-22T10:48:11.887963
--- Source: /home/developer/source/dataprism/data/spider/database/car_1/car_1.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/car_1/car_1.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS car_1;

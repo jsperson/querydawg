@@ -72,7 +72,7 @@ ON CONFLICT (key) DO NOTHING;
 
 def main():
     print("\n" + "=" * 80)
-    print("DATAPRISM METADATA SCHEMA DEPLOYMENT")
+    print("QUERYDAWG METADATA SCHEMA DEPLOYMENT")
     print("=" * 80)
     print("\nThis will create tables in Supabase for:")
     print("  - semantic_layers (generated database documentation)")

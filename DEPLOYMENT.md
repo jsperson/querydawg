@@ -1,6 +1,6 @@
-# DataPrism Deployment Guide
+# QueryDawg Deployment Guide
 
-This guide covers deploying the DataPrism application to production.
+This guide covers deploying the QueryDawg application to production.
 
 **Status:** Week 1 deployments tested and verified. Deployments can be activated on-demand.
 
@@ -31,7 +31,7 @@ This guide covers deploying the DataPrism application to production.
 2. Click "New Project"
 3. Select "Deploy from GitHub repo"
 4. Authorize Railway to access your GitHub account
-5. Select the `dataprism` repository
+5. Select the `querydawg` repository
 6. Railway will automatically detect the `railway.toml` configuration
 
 ### Step 2: Configure Environment Variables
@@ -278,7 +278,7 @@ Vercel uses strict ESLint rules. Common issues and fixes:
 
 ## Security Checklist
 
-- [ ] Generate secure `API_KEY` for production (not `dev-dataprism-api-key-2024`)
+- [ ] Generate secure `API_KEY` for production (not `dev-querydawg-api-key-2024`)
 - [ ] Configure CORS to only allow your frontend domain
 - [ ] Use environment variables for all secrets (never commit to git)
 - [ ] Enable HTTPS (Railway and Vercel provide this automatically)
@@ -330,8 +330,8 @@ Vercel uses strict ESLint rules. Common issues and fixes:
 ### Week 1 Deployments (October 2025)
 
 **Backend - Railway:**
-- Project: `dataprism-production`
-- URL: `https://dataprism-production.up.railway.app`
+- Project: `querydawg-production`
+- URL: `https://querydawg-production.up.railway.app`
 - Status: ✅ Successfully deployed and tested
 - Configuration: SQLite databases, OpenAI GPT-4o-mini, modular LLM architecture
 - Health check: `/api/health`
@@ -339,8 +339,8 @@ Vercel uses strict ESLint rules. Common issues and fixes:
 - Databases loaded: 19 Spider datasets
 
 **Frontend - Vercel:**
-- Project: `dataprism`
-- URL: `https://dataprism.vercel.app`
+- Project: `querydawg`
+- URL: `https://querydawg.vercel.app`
 - Status: ✅ Successfully deployed and tested (deactivated for cost control)
 - Configuration: Next.js 14 App Router, shadcn/ui, Tailwind CSS
 - Features: Database selection, SQL generation, query execution, results display

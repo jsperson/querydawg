@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test all service connections for DataPrism project.
+Test all service connections for QueryDawg project.
 
 This script verifies that all API keys and service configurations are working correctly.
 Run this after setting up .env file to ensure everything is ready for development.
@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 load_dotenv(project_root / ".env")
 
 print("=" * 70)
-print("DataPrism Service Connection Tests")
+print("QueryDawg Service Connection Tests")
 print("=" * 70)
 print()
 
@@ -116,7 +116,7 @@ try:
     # List indexes
     indexes = pc.list_indexes()
 
-    index_name = os.getenv("PINECONE_INDEX_NAME", "dataprism-sematic")
+    index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-sematic")
 
     # Check if our index exists
     index_names = [idx.name for idx in indexes]

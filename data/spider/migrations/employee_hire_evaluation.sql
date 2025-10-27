@@ -1,6 +1,6 @@
 -- Migration SQL for employee_hire_evaluation
 -- Generated: 2025-10-22T12:09:48.714756
--- Source: /home/developer/source/dataprism/data/spider/database/employee_hire_evaluation/employee_hire_evaluation.sqlite
+-- Source: /home/developer/source/querydawg/data/spider/database/employee_hire_evaluation/employee_hire_evaluation.sqlite
 
 -- Create schema
 CREATE SCHEMA IF NOT EXISTS employee_hire_evaluation;

@@ -640,7 +640,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 80)
-    print("DataPrism: Load Spider Databases to PostgreSQL")
+    print("QueryDawg: Load Spider Databases to PostgreSQL")
     print("=" * 80)
     print()
 

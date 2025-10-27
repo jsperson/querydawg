@@ -21,7 +21,7 @@ python-dotenv==1.0.1
 openai>=1.10.0
 
 # Vector Database (Week 3)
-pinecone-client>=3.0.2
+pinecone>=5.0.0
 
 # Data Processing (for evaluation - Week 4-5)
 # pandas>=2.1.4

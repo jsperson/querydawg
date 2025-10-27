@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://dataprism-production.up.railway.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://querydawg-production.up.railway.app';
 const API_KEY = process.env.BACKEND_API_KEY || '';
 
 export async function GET() {

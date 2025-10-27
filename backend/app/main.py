@@ -416,7 +416,7 @@ async def execute_sql(
 async def root():
     """Root endpoint - redirect to docs"""
     return {
-        "message": "DataPrism API",
+        "message": "QueryDawg API",
         "version": VERSION,
         "docs": "/docs",
         "health": "/api/health"

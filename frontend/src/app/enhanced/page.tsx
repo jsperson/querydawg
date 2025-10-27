@@ -121,7 +121,7 @@ export default function EnhancedPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2">DataPrism</h1>
+            <h1 className="text-4xl font-bold mb-2">QueryDawg</h1>
             <p className="text-lg text-muted-foreground">
               Natural Language to SQL - Enhanced Mode
             </p>

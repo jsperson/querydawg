@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth import verify_api_key
+from app.dependencies import verify_api_key
 from app.models.responses import (
     HealthResponse,
     DatabaseListResponse,

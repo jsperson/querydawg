@@ -3,11 +3,12 @@ Enhanced text-to-SQL generator using schema + semantic layer
 """
 import os
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from app.services.schema import SchemaExtractorFactory
 from app.services.llm.config import LLMConfig
 from app.services.llm.prompts import PromptTemplates
 from app.database.metadata_store import get_metadata_store
+from app.services.embedding_service import EmbeddingService
 from app.config import get_settings
 
 
@@ -19,7 +20,14 @@ class EnhancedSQLGenerator:
     to provide better context about table meanings, column descriptions, and business logic.
     """
 
-    def __init__(self, database_url: str, database_name: str, connection_name: str = "Supabase"):
+    def __init__(
+        self,
+        database_url: str,
+        database_name: str,
+        connection_name: str = "Supabase",
+        use_vector_search: bool = True,
+        top_k_chunks: int = 5
+    ):
         """
         Initialize enhanced SQL generator
 
@@ -27,12 +35,17 @@ class EnhancedSQLGenerator:
             database_url: PostgreSQL connection string
             database_name: Schema name in Supabase
             connection_name: Connection name for semantic layer lookup
+            use_vector_search: If True, use vector search for semantic context retrieval
+            top_k_chunks: Number of semantic chunks to retrieve (if using vector search)
         """
         self.database_url = database_url
         self.database_name = database_name
         self.connection_name = connection_name
+        self.use_vector_search = use_vector_search
+        self.top_k_chunks = top_k_chunks
         self._schema_cache: Optional[Dict[str, Any]] = None
         self._semantic_layer_cache: Optional[Dict[str, Any]] = None
+        self._embedding_service: Optional[EmbeddingService] = None
 
     def _get_schema(self) -> Dict[str, Any]:
         """
@@ -51,12 +64,75 @@ class EnhancedSQLGenerator:
 
         return self._schema_cache
 
-    def _get_semantic_layer(self) -> Optional[Dict[str, Any]]:
+    def _get_embedding_service(self) -> EmbeddingService:
         """
-        Get semantic layer from metadata store (cached)
+        Get embedding service instance (lazy initialization)
 
         Returns:
-            Semantic layer dictionary or None if not found
+            EmbeddingService instance
+        """
+        if self._embedding_service is None:
+            settings = get_settings()
+            self._embedding_service = EmbeddingService(
+                openai_api_key=settings.openai_api_key,
+                pinecone_api_key=settings.pinecone_api_key,
+                pinecone_environment=settings.pinecone_environment,
+                pinecone_index_name=settings.pinecone_index_name
+            )
+        return self._embedding_service
+
+    def _get_semantic_context(self, question: str) -> Optional[str]:
+        """
+        Get relevant semantic context for the question.
+
+        If use_vector_search is True, retrieves relevant chunks via vector search.
+        Otherwise, loads the full semantic layer from metadata store.
+
+        Args:
+            question: Natural language question
+
+        Returns:
+            Formatted semantic context string or None if not available
+        """
+        if self.use_vector_search:
+            # Use vector search to get relevant chunks
+            try:
+                embedding_service = self._get_embedding_service()
+                chunks = embedding_service.search_semantic_context(
+                    query=question,
+                    database_name=self.database_name,
+                    top_k=self.top_k_chunks
+                )
+
+                if not chunks:
+                    return None
+
+                # Format chunks into a readable context
+                context_parts = [f"Relevant semantic information for {self.database_name}:\n"]
+
+                for i, chunk in enumerate(chunks, 1):
+                    context_parts.append(f"\n[Context {i}] ({chunk['chunk_type']}, relevance: {chunk['score']:.3f})")
+                    if chunk.get('table_name'):
+                        context_parts.append(f"Table: {chunk['table_name']}")
+                    context_parts.append(chunk['text'])
+
+                return "\n".join(context_parts)
+
+            except Exception as e:
+                print(f"Warning: Vector search failed: {e}")
+                # Fall back to full semantic layer
+                return self._get_full_semantic_layer_text()
+
+        else:
+            # Load full semantic layer
+            return self._get_full_semantic_layer_text()
+
+    def _get_full_semantic_layer_text(self) -> Optional[str]:
+        """
+        Get full semantic layer from metadata store and format as text.
+
+        Returns:
+            Formatted semantic layer string or None if not found
         """
         if self._semantic_layer_cache is None:
             settings = get_settings()
@@ -73,7 +149,11 @@ class EnhancedSQLGenerator:
             if result:
                 self._semantic_layer_cache = result.get("semantic_layer")
 
-        return self._semantic_layer_cache
+        if not self._semantic_layer_cache:
+            return None
+
+        # Convert semantic layer to formatted text
+        return json.dumps(self._semantic_layer_cache, indent=2)
 
     def generate_sql(self, question: str) -> Dict[str, Any]:
         """
@@ -87,13 +167,14 @@ class EnhancedSQLGenerator:
                 - sql: Generated SQL query
                 - explanation: Natural language explanation
                 - metadata: Token usage, cost, timing, model info
-                - has_semantic_layer: Whether semantic layer was used
+                - has_semantic_context: Whether semantic context was used
+                - used_vector_search: Whether vector search was used for context retrieval
         """
         # Get schema
         schema = self._get_schema()
 
-        # Get semantic layer (may be None)
-        semantic_layer = self._get_semantic_layer()
+        # Get semantic context (may be None)
+        semantic_context = self._get_semantic_context(question)
 
         # Get LLM provider for enhanced SQL generation
         llm = LLMConfig.get_provider_for_task("enhanced_sql")
@@ -101,7 +182,9 @@ class EnhancedSQLGenerator:
 
         # Generate SQL with semantic context
         system_prompt = PromptTemplates.enhanced_sql_system()
-        user_prompt = PromptTemplates.enhanced_sql_user(question, schema, semantic_layer)
+        user_prompt = PromptTemplates.enhanced_sql_user_with_context(
+            question, schema, semantic_context
+        )
 
         response = llm.generate(
             system_prompt=system_prompt,
@@ -125,7 +208,8 @@ class EnhancedSQLGenerator:
                 "model": response.model,
                 "provider": response.provider,
                 "database": self.database_name,
-                "has_semantic_layer": semantic_layer is not None
+                "has_semantic_context": semantic_context is not None,
+                "used_vector_search": self.use_vector_search
             }
         }
 

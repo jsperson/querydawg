@@ -11,6 +11,7 @@ from ..llm.openai_llm import OpenAILLM
 from ..services.semantic_layer_generator import SemanticLayerGenerator
 from ..database.metadata_store import MetadataStore, get_metadata_store
 from ..dependencies import verify_api_key
+from ..services.embedding_service import EmbeddingService
 
 
 router = APIRouter(prefix="/api/semantic", tags=["semantic"])
@@ -34,6 +35,25 @@ class PromptRequest(BaseModel):
 
 class CustomInstructionsRequest(BaseModel):
     instructions: str
+
+
+class SearchRequest(BaseModel):
+    database: str
+    query: str
+    top_k: int = 5
+
+
+class SearchResultChunk(BaseModel):
+    chunk_type: str
+    table_name: Optional[str]
+    text: str
+    score: float
+
+
+class SearchResponse(BaseModel):
+    database: str
+    query: str
+    results: List[SearchResultChunk]
 
 
 class SemanticLayerResponse(BaseModel):
@@ -299,3 +319,55 @@ async def set_custom_instructions(
     """Set custom instructions for semantic layer generation."""
     metadata_store.save_custom_instructions(request.instructions)
     return {"message": "Custom instructions saved"}
+
+
+# Dependency to get embedding service
+def get_embedding_service_instance() -> EmbeddingService:
+    settings = get_settings()
+    return EmbeddingService(
+        openai_api_key=settings.openai_api_key,
+        pinecone_api_key=settings.pinecone_api_key,
+        pinecone_environment=settings.pinecone_environment,
+        pinecone_index_name=settings.pinecone_index_name
+    )
+
+
+@router.post("/search", response_model=SearchResponse)
+async def search_semantic_context(
+    request: SearchRequest,
+    _: str = Depends(verify_api_key),
+    embedding_service: EmbeddingService = Depends(get_embedding_service_instance)
+):
+    """
+    Search for relevant semantic context for a given query.
+
+    Uses vector similarity search in Pinecone to find the most relevant
+    semantic layer chunks for the user's question.
+    """
+    try:
+        # Search for relevant chunks
+        results = embedding_service.search_semantic_context(
+            query=request.query,
+            database_name=request.database,
+            top_k=request.top_k
+        )
+
+        return SearchResponse(
+            database=request.database,
+            query=request.query,
+            results=[
+                SearchResultChunk(
+                    chunk_type=chunk['chunk_type'],
+                    table_name=chunk.get('table_name'),
+                    text=chunk['text'],
+                    score=chunk['score']
+                )
+                for chunk in results
+            ]
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching semantic context: {str(e)}"
+        )

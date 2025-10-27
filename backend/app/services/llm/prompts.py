@@ -244,3 +244,37 @@ Guidelines:
 QUESTION: {question}
 
 Generate a PostgreSQL query to answer this question. Use the semantic layer documentation to understand the business context and choose the right tables and columns. Return only the SQL query."""
+
+    @staticmethod
+    def enhanced_sql_user_with_context(
+        question: str,
+        schema: Dict[str, Any],
+        semantic_context: Optional[str]
+    ) -> str:
+        """
+        User prompt for enhanced SQL generation with text-based semantic context.
+
+        This version accepts semantic context as a pre-formatted string
+        (e.g., from vector search results) instead of a full semantic layer dict.
+
+        Args:
+            question: Natural language question
+            schema: Database schema from SchemaExtractor
+            semantic_context: Pre-formatted semantic context string (may be None)
+
+        Returns:
+            Formatted user prompt
+        """
+        formatted_schema = format_schema_for_prompt(schema)
+
+        # Build semantic context section if available
+        context_section = ""
+        if semantic_context:
+            context_section = f"\n\nSEMANTIC CONTEXT:\n{semantic_context}\n"
+
+        return f"""DATABASE SCHEMA:
+{formatted_schema}{context_section}
+
+QUESTION: {question}
+
+Generate a PostgreSQL query to answer this question. Use the semantic context to understand the business meaning and choose the right tables and columns. Return only the SQL query."""

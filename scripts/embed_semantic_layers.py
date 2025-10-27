@@ -30,12 +30,13 @@ def main():
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
     pinecone_environment = os.getenv("PINECONE_ENVIRONMENT")
     pinecone_index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-semantic")
-    database_url = os.getenv("DATABASE_URL")
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
     # Validate environment variables
-    if not all([openai_api_key, pinecone_api_key, pinecone_environment, database_url]):
+    if not all([openai_api_key, pinecone_api_key, pinecone_environment, supabase_url, supabase_service_role_key]):
         print("❌ Error: Missing required environment variables")
-        print("Required: OPENAI_API_KEY, PINECONE_API_KEY, PINECONE_ENVIRONMENT, DATABASE_URL")
+        print("Required: OPENAI_API_KEY, PINECONE_API_KEY, PINECONE_ENVIRONMENT, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY")
         sys.exit(1)
 
     print("=" * 80)
@@ -52,7 +53,7 @@ def main():
         pinecone_index_name=pinecone_index_name
     )
 
-    metadata_store = MetadataStore(database_url)
+    metadata_store = MetadataStore(supabase_url, supabase_service_role_key)
 
     # Get Pinecone index stats
     print("\nPinecone Index Status:")
@@ -74,17 +75,13 @@ def main():
     print(f"Found {len(semantic_layers)} semantic layer(s)")
     print()
 
-    # Ask for confirmation
+    # Show what will be done
     print("This will:")
     print(f"  - Generate embeddings for {len(semantic_layers)} database(s)")
     print("  - Upload vectors to Pinecone")
     print("  - Estimated cost: ~$0.10-0.50 (depending on semantic layer sizes)")
     print()
-
-    response = input("Continue? [y/N]: ").strip().lower()
-    if response != 'y':
-        print("Aborted.")
-        sys.exit(0)
+    print("Starting embedding generation...")
 
     print()
     print("=" * 80)
@@ -97,14 +94,24 @@ def main():
     total_vectors = 0
     total_cost = 0.0
 
-    for i, layer in enumerate(semantic_layers, 1):
-        database_name = layer['database_name']
-        semantic_layer = layer['semantic_layer']
+    for i, layer_metadata in enumerate(semantic_layers, 1):
+        database_name = layer_metadata['database_name']
+        connection_name = layer_metadata.get('connection_name', 'Supabase')
 
         print(f"[{i}/{len(semantic_layers)}] Processing: {database_name}")
         print("-" * 80)
 
         try:
+            # Fetch full semantic layer (list_semantic_layers only returns metadata)
+            full_layer = metadata_store.get_semantic_layer(database_name, connection_name=connection_name)
+
+            if not full_layer or 'semantic_layer' not in full_layer:
+                print(f"⚠️  Skipping {database_name}: semantic layer data not found")
+                print()
+                continue
+
+            semantic_layer = full_layer['semantic_layer']
+
             # Embed and upload
             result = embedding_service.embed_semantic_layer(
                 semantic_layer=semantic_layer,

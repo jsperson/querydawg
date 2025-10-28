@@ -1141,5 +1141,21 @@ Completed all Week 3 objectives (originally 7 days) in a single day with full pr
 
 ---
 
-**Last Updated:** 2025-10-27
+### Technical Debt & Future Improvements
+
+**Configuration Management:**
+- [ ] **Refactor LLM provider selection from env vars to application config** (2025-10-28)
+  - Current: Tasks can be overridden via env vars (e.g., `BASELINE_SQL_PROVIDER=openai`)
+  - Problem: Requires many environment variables in Railway deployment
+  - Solution: Move provider/model selection entirely into LLMConfig.TASKS as single source of truth
+  - Benefits: Fewer secrets to manage, version-controlled choices, simpler deploys
+  - Impact: Only need API keys (OPENAI_API_KEY) instead of model configuration vars
+
+**Code Quality:**
+- ✅ Consolidated duplicate auth implementations (2025-10-28)
+- ✅ Consolidated duplicate LLM wrappers (2025-10-28)
+
+---
+
+**Last Updated:** 2025-10-28
 **Next Review:** Week 4 - Enhanced Text-to-SQL Testing & Evaluation

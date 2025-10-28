@@ -53,13 +53,14 @@ class PromptTemplates:
 
 Guidelines:
 1. Generate ONLY valid PostgreSQL syntax
-2. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
-3. Include proper WHERE clauses for filtering
-4. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
-5. Add ORDER BY and LIMIT clauses when relevant
-6. Use table aliases for clarity in multi-table queries
-7. Ensure column references are unambiguous
-8. Return ONLY the SQL query without explanations or markdown formatting"""
+2. ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)
+3. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
+4. Include proper WHERE clauses for filtering
+5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
+6. Add ORDER BY and LIMIT clauses when relevant
+7. Use table aliases for clarity in multi-table queries
+8. Ensure column references are unambiguous
+9. Return ONLY the SQL query without explanations or markdown formatting"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
@@ -75,8 +76,12 @@ Guidelines:
         """
         formatted_schema = format_schema_for_prompt(schema)
 
+        database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:
 {formatted_schema}
+
+IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
+For example, use "{database_name}.table_name" NOT just "table_name".
 
 QUESTION: {question}
 
@@ -114,7 +119,11 @@ Please explain what this SQL query does in 2-3 clear, concise sentences. Focus o
     @staticmethod
     def error_correction_system() -> str:
         """System prompt for SQL error correction"""
-        return """You are an expert PostgreSQL debugger. Your task is to identify and fix SQL syntax errors and logical issues. Return ONLY the corrected SQL query without explanations."""
+        return """You are an expert PostgreSQL debugger. Your task is to identify and fix SQL syntax errors and logical issues.
+
+IMPORTANT: All table names must be qualified with their schema name (e.g., schema_name.table_name).
+
+Return ONLY the corrected SQL query without explanations."""
 
     @staticmethod
     def error_correction_user(
@@ -135,6 +144,7 @@ Please explain what this SQL query does in 2-3 clear, concise sentences. Focus o
         """
         formatted_schema = format_schema_for_prompt(schema)
 
+        database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:
 {formatted_schema}
 
@@ -143,6 +153,9 @@ FAILED SQL QUERY:
 
 ERROR MESSAGE:
 {error_message}
+
+IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
+For example, use "{database_name}.table_name" NOT just "table_name".
 
 Fix the SQL query to resolve this error. Return only the corrected SQL query."""
 
@@ -184,15 +197,16 @@ The semantic layer provides important business context:
 
 Guidelines:
 1. Generate ONLY valid PostgreSQL syntax
-2. Use the semantic layer to understand business context and terminology
-3. Choose appropriate tables and columns based on semantic meanings
-4. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
-5. Include proper WHERE clauses for filtering
-6. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
-7. Add ORDER BY and LIMIT clauses when relevant
-8. Use table aliases for clarity in multi-table queries
-9. Ensure column references are unambiguous
-10. Return ONLY the SQL query without explanations or markdown formatting"""
+2. ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)
+3. Use the semantic layer to understand business context and terminology
+4. Choose appropriate tables and columns based on semantic meanings
+5. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
+6. Include proper WHERE clauses for filtering
+7. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
+8. Add ORDER BY and LIMIT clauses when relevant
+9. Use table aliases for clarity in multi-table queries
+10. Ensure column references are unambiguous
+11. Return ONLY the SQL query without explanations or markdown formatting"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:
@@ -238,8 +252,12 @@ Guidelines:
                         for rel in relationships:
                             semantic_section += f"      - {rel.get('description', 'N/A')}\n"
 
+        database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:
 {formatted_schema}{semantic_section}
+
+IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
+For example, use "{database_name}.table_name" NOT just "table_name".
 
 QUESTION: {question}
 
@@ -272,8 +290,12 @@ Generate a PostgreSQL query to answer this question. Use the semantic layer docu
         if semantic_context:
             context_section = f"\n\nSEMANTIC CONTEXT:\n{semantic_context}\n"
 
+        database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:
 {formatted_schema}{context_section}
+
+IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
+For example, use "{database_name}.table_name" NOT just "table_name".
 
 QUESTION: {question}
 

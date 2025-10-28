@@ -146,7 +146,7 @@ export default function EnhancedPage() {
             <CardHeader>
               <CardTitle>Ask a Question</CardTitle>
               <CardDescription>
-                Select a database and ask a question in natural language. Uses schema + semantic layer (GPT-4o).
+                Select a database and ask a question in natural language. Uses schema + semantic layer (GPT-4o-mini).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

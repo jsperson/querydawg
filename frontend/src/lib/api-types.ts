@@ -136,3 +136,15 @@ export interface CustomInstructionsRequest {
 export interface CustomInstructionsResponse {
   instructions: string;
 }
+
+export interface DatabaseOverview {
+  domain: string;
+  purpose: string;
+  key_entities: string[];
+  typical_questions: string[];
+}
+
+export interface DatabaseOverviewResponse {
+  database: string;
+  overview: DatabaseOverview;
+}

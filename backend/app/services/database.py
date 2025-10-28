@@ -27,30 +27,29 @@ class DatabaseService:
         Returns:
             List of database/schema names (excluding system schemas)
         """
-        # Hardcoded list of 19 Spider databases loaded into Supabase
-        # This avoids IPv6 connection issues with direct PostgreSQL access
-        # TODO: Make this dynamic once connection issues are resolved
-        return [
-            "battle_death",
-            "car_1",
-            "concert_singer",
-            "course_teach",
-            "cre_Doc_Template_Mgt",
-            "dog_kennels",
-            "employee_hire_evaluation",
-            "flight_2",
-            "museum_visit",
-            "network_1",
-            "orchestra",
-            "pets_1",
-            "poker_player",
-            "real_estate_properties",
-            "singer",
-            "student_transcripts_tracking",
-            "tvshow",
-            "voter_1",
-            "world_1"
-        ]
+        conn = self.get_connection()
+        try:
+            cursor = conn.cursor()
+
+            # Query for all Spider database schemas (exclude Supabase system schemas)
+            cursor.execute("""
+                SELECT schema_name
+                FROM information_schema.schemata
+                WHERE schema_name NOT IN (
+                    'pg_catalog', 'information_schema', 'pg_toast',
+                    'public', 'auth', 'extensions', 'graphql', 'graphql_public',
+                    'pgbouncer', 'realtime', 'storage', 'vault'
+                )
+                AND schema_name NOT LIKE 'pg_temp_%'
+                AND schema_name NOT LIKE 'pg_toast_temp_%'
+                ORDER BY schema_name
+            """)
+
+            databases = [row[0] for row in cursor.fetchall()]
+            cursor.close()
+            return databases
+        finally:
+            conn.close()
 
     def database_exists(self, database_name: str) -> bool:
         """

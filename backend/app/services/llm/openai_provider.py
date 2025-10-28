@@ -112,8 +112,13 @@ class OpenAIProvider(LLMProvider):
         total_tokens = response.usage.total_tokens
         cost_usd = self.calculate_cost(prompt_tokens, completion_tokens)
 
+        # Extract content safely
+        content = response.choices[0].message.content
+        if content is None:
+            raise ValueError(f"OpenAI returned None content. Response: {response}")
+
         return LLMResponse(
-            content=response.choices[0].message.content.strip(),
+            content=content.strip(),
             tokens_used=total_tokens,
             cost_usd=cost_usd,
             generation_time_ms=generation_time_ms,

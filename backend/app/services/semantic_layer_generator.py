@@ -84,12 +84,34 @@ class SemanticLayerGenerator:
         )
 
         # Parse JSON response
+        print(f"LLM Response metadata: tokens={llm_response.tokens_used}, cost=${llm_response.cost_usd:.4f}, time={llm_response.generation_time_ms}ms")
+        print(f"LLM Response content length: {len(llm_response.content) if llm_response.content else 0} chars")
+
+        # Handle None or empty response
+        if not llm_response.content:
+            raise ValueError("LLM returned empty response")
+
+        # Strip markdown code blocks if present
+        content = llm_response.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]  # Remove ```json
+        if content.startswith("```"):
+            content = content[3:]  # Remove ```
+        if content.endswith("```"):
+            content = content[:-3]  # Remove trailing ```
+        content = content.strip()
+
+        print(f"After cleanup, content length: {len(content)} chars")
+        print(f"First 200 chars: {content[:200]}")
+
         try:
-            semantic_layer = json.loads(llm_response.content)
+            semantic_layer = json.loads(content)
         except json.JSONDecodeError as e:
-            print(f"Error parsing LLM response as JSON: {e}")
-            print(f"Response: {llm_response.content[:500]}...")
-            raise
+            print(f"ERROR: Failed to parse LLM response as JSON")
+            print(f"JSONDecodeError: {e}")
+            print(f"Full response (first 1000 chars):")
+            print(content[:1000])
+            raise ValueError(f"Failed to parse JSON: {e}") from e
 
         # Add metadata
         result = {

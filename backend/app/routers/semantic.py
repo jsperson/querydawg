@@ -98,35 +98,46 @@ async def generate_semantic_layer(
     settings = get_settings()
 
     try:
+        print(f"[GENERATE] Starting generation for database: {request.database}")
+
         # Initialize LLM provider for semantic layer generation
+        print("[GENERATE] Initializing LLM provider...")
         llm = LLMConfig.get_provider_for_task("semantic_layer")
+        print(f"[GENERATE] LLM provider initialized: {llm.__class__.__name__}, model: {llm.model}")
 
         # Get custom instructions (from request or stored)
         custom_instructions = request.custom_instructions
         if not custom_instructions:
             custom_instructions = metadata_store.get_custom_instructions()
+        print(f"[GENERATE] Custom instructions: {len(custom_instructions) if custom_instructions else 0} chars")
 
         # Generate semantic layer (using Supabase PostgreSQL as source)
+        print(f"[GENERATE] Creating generator with DATABASE_URL: {settings.database_url[:50]}...")
         generator = SemanticLayerGenerator(
             llm=llm,
             database_url=settings.database_url,  # PostgreSQL connection string
             custom_instructions=custom_instructions,
             sample_rows=request.sample_rows
         )
+        print("[GENERATE] Generator created successfully")
 
+        print(f"[GENERATE] Calling generator.generate() for {request.database}...")
         result = generator.generate(
             database_name=request.database,  # Schema name in Supabase
             anonymize=request.anonymize,
             save_prompt=True
         )
+        print("[GENERATE] Generation completed successfully")
 
         # Delete existing semantic layers for this database (only after successful generation)
+        print("[GENERATE] Deleting existing semantic layer...")
         metadata_store.delete_semantic_layer(
             database_name=request.database,
             connection_name=request.connection_name
         )
 
         # Save to Supabase metadata store
+        print("[GENERATE] Saving to metadata store...")
         metadata_store.save_semantic_layer(
             database_name=request.database,
             semantic_layer=result["semantic_layer"],
@@ -134,6 +145,7 @@ async def generate_semantic_layer(
             prompt_used=result.get("prompt_used"),
             connection_name=request.connection_name
         )
+        print("[GENERATE] Saved successfully!")
 
         return SemanticLayerResponse(
             database=request.database,
@@ -143,9 +155,12 @@ async def generate_semantic_layer(
         )
 
     except Exception as e:
+        print(f"[GENERATE ERROR] {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error generating semantic layer: {str(e)}"
+            detail=f"Error generating semantic layer: {type(e).__name__}: {str(e)}"
         )
 
 

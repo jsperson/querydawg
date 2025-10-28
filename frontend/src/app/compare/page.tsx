@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { QueryNavigation } from '@/components/QueryNavigation';
-import type { TextToSQLResponse, ExecuteResponse } from '@/lib/api-types';
+import type { TextToSQLResponse, ExecuteResponse, DatabaseOverview } from '@/lib/api-types';
 
 interface ComparisonResult {
   baseline: {
@@ -35,6 +35,8 @@ export default function ComparePage() {
   // State
   const [databases, setDatabases] = useState<string[]>([]);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
+  const [databaseOverview, setDatabaseOverview] = useState<DatabaseOverview | null>(null);
+  const [isLoadingOverview, setIsLoadingOverview] = useState(false);
   const [question, setQuestion] = useState<string>('');
   const [result, setResult] = useState<ComparisonResult | null>(null);
   const [isLoadingDatabases, setIsLoadingDatabases] = useState(true);
@@ -52,7 +54,10 @@ export default function ComparePage() {
       const response = await api.getDatabases();
       setDatabases(response.databases);
       if (response.databases.length > 0) {
-        setSelectedDatabase(response.databases[0]);
+        const firstDb = response.databases[0];
+        setSelectedDatabase(firstDb);
+        // Load overview for first database
+        handleDatabaseChange(firstDb);
       }
       setError('');
     } catch {
@@ -62,11 +67,26 @@ export default function ComparePage() {
     }
   };
 
-  const handleDatabaseChange = (newDatabase: string) => {
+  const handleDatabaseChange = async (newDatabase: string) => {
     setSelectedDatabase(newDatabase);
     setQuestion('');
     setResult(null);
     setError('');
+    setDatabaseOverview(null);
+
+    // Load database overview
+    if (newDatabase) {
+      setIsLoadingOverview(true);
+      try {
+        const response = await api.getDatabaseOverview(newDatabase);
+        setDatabaseOverview(response.overview);
+      } catch (err) {
+        console.error('Failed to load database overview:', err);
+        // Don't show error to user, just skip overview
+      } finally {
+        setIsLoadingOverview(false);
+      }
+    }
   };
 
   const handleRun = async () => {
@@ -333,6 +353,35 @@ export default function ComparePage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Database Overview */}
+              {isLoadingOverview && (
+                <div className="bg-muted/50 p-4 rounded-md text-sm text-muted-foreground">
+                  Loading database overview...
+                </div>
+              )}
+              {databaseOverview && !isLoadingOverview && (
+                <div className="bg-muted/50 p-4 rounded-md space-y-3 text-sm">
+                  <div>
+                    <span className="font-semibold text-foreground">Domain:</span>{' '}
+                    <span className="text-muted-foreground">{databaseOverview.domain}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-foreground">Purpose:</span>{' '}
+                    <span className="text-muted-foreground">{databaseOverview.purpose}</span>
+                  </div>
+                  {databaseOverview.typical_questions && databaseOverview.typical_questions.length > 0 && (
+                    <div>
+                      <div className="font-semibold text-foreground mb-2">Example Questions:</div>
+                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                        {databaseOverview.typical_questions.slice(0, 3).map((q, idx) => (
+                          <li key={idx}>{q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Question Input */}
               <div>

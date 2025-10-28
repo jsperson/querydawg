@@ -17,6 +17,7 @@ import {
   SemanticLayerListItem,
   CustomInstructionsRequest,
   CustomInstructionsResponse,
+  DatabaseOverviewResponse,
 } from './api-types';
 
 const API_BASE = '/api';
@@ -104,6 +105,12 @@ export const api = {
     const params = version ? `?version=${version}` : '';
     return fetchAPI<SemanticLayerResponse>(`/semantic/${database}${params}`);
   },
+
+  /**
+   * Get database overview/summary from semantic layer
+   */
+  getDatabaseOverview: (database: string) =>
+    fetchAPI<DatabaseOverviewResponse>(`/semantic/overview/${database}`),
 
   /**
    * List all semantic layers

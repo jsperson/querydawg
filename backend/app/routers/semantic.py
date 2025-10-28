@@ -294,6 +294,40 @@ async def delete_semantic_layer(
     return {"message": f"Deleted semantic layers for {database} ({connection_name})"}
 
 
+@router.get("/overview/{database}", response_model=Dict[str, Any])
+async def get_database_overview(
+    database: str,
+    connection_name: str = "Supabase",
+    _: str = Depends(verify_api_key),
+    metadata_store: MetadataStore = Depends(get_metadata_store_instance)
+):
+    """
+    Get overview/summary of a database from its semantic layer.
+
+    Returns domain, purpose, key entities, and typical questions to help
+    users understand what the database contains and what questions they can ask.
+    """
+    result = metadata_store.get_semantic_layer(
+        database,
+        connection_name=connection_name
+    )
+
+    if not result or 'semantic_layer' not in result:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Semantic layer not found for database: {database}"
+        )
+
+    semantic_layer = result['semantic_layer']
+    overview = semantic_layer.get('overview', {})
+
+    # Return overview with database name
+    return {
+        "database": database,
+        "overview": overview
+    }
+
+
 @router.get("/status", response_model=Dict[str, List[str]])
 async def get_databases_with_semantic_layers(
     connection_name: str = "Supabase",

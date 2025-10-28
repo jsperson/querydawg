@@ -161,8 +161,9 @@ export default function ComparePage() {
         {error && !sqlResponse && (
           <Card>
             <CardContent className="pt-6">
-              <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
-                {error}
+              <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md space-y-2">
+                <div className="font-semibold">Error</div>
+                <div>{error}</div>
               </div>
             </CardContent>
           </Card>
@@ -175,12 +176,12 @@ export default function ComparePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   SQL Query
-                  {sqlResponse.metadata.has_semantic_layer && (
+                  {(sqlResponse.metadata as { has_semantic_context?: boolean }).has_semantic_context && (
                     <Badge variant="default" className="bg-green-600">
                       Semantic Layer Used
                     </Badge>
                   )}
-                  {sqlResponse.metadata.has_semantic_layer === false && (
+                  {(sqlResponse.metadata as { has_semantic_context?: boolean }).has_semantic_context === false && (
                     <Badge variant="secondary">
                       No Semantic Layer
                     </Badge>
@@ -215,8 +216,14 @@ export default function ComparePage() {
             {error && (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
-                    {error}
+                  <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md space-y-2">
+                    <div className="font-semibold">Execution Error</div>
+                    <div>{error}</div>
+                    <div className="mt-3 pt-3 border-t border-destructive/20">
+                      <div className="text-sm font-mono text-destructive/80 whitespace-pre-wrap">
+                        {sqlResponse.sql}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -375,7 +382,7 @@ export default function ComparePage() {
               <div>
                 {renderSQLResult(
                   'Enhanced',
-                  'GPT-4o, schema + semantic layer',
+                  'GPT-4o-mini, schema + semantic layer',
                   result.enhanced.sql,
                   result.enhanced.execution,
                   result.enhanced.error

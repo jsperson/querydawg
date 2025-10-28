@@ -22,7 +22,7 @@ class LLMConfig:
         },
         "enhanced_sql": {
             "provider": "openai",
-            "model": "gpt-4o",
+            "model": "gpt-4o-mini",
             "temperature": 0.0,
             "max_tokens": 1000,
             "description": "Generate SQL with RAG and examples (enhanced)"

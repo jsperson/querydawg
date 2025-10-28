@@ -1144,6 +1144,25 @@ Completed all Week 3 objectives (originally 7 days) in a single day with full pr
 ### Technical Debt & Future Improvements
 
 **Configuration Management:**
+- [ ] **Move configuration from environment variables to application code** (2025-10-28)
+  - Current: Many configuration values require manual setup in Railway/Vercel dashboards
+  - Problem:
+    - Tedious manual configuration across deployment layers
+    - Configuration drift between environments
+    - Not version controlled
+    - Harder to onboard new developers
+  - Solution:
+    - Keep ONLY secrets in env vars (API keys, passwords)
+    - Move all configuration (models, timeouts, feature flags, URLs) into application code
+    - Use sensible defaults with optional overrides
+  - Examples to move to code:
+    - `LLM_MODEL`, `LLM_PROVIDER` → hardcoded in LLMConfig.TASKS
+    - `PINECONE_ENVIRONMENT`, `PINECONE_INDEX_NAME` → config.py with defaults
+    - `PORT`, `DEBUG` → app defaults
+    - Database names, schema names, etc.
+  - Keep as env vars: `OPENAI_API_KEY`, `PINECONE_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, etc.
+  - Benefits: Single deploy, fewer secrets, version controlled, easier testing
+
 - [ ] **Refactor LLM provider selection from env vars to application config** (2025-10-28)
   - Current: Tasks can be overridden via env vars (e.g., `BASELINE_SQL_PROVIDER=openai`)
   - Problem: Requires many environment variables in Railway deployment

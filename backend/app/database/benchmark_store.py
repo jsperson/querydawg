@@ -86,8 +86,8 @@ class BenchmarkStore:
             "failed_count": failed,
         }
 
-        if current_question:
-            updates["current_question"] = current_question
+        # Always update current_question (None clears it)
+        updates["current_question"] = current_question
 
         self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
 

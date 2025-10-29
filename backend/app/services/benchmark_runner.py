@@ -7,9 +7,11 @@ from typing import List, Dict, Any, Optional, Tuple
 from decimal import Decimal
 from datetime import datetime
 import os
+from pathlib import Path
 
 import psycopg2
 from psycopg2 import pool
+from psycopg2 import sql
 import sqlglot
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
@@ -40,7 +42,7 @@ class BenchmarkRunner:
     def __init__(
         self,
         benchmark_store: BenchmarkStore,
-        spider_data_path: str = "/home/developer/source/querydawg/data/spider/dev.json",
+        spider_data_path: Optional[str] = None,
         budget_limit_usd: float = 5.0,
         connection_string: Optional[str] = None
     ):
@@ -49,11 +51,18 @@ class BenchmarkRunner:
 
         Args:
             benchmark_store: Store for persisting results
-            spider_data_path: Path to Spider dev.json
+            spider_data_path: Path to Spider dev.json (defaults to data/spider/dev.json relative to project root)
             budget_limit_usd: Maximum cost per run
             connection_string: PostgreSQL connection string for query execution
         """
         self.store = benchmark_store
+
+        # Resolve spider_data_path relative to project root if not provided
+        if spider_data_path is None:
+            # backend/app/services/benchmark_runner.py -> project root is 3 levels up
+            project_root = Path(__file__).parent.parent.parent.parent
+            spider_data_path = str(project_root / "data" / "spider" / "dev.json")
+
         self.spider_data_path = spider_data_path
         self.budget_limit = budget_limit_usd
         self.total_cost = 0.0
@@ -165,14 +174,14 @@ class BenchmarkRunner:
     )
     def execute_sql_safely(
         self,
-        sql: str,
+        query: str,
         database: str
     ) -> Tuple[List[Tuple], Optional[str]]:
         """
         Execute SQL in read-only transaction with timeout
 
         Args:
-            sql: SQL query to execute
+            query: SQL query to execute
             database: Database/schema name
 
         Returns:
@@ -186,10 +195,15 @@ class BenchmarkRunner:
                 # Set read-only and timeout
                 cur.execute("SET TRANSACTION READ ONLY")
                 cur.execute("SET statement_timeout = '5s'")
-                cur.execute(f"SET search_path TO {database}")
+
+                # Safely set search_path using sql.Identifier to prevent SQL injection
+                search_path_query = sql.SQL("SET search_path TO {}").format(
+                    sql.Identifier(database)
+                )
+                cur.execute(search_path_query)
 
                 # Execute query
-                cur.execute(sql)
+                cur.execute(query)
                 results = cur.fetchall()
 
                 # Sort results for deterministic comparison

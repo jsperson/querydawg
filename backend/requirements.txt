@@ -23,6 +23,10 @@ openai>=1.10.0
 # Vector Database (Week 3)
 pinecone>=5.0.0
 
+# Benchmark System (Week 6)
+sqlglot>=20.0.0  # SQL parsing and normalization
+tenacity>=8.2.0  # Retry logic with exponential backoff
+
 # Data Processing (for evaluation - Week 4-5)
 # pandas>=2.1.4
 # numpy>=1.26.3

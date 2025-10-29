@@ -25,7 +25,7 @@ from app.services.database import get_db_service
 from app.services.schema import SchemaExtractorFactory
 from app.services.text_to_sql import BaselineSQLGenerator, EnhancedSQLGenerator
 from app.services.executor import SQLExecutor, SQLExecutionError
-from app.routers import semantic
+from app.routers import semantic, benchmark
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / ".env"
@@ -55,6 +55,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(semantic.router)
+app.include_router(benchmark.router)
 
 
 @app.get(

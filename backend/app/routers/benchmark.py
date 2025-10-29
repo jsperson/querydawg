@@ -15,7 +15,7 @@ from ..models.benchmark import (
 )
 from ..database.benchmark_store import get_benchmark_store, BenchmarkStore
 from ..services.benchmark_runner import BenchmarkRunner, BudgetExceededError
-from ..middleware.auth import verify_api_key
+from ..dependencies import verify_api_key
 
 
 router = APIRouter(prefix="/api/benchmark", tags=["benchmark"])

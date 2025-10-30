@@ -74,7 +74,9 @@ async def start_benchmark(
             except BudgetExceededError as e:
                 print(f"Budget exceeded: {str(e)}")
             except Exception as e:
+                import traceback
                 print(f"Benchmark failed: {str(e)}")
+                traceback.print_exc()
 
         # Start background task
         background_tasks.add_task(run_benchmark_task)
@@ -90,7 +92,16 @@ async def start_benchmark(
             }
         }
 
+    except FileNotFoundError as e:
+        # Provide detailed error for missing Spider dataset
+        raise HTTPException(
+            status_code=500,
+            detail=f"Spider dataset not found: {str(e)}"
+        )
     except Exception as e:
+        import traceback
+        error_detail = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+        print(f"Error starting benchmark: {error_detail}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

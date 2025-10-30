@@ -40,6 +40,12 @@ class BenchmarkRunResponse(BaseModel):
     created_at: datetime
     started_at: Optional[datetime] = None
 
+    # Running metrics (calculated from completed results so far)
+    baseline_exec_match_rate: Optional[float] = None
+    baseline_correct_count: Optional[int] = None
+    enhanced_exec_match_rate: Optional[float] = None
+    enhanced_correct_count: Optional[int] = None
+
 
 class BenchmarkSummary(BaseModel):
     """Complete summary of a benchmark run with calculated metrics"""

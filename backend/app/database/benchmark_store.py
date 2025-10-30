@@ -148,6 +148,34 @@ class BenchmarkStore:
         total = run["question_count"]
         progress = completed / total if total > 0 else 0.0
 
+        # Calculate running metrics from completed results so far
+        baseline_exec_match_rate = None
+        baseline_correct_count = None
+        enhanced_exec_match_rate = None
+        enhanced_correct_count = None
+
+        if completed > 0:
+            # Query benchmark_results for this run to get running metrics
+            results = (
+                self.client.table("benchmark_results")
+                .select("baseline_exec_match, enhanced_exec_match")
+                .eq("run_id", run_id)
+                .execute()
+            )
+
+            if results.data:
+                # Calculate baseline metrics
+                baseline_results = [r for r in results.data if r.get("baseline_exec_match") is not None]
+                if baseline_results:
+                    baseline_correct_count = sum(1 for r in baseline_results if r.get("baseline_exec_match") is True)
+                    baseline_exec_match_rate = baseline_correct_count / len(baseline_results)
+
+                # Calculate enhanced metrics
+                enhanced_results = [r for r in results.data if r.get("enhanced_exec_match") is not None]
+                if enhanced_results:
+                    enhanced_correct_count = sum(1 for r in enhanced_results if r.get("enhanced_exec_match") is True)
+                    enhanced_exec_match_rate = enhanced_correct_count / len(enhanced_results)
+
         return BenchmarkRunResponse(
             id=run["id"],
             name=run["name"],
@@ -160,7 +188,11 @@ class BenchmarkStore:
             current_question=run.get("current_question"),
             total_cost_usd=Decimal(str(run.get("total_cost_usd", 0))),
             created_at=datetime.fromisoformat(run["created_at"]),
-            started_at=datetime.fromisoformat(run["started_at"]) if run.get("started_at") else None
+            started_at=datetime.fromisoformat(run["started_at"]) if run.get("started_at") else None,
+            baseline_exec_match_rate=baseline_exec_match_rate,
+            baseline_correct_count=baseline_correct_count,
+            enhanced_exec_match_rate=enhanced_exec_match_rate,
+            enhanced_correct_count=enhanced_correct_count
         )
 
     def calculate_and_save_metrics(self, run_id: str):

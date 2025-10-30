@@ -65,6 +65,30 @@ export default function BenchmarkControlPanel() {
     }
   };
 
+  const handleCancelRun = async (runId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!confirm('Are you sure you want to cancel this benchmark run?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/benchmark/run/${runId}/cancel`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel benchmark');
+      }
+
+      // Refresh the runs list
+      await loadRuns();
+      setError('✅ Benchmark cancelled successfully');
+    } catch (err) {
+      setError(`❌ Failed to cancel: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   const handleStartBenchmark = async () => {
     if (!name.trim()) {
       setError('Please enter a name for this benchmark run');
@@ -291,16 +315,27 @@ export default function BenchmarkControlPanel() {
                             {new Date(run.created_at).toLocaleDateString()}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/admin/benchmark/${run.run_id}`);
-                              }}
-                            >
-                              View Details
-                            </Button>
+                            <div className="flex gap-2">
+                              {(run.status === 'pending' || run.status === 'running') && (
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={(e) => handleCancelRun(run.run_id, e)}
+                                >
+                                  Stop
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/admin/benchmark/${run.run_id}`);
+                                }}
+                              >
+                                View Details
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

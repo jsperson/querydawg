@@ -45,9 +45,27 @@ interface BenchmarkResult {
   enhanced_error: string | null;
 }
 
+interface BenchmarkStatus {
+  id: string;
+  name: string;
+  run_type: string;
+  status: string;
+  progress: number;
+  completed_count: number;
+  failed_count: number;
+  question_count: number;
+  current_question: string | null;
+  total_cost_usd: number;
+  baseline_exec_match_rate: number | null;
+  baseline_correct_count: number | null;
+  enhanced_exec_match_rate: number | null;
+  enhanced_correct_count: number | null;
+}
+
 export default function BenchmarkResultsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [summary, setSummary] = useState<BenchmarkSummary | null>(null);
+  const [status, setStatus] = useState<BenchmarkStatus | null>(null);
   const [results, setResults] = useState<BenchmarkResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<BenchmarkResult | null>(null);
   const [showFailuresOnly, setShowFailuresOnly] = useState(false);
@@ -61,6 +79,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
     // Poll for updates if status is pending or running
     const interval = setInterval(() => {
       if (summary && (summary.status === 'pending' || summary.status === 'running')) {
+        loadStatus();
         loadSummary();
       }
     }, 3000); // Poll every 3 seconds
@@ -80,6 +99,17 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
       setError('Failed to load benchmark results');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadStatus = async () => {
+    try {
+      const response = await fetch(`/api/benchmark/run/${params.id}/status`);
+      if (!response.ok) return; // Silently fail, not critical
+      const data = await response.json();
+      setStatus(data);
+    } catch {
+      // Silently fail - status is supplementary
     }
   };
 
@@ -230,6 +260,39 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                   </div>
                   <Progress value={progress} className="h-2" />
                 </div>
+
+                {/* Running Metrics */}
+                {status && summary.completed > 0 && (
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                    {status.baseline_exec_match_rate !== null && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Baseline Success (so far)</p>
+                        <div className="flex items-baseline gap-2">
+                          <p className="text-2xl font-bold text-blue-600">
+                            {(status.baseline_exec_match_rate * 100).toFixed(1)}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            ({status.baseline_correct_count} correct)
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {status.enhanced_exec_match_rate !== null && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Enhanced Success (so far)</p>
+                        <div className="flex items-baseline gap-2">
+                          <p className="text-2xl font-bold text-green-600">
+                            {(status.enhanced_exec_match_rate * 100).toFixed(1)}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            ({status.enhanced_correct_count} correct)
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <p className="text-sm text-muted-foreground">
                   ⏳ Benchmark is currently running... This page will auto-refresh.
                 </p>

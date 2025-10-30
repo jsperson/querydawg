@@ -89,7 +89,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
     try {
       const params_str = new URLSearchParams({
         failures_only: showFailuresOnly.toString(),
-        page_size: '1000'
+        page_size: '500'  // Backend max limit
       });
       const response = await fetch(`/api/benchmark/run/${params.id}/results?${params_str}`);
       if (!response.ok) {

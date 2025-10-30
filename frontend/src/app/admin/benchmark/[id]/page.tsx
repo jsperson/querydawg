@@ -93,8 +93,8 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
       });
       const response = await fetch(`/api/benchmark/run/${params.id}/results?${params_str}`);
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to load results');
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
       console.log('Loaded results:', data);
@@ -104,7 +104,8 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
       }
     } catch (err) {
       console.error('Failed to load results:', err);
-      setError(`Failed to load results: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
+      setError(`Failed to load results: ${errorMessage}`);
     } finally {
       setIsLoadingResults(false);
     }

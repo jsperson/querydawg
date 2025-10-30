@@ -60,7 +60,13 @@ Guidelines:
 6. Add ORDER BY and LIMIT clauses when relevant
 7. Use table aliases for clarity in multi-table queries
 8. Ensure column references are unambiguous
-9. Return ONLY the SQL query without explanations or markdown formatting"""
+9. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
+10. Return ONLY the SQL query without explanations or markdown formatting
+
+Example:
+- Question: "What is the year with the most concerts?"
+- WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
@@ -206,7 +212,13 @@ Guidelines:
 8. Add ORDER BY and LIMIT clauses when relevant
 9. Use table aliases for clarity in multi-table queries
 10. Ensure column references are unambiguous
-11. Return ONLY the SQL query without explanations or markdown formatting"""
+11. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
+12. Return ONLY the SQL query without explanations or markdown formatting
+
+Example:
+- Question: "What is the year with the most concerts?"
+- WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:

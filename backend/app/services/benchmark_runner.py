@@ -64,15 +64,6 @@ class BenchmarkRunner:
             spider_data_path = str(project_root / "data" / "spider" / "dev.json")
 
         self.spider_data_path = spider_data_path
-
-        # Verify the file exists
-        if not Path(self.spider_data_path).exists():
-            raise FileNotFoundError(
-                f"Spider dataset not found at: {self.spider_data_path}\n"
-                f"Current working directory: {Path.cwd()}\n"
-                f"Resolved project root: {Path(__file__).parent.parent.parent.parent}\n"
-                "Please ensure the Spider dev.json file is available."
-            )
         self.budget_limit = budget_limit_usd
         self.total_cost = 0.0
 
@@ -115,7 +106,18 @@ class BenchmarkRunner:
 
         Returns:
             List of SpiderQuestion objects
+
+        Raises:
+            FileNotFoundError: If Spider dataset is not available
         """
+        if not Path(self.spider_data_path).exists():
+            raise FileNotFoundError(
+                f"Spider dataset not found at: {self.spider_data_path}\n"
+                f"Please download the dataset by running: python scripts/download_spider.py\n"
+                f"Or manually download from: https://drive.google.com/file/d/1m68AHHPC4pqyjT-Zmt-u8TRqdw5vp-U5/view\n"
+                f"And extract dev.json to: {Path(self.spider_data_path).parent}"
+            )
+
         with open(self.spider_data_path, 'r') as f:
             data = json.load(f)
 

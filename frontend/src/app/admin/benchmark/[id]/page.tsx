@@ -105,11 +105,19 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
   const loadStatus = async () => {
     try {
       const response = await fetch(`/api/benchmark/run/${params.id}/status`);
-      if (!response.ok) return; // Silently fail, not critical
+      if (!response.ok) {
+        console.error('Status fetch failed:', response.status);
+        return;
+      }
       const data = await response.json();
+      console.log('Status update:', {
+        completed: data.completed_count,
+        baseline_rate: data.baseline_exec_match_rate,
+        enhanced_rate: data.enhanced_exec_match_rate
+      });
       setStatus(data);
-    } catch {
-      // Silently fail - status is supplementary
+    } catch (error) {
+      console.error('Status fetch error:', error);
     }
   };
 

@@ -155,26 +155,54 @@ class BenchmarkStore:
         enhanced_correct_count = None
 
         if completed > 0:
-            # Query benchmark_results for this run to get running metrics
-            results = (
+            # Use database aggregation instead of fetching all rows
+            # This is much faster for large result sets
+
+            # Count baseline correct (True)
+            baseline_correct_result = (
                 self.client.table("benchmark_results")
-                .select("baseline_exec_match, enhanced_exec_match")
+                .select("*", count="exact")
                 .eq("run_id", run_id)
+                .eq("baseline_exec_match", True)
                 .execute()
             )
+            baseline_correct_count = baseline_correct_result.count or 0
 
-            if results.data:
-                # Calculate baseline metrics
-                baseline_results = [r for r in results.data if r.get("baseline_exec_match") is not None]
-                if baseline_results:
-                    baseline_correct_count = sum(1 for r in baseline_results if r.get("baseline_exec_match") is True)
-                    baseline_exec_match_rate = baseline_correct_count / len(baseline_results)
+            # Count baseline total (not None)
+            baseline_total_result = (
+                self.client.table("benchmark_results")
+                .select("*", count="exact")
+                .eq("run_id", run_id)
+                .not_.is_("baseline_exec_match", "null")
+                .execute()
+            )
+            baseline_total = baseline_total_result.count or 0
 
-                # Calculate enhanced metrics
-                enhanced_results = [r for r in results.data if r.get("enhanced_exec_match") is not None]
-                if enhanced_results:
-                    enhanced_correct_count = sum(1 for r in enhanced_results if r.get("enhanced_exec_match") is True)
-                    enhanced_exec_match_rate = enhanced_correct_count / len(enhanced_results)
+            if baseline_total > 0:
+                baseline_exec_match_rate = baseline_correct_count / baseline_total
+
+            # Count enhanced correct (True)
+            enhanced_correct_result = (
+                self.client.table("benchmark_results")
+                .select("*", count="exact")
+                .eq("run_id", run_id)
+                .eq("enhanced_exec_match", True)
+                .execute()
+            )
+            enhanced_correct_count = enhanced_correct_result.count or 0
+
+            # Count enhanced total (not None)
+            enhanced_total_result = (
+                self.client.table("benchmark_results")
+                .select("*", count="exact")
+                .eq("run_id", run_id)
+                .not_.is_("enhanced_exec_match", "null")
+                .execute()
+            )
+            enhanced_total = enhanced_total_result.count or 0
+
+            if enhanced_total > 0:
+                enhanced_exec_match_rate = enhanced_correct_count / enhanced_total
 
         return BenchmarkRunResponse(
             id=run["id"],

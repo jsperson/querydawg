@@ -146,6 +146,49 @@ class BenchmarkRunner:
 
         return questions
 
+    def sqlite_to_postgres_sql(self, sql: str) -> str:
+        """
+        Convert SQLite-style SQL to PostgreSQL-compatible SQL
+
+        Main conversion: double quotes for strings → single quotes
+        SQLite allows "string" but PostgreSQL treats " as identifier quotes
+
+        Args:
+            sql: SQLite-style SQL string
+
+        Returns:
+            PostgreSQL-compatible SQL string
+        """
+        import re
+
+        # Pattern to match double-quoted strings (not identifiers)
+        # We need to look at context to determine if it's a string literal or identifier
+
+        # Strategy: Look for quoted values that appear after operators or keywords
+        # that typically precede string literals, not identifiers
+
+        # First pass: convert obvious string literals (after =, !=, <, >, IN, etc.)
+        # Pattern: operator/keyword followed by optional whitespace and double-quoted string
+        patterns = [
+            (r'(=\s*)"([^"]+)"', r"\1'\2'"),           # = "value"
+            (r'(!=\s*)"([^"]+)"', r"\1'\2'"),          # != "value"
+            (r'(<>\s*)"([^"]+)"', r"\1'\2'"),          # <> "value"
+            (r'(>\s*)"([^"]+)"', r"\1'\2'"),           # > "value"
+            (r'(<\s*)"([^"]+)"', r"\1'\2'"),           # < "value"
+            (r'(>=\s*)"([^"]+)"', r"\1'\2'"),          # >= "value"
+            (r'(<=\s*)"([^"]+)"', r"\1'\2'"),          # <= "value"
+            (r'(\bIN\s*\()"([^"]+)"', r"\1'\2'"),      # IN ("value"
+            (r'(,\s*)"([^"]+)"', r"\1'\2'"),           # , "value" (in IN clause)
+            (r'(\bLIKE\s+)"([^"]+)"', r"\1'\2'"),      # LIKE "value"
+            (r'(\bNOT\s+LIKE\s+)"([^"]+)"', r"\1'\2'"),# NOT LIKE "value"
+        ]
+
+        result = sql
+        for pattern, replacement in patterns:
+            result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+
+        return result
+
     def normalize_sql(self, sql: str) -> str:
         """
         Normalize SQL for comparison using sqlglot
@@ -169,13 +212,16 @@ class BenchmarkRunner:
 
         Args:
             generated_sql: Generated SQL
-            gold_sql: Ground truth SQL
+            gold_sql: Ground truth SQL (SQLite syntax)
 
         Returns:
             True if normalized SQL strings match
         """
+        # Convert gold SQL from SQLite to PostgreSQL syntax
+        gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+
         norm_generated = self.normalize_sql(generated_sql)
-        norm_gold = self.normalize_sql(gold_sql)
+        norm_gold = self.normalize_sql(gold_sql_converted)
         return norm_generated == norm_gold
 
     @retry(
@@ -240,7 +286,7 @@ class BenchmarkRunner:
 
         Args:
             generated_sql: Generated SQL
-            gold_sql: Ground truth SQL
+            gold_sql: Ground truth SQL (SQLite syntax)
             database: Database/schema name
 
         Returns:
@@ -248,8 +294,11 @@ class BenchmarkRunner:
             match: True if results match
             error_message: Error from generated SQL execution (None if success)
         """
+        # Convert gold SQL from SQLite to PostgreSQL syntax
+        gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+
         # Execute gold SQL
-        gold_results, gold_error = self.execute_sql_safely(gold_sql, database)
+        gold_results, gold_error = self.execute_sql_safely(gold_sql_converted, database)
         if gold_error:
             # Gold SQL should always work; if it doesn't, something is wrong
             return False, f"Gold SQL failed: {gold_error}"

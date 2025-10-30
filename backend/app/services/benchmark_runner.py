@@ -64,6 +64,15 @@ class BenchmarkRunner:
             spider_data_path = str(project_root / "data" / "spider" / "dev.json")
 
         self.spider_data_path = spider_data_path
+
+        # Verify the file exists
+        if not Path(self.spider_data_path).exists():
+            raise FileNotFoundError(
+                f"Spider dataset not found at: {self.spider_data_path}\n"
+                f"Current working directory: {Path.cwd()}\n"
+                f"Resolved project root: {Path(__file__).parent.parent.parent.parent}\n"
+                "Please ensure the Spider dev.json file is available."
+            )
         self.budget_limit = budget_limit_usd
         self.total_cost = 0.0
 

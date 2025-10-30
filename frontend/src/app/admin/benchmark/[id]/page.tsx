@@ -477,9 +477,11 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                 )}
               </CardContent>
             </Card>
+          </>
+        )}
 
-            {/* SQL Results Viewer */}
-            <Card>
+        {/* SQL Results Viewer - Available for all run statuses */}
+        <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -661,8 +663,6 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                 ) : null}
               </CardContent>
             </Card>
-          </>
-        )}
       </div>
     </main>
   );

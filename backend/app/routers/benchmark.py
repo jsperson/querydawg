@@ -256,6 +256,37 @@ async def get_run_results(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/run/{run_id}/cancel")
+async def cancel_run(
+    run_id: str,
+    _: str = Depends(verify_api_key)
+):
+    """Cancel a running or pending benchmark"""
+    try:
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+        if not all([supabase_url, supabase_key]):
+            raise HTTPException(status_code=500, detail="Server configuration error")
+
+        store = get_benchmark_store(supabase_url, supabase_key)
+
+        # Update status to cancelled
+        store.update_run_status(
+            run_id,
+            "cancelled",
+            status_reason="cancelled_by_user"
+        )
+
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Benchmark cancelled", "run_id": run_id}
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.delete("/run/{run_id}")
 async def delete_run(
     run_id: str,

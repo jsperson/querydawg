@@ -474,6 +474,13 @@ class BenchmarkRunner:
 
         try:
             for question in questions:
+                # Check if run was cancelled
+                status = self.store.get_run_status(run_id)
+                if status and status.status == "cancelled":
+                    print(f"Benchmark {run_id} was cancelled by user")
+                    self.store.update_run_progress(run_id, completed, failed, current_question=None)
+                    return run_id
+
                 # Update progress
                 self.store.update_run_progress(
                     run_id,

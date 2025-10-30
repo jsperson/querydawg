@@ -85,17 +85,26 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
 
   const loadResults = async () => {
     setIsLoadingResults(true);
+    setError('');
     try {
       const params_str = new URLSearchParams({
         failures_only: showFailuresOnly.toString(),
         page_size: '1000'
       });
       const response = await fetch(`/api/benchmark/run/${params.id}/results?${params_str}`);
-      if (!response.ok) throw new Error('Failed to load results');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to load results');
+      }
       const data = await response.json();
+      console.log('Loaded results:', data);
       setResults(data.results || []);
+      if (!data.results || data.results.length === 0) {
+        setError('No results found for this benchmark run');
+      }
     } catch (err) {
       console.error('Failed to load results:', err);
+      setError(`Failed to load results: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoadingResults(false);
     }
@@ -425,11 +434,16 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                 </div>
               </CardHeader>
               <CardContent>
-                {results.length === 0 ? (
+                {error && results.length === 0 && (
+                  <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md mb-4">
+                    {error}
+                  </div>
+                )}
+                {results.length === 0 && !error ? (
                   <p className="text-center text-muted-foreground py-8">
                     Click &quot;Load Results&quot; to view detailed SQL for each question
                   </p>
-                ) : (
+                ) : results.length > 0 ? (
                   <div className="grid grid-cols-2 gap-6">
                     {/* Question List */}
                     <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
@@ -572,7 +586,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                       )}
                     </div>
                   </div>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           </>

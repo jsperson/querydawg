@@ -46,6 +46,7 @@ export default function ComparePage() {
   // Load databases on mount
   useEffect(() => {
     loadDatabases();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadDatabases = async () => {

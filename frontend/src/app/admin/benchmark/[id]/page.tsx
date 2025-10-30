@@ -66,6 +66,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
     }, 3000); // Poll every 3 seconds
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, summary?.status]);
 
   const loadSummary = async () => {
@@ -433,12 +434,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                     {/* Question List */}
                     <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
                       <h3 className="font-semibold mb-3">Questions ({results.length})</h3>
-                      {results.map((result) => {
-                        const hasFailure =
-                          (result.baseline_exact_match === false || result.baseline_exec_match === false) ||
-                          (result.enhanced_exact_match === false || result.enhanced_exec_match === false);
-
-                        return (
+                      {results.map((result) => (
                           <div
                             key={result.question_id}
                             onClick={() => setSelectedResult(result)}
@@ -480,8 +476,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                             <p className="text-sm line-clamp-2">{result.question}</p>
                             <p className="text-xs text-muted-foreground mt-1">{result.database}</p>
                           </div>
-                        );
-                      })}
+                      ))}
                     </div>
 
                     {/* SQL Comparison View */}

@@ -314,6 +314,12 @@ export default function ComparePage() {
             >
               Semantic Layer Admin
             </a>
+            <a
+              href="/admin/benchmark"
+              className="px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md font-medium transition-colors"
+            >
+              Run Benchmarks
+            </a>
           </div>
         </div>
 

@@ -8,7 +8,11 @@ cmds = [
 ]
 
 [phases.build]
-cmds = []
+cmds = [
+  "mkdir -p data/spider",
+  "if [ ! -f data/spider/dev.json ]; then . /opt/venv/bin/activate && python scripts/download_spider.py || echo 'Warning: Failed to download Spider dataset'; fi",
+  "ls -lh data/spider/dev.json || echo 'Warning: dev.json not found'"
+]
 
 [start]
 cmd = ". /opt/venv/bin/activate && cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000"

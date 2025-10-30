@@ -178,20 +178,32 @@ class BenchmarkStore:
 
         total = len(results.data)
 
-        # Calculate baseline metrics
-        baseline_exact = sum(1 for r in results.data if r.get("baseline_exact_match"))
-        baseline_exec = sum(1 for r in results.data if r.get("baseline_exec_match"))
+        # Calculate baseline metrics (count True values, handle None properly)
+        baseline_exact_count = sum(1 for r in results.data if r.get("baseline_exact_match") is True)
+        baseline_exact_total = sum(1 for r in results.data if r.get("baseline_exact_match") is not None)
+        baseline_exec_count = sum(1 for r in results.data if r.get("baseline_exec_match") is True)
+        baseline_exec_total = sum(1 for r in results.data if r.get("baseline_exec_match") is not None)
 
-        # Calculate enhanced metrics
-        enhanced_exact = sum(1 for r in results.data if r.get("enhanced_exact_match"))
-        enhanced_exec = sum(1 for r in results.data if r.get("enhanced_exec_match"))
+        # Calculate enhanced metrics (count True values, handle None properly)
+        enhanced_exact_count = sum(1 for r in results.data if r.get("enhanced_exact_match") is True)
+        enhanced_exact_total = sum(1 for r in results.data if r.get("enhanced_exact_match") is not None)
+        enhanced_exec_count = sum(1 for r in results.data if r.get("enhanced_exec_match") is True)
+        enhanced_exec_total = sum(1 for r in results.data if r.get("enhanced_exec_match") is not None)
 
         updates = {
-            "baseline_exact_match": baseline_exact / total if total > 0 else None,
-            "baseline_exec_match": baseline_exec / total if total > 0 else None,
-            "enhanced_exact_match": enhanced_exact / total if total > 0 else None,
-            "enhanced_exec_match": enhanced_exec / total if total > 0 else None,
+            "baseline_exact_match": baseline_exact_count / baseline_exact_total if baseline_exact_total > 0 else None,
+            "baseline_exec_match": baseline_exec_count / baseline_exec_total if baseline_exec_total > 0 else None,
+            "enhanced_exact_match": enhanced_exact_count / enhanced_exact_total if enhanced_exact_total > 0 else None,
+            "enhanced_exec_match": enhanced_exec_count / enhanced_exec_total if enhanced_exec_total > 0 else None,
         }
+
+        # Debug logging
+        print(f"Metrics calculation for run {run_id}:")
+        print(f"  Total results: {total}")
+        print(f"  Baseline exact: {baseline_exact_count}/{baseline_exact_total} = {updates['baseline_exact_match']}")
+        print(f"  Baseline exec: {baseline_exec_count}/{baseline_exec_total} = {updates['baseline_exec_match']}")
+        print(f"  Enhanced exact: {enhanced_exact_count}/{enhanced_exact_total} = {updates['enhanced_exact_match']}")
+        print(f"  Enhanced exec: {enhanced_exec_count}/{enhanced_exec_total} = {updates['enhanced_exec_match']}")
 
         self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
 

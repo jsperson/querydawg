@@ -9,7 +9,7 @@ pydantic-settings==2.1.0
 
 # Database (PostgreSQL)
 psycopg2-binary==2.9.9
-supabase>=2.3.0
+supabase==2.9.0  # Pin to version compatible with Pydantic v2
 
 # Utilities
 python-dotenv==1.0.1

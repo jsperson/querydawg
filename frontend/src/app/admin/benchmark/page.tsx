@@ -102,11 +102,13 @@ export default function BenchmarkControlPanel() {
       // Refresh runs list
       await loadRuns();
 
-      // Show success
-      alert(`Benchmark started! Processing ${result.question_count} questions.`);
+      // Show success message that stays visible
+      setError(`✅ Success! Benchmark started. Processing ${result.question_count} questions. Refresh the page to see progress.`);
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start benchmark');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to start benchmark';
+      console.error('Benchmark start error:', err);
+      setError(`❌ Error: ${errorMessage}`);
     } finally {
       setIsStarting(false);
     }
@@ -195,10 +197,22 @@ export default function BenchmarkControlPanel() {
               </p>
             </div>
 
-            {/* Error Display */}
+            {/* Error/Success Display */}
             {error && (
-              <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
-                {error}
+              <div className={`px-4 py-3 rounded-md border ${
+                error.startsWith('✅')
+                  ? 'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800'
+                  : 'bg-destructive/10 text-destructive border-destructive/20'
+              }`}>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 whitespace-pre-wrap">{error}</div>
+                  <button
+                    onClick={() => setError('')}
+                    className="text-current opacity-70 hover:opacity-100 font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             )}
 

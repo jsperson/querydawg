@@ -59,6 +59,8 @@ htmlcov/
 data/spider/spider-fixed.zip
 data/spider/database/
 data/spider/*.json
+# Exception: Keep the dev.json dataset (required for benchmarks)
+!data/spider/dev.json
 data/spider/*.sql
 data/spider/**/*.sqlite
 # Keep only the main README

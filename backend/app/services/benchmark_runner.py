@@ -150,8 +150,9 @@ class BenchmarkRunner:
         """
         Convert SQLite-style SQL to PostgreSQL-compatible SQL
 
-        Main conversion: double quotes for strings → single quotes
-        SQLite allows "string" but PostgreSQL treats " as identifier quotes
+        Main conversions:
+        1. Double quotes for strings → single quotes
+        2. GROUP BY column expansion for joined tables
 
         Args:
             sql: SQLite-style SQL string
@@ -161,13 +162,7 @@ class BenchmarkRunner:
         """
         import re
 
-        # Pattern to match double-quoted strings (not identifiers)
-        # We need to look at context to determine if it's a string literal or identifier
-
-        # Strategy: Look for quoted values that appear after operators or keywords
-        # that typically precede string literals, not identifiers
-
-        # First pass: convert obvious string literals (after =, !=, <, >, IN, etc.)
+        # Step 1: Convert double-quoted string literals to single quotes
         # Pattern: operator/keyword followed by optional whitespace and double-quoted string
         patterns = [
             (r'(=\s*)"([^"]+)"', r"\1'\2'"),           # = "value"
@@ -186,6 +181,54 @@ class BenchmarkRunner:
         result = sql
         for pattern, replacement in patterns:
             result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+
+        # Step 2: Fix GROUP BY with joined tables
+        # PostgreSQL requires all selected non-aggregate columns to be in GROUP BY
+        # This is a heuristic fix for common Spider patterns
+
+        # Pattern: SELECT columns with aliases FROM table1 JOIN table2 ... GROUP BY single_column
+        # Look for GROUP BY that doesn't include all table aliases used in SELECT
+        # Match until we hit HAVING, ORDER, LIMIT, or end of string
+        group_by_match = re.search(r'\bGROUP\s+BY\s+(.*?)(?:\s+HAVING|\s+ORDER|\s+LIMIT|$)', result, re.IGNORECASE)
+        if group_by_match:
+            group_by_clause = group_by_match.group(1).strip()
+
+            # Check if GROUP BY has table aliases (e.g., T1.column)
+            has_alias = re.search(r'([A-Za-z]\d+)\.', group_by_clause)
+
+            if has_alias:
+                # Extract SELECT clause (before FROM)
+                select_match = re.search(r'SELECT\s+(.*?)\s+FROM', result, re.IGNORECASE | re.DOTALL)
+                if select_match:
+                    select_clause = select_match.group(1)
+
+                    # Find non-aggregate columns with different table aliases
+                    # Look for patterns like T2.name where T2 is different from T1 in GROUP BY
+                    select_columns = []
+                    for col_match in re.finditer(r'([A-Za-z]\d+)\.([A-Za-z_][A-Za-z0-9_]*)', select_clause):
+                        table_alias = col_match.group(1)
+                        column_name = col_match.group(2)
+                        full_column = f"{table_alias}.{column_name}"
+
+                        # Skip if it's an aggregate function argument
+                        # Check backwards for COUNT, SUM, AVG, etc.
+                        start_pos = col_match.start()
+                        preceding_text = select_clause[max(0, start_pos-20):start_pos]
+                        if not re.search(r'(COUNT|SUM|AVG|MIN|MAX|GROUP_CONCAT)\s*\(', preceding_text, re.IGNORECASE):
+                            select_columns.append(full_column)
+
+                    # Add missing columns to GROUP BY
+                    for col in select_columns:
+                        if col not in group_by_clause:
+                            group_by_clause += f", {col}"
+
+                    # Replace GROUP BY clause
+                    result = re.sub(
+                        r'\bGROUP\s+BY\s+(.*?)(?=\s+HAVING|\s+ORDER|\s+LIMIT|$)',
+                        f"GROUP BY {group_by_clause}",
+                        result,
+                        flags=re.IGNORECASE
+                    )
 
         return result
 

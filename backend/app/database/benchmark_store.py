@@ -2,11 +2,11 @@
 Supabase operations for benchmark system
 """
 from typing import List, Optional, Dict, Any
-from supabase import create_client, Client
 from datetime import datetime
 from decimal import Decimal
 import uuid
 
+from .supabase_client import SupabaseClient
 from ..models.benchmark import (
     BenchmarkRunCreate,
     BenchmarkRunResponse,
@@ -17,12 +17,16 @@ from ..models.benchmark import (
 )
 
 
-class BenchmarkStore:
-    """Handles all Supabase operations for benchmark system"""
+class BenchmarkStore(SupabaseClient):
+    """
+    Handles all Supabase operations for benchmark system.
+
+    Inherits automatic retry logic from SupabaseClient for all database operations.
+    """
 
     def __init__(self, supabase_url: str, service_role_key: str):
-        """Initialize Supabase client"""
-        self.client: Client = create_client(supabase_url, service_role_key)
+        """Initialize Supabase client with retry logic"""
+        super().__init__(supabase_url, service_role_key)
 
     def create_run(self, config: BenchmarkRunCreate) -> str:
         """
@@ -80,7 +84,7 @@ class BenchmarkStore:
         failed: int,
         current_question: Optional[str] = None
     ):
-        """Update progress counters"""
+        """Update progress counters (retry logic inherited from SupabaseClient)"""
         updates = {
             "completed_count": completed,
             "failed_count": failed,

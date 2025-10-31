@@ -10,10 +10,7 @@ import os
 from pathlib import Path
 
 import psycopg2
-from psycopg2 import pool
-from psycopg2 import sql
 import sqlglot
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from ..models.benchmark import (
     BenchmarkConfig,
@@ -22,6 +19,7 @@ from ..models.benchmark import (
     SpiderQuestion
 )
 from ..database.benchmark_store import BenchmarkStore
+from ..database.query_executor import QueryExecutor, PostgreSQLExecutor
 from ..services.text_to_sql import BaselineSQLGenerator, EnhancedSQLGenerator
 
 
@@ -76,21 +74,17 @@ class BenchmarkRunner:
         # Store connection string for generators
         self.connection_string = connection_string
 
-        # Create connection pool (2-10 connections)
-        self.db_pool = pool.SimpleConnectionPool(
-            minconn=2,
-            maxconn=10,
-            dsn=connection_string
-        )
+        # Create query executor (handles connection pooling and query execution)
+        self.query_executor: QueryExecutor = PostgreSQLExecutor(connection_string)
 
         # Cache for SQL generators (one per database)
         self._baseline_generators = {}
         self._enhanced_generators = {}
 
     def __del__(self):
-        """Clean up connection pool"""
-        if hasattr(self, 'db_pool') and self.db_pool:
-            self.db_pool.closeall()
+        """Clean up query executor"""
+        if hasattr(self, 'query_executor') and self.query_executor:
+            self.query_executor.close()
 
     def load_spider_questions(
         self,
@@ -336,18 +330,16 @@ class BenchmarkRunner:
         norm_gold = self.normalize_sql(gold_sql_converted)
         return norm_generated == norm_gold
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=2, min=2, max=8),
-        retry=retry_if_exception_type(psycopg2.OperationalError)
-    )
     def execute_sql_safely(
         self,
         query: str,
         database: str
     ) -> Tuple[List[Tuple], Optional[str]]:
         """
-        Execute SQL in read-only transaction with timeout
+        Execute SQL query using the query executor.
+
+        Delegates to QueryExecutor which handles connection pooling,
+        retries, and transaction management.
 
         Args:
             query: SQL query to execute
@@ -358,34 +350,7 @@ class BenchmarkRunner:
             results: List of tuples, sorted for comparison
             error_message: None if success, error string if failure
         """
-        conn = self.db_pool.getconn()
-        try:
-            with conn.cursor() as cur:
-                # Set read-only and timeout
-                cur.execute("SET TRANSACTION READ ONLY")
-                cur.execute("SET statement_timeout = '5s'")
-
-                # Safely set search_path using sql.Identifier to prevent SQL injection
-                search_path_query = sql.SQL("SET search_path TO {}").format(
-                    sql.Identifier(database)
-                )
-                cur.execute(search_path_query)
-
-                # Execute query
-                cur.execute(query)
-                results = cur.fetchall()
-
-                # Sort results for deterministic comparison
-                sorted_results = sorted(results, key=lambda x: str(x))
-                return sorted_results, None
-
-        except Exception as e:
-            return [], str(e)
-
-        finally:
-            # Always rollback (read-only) and return connection
-            conn.rollback()
-            self.db_pool.putconn(conn)
+        return self.query_executor.execute_query(query, database)
 
     def results_match(self, results1: List[Tuple], results2: List[Tuple]) -> bool:
         """

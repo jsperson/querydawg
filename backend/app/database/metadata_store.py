@@ -7,21 +7,25 @@ Separate from source databases to allow flexibility in data sources.
 import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from supabase import create_client, Client
+from .supabase_client import SupabaseClient
 
 
-class MetadataStore:
-    """Store and retrieve semantic layers and metadata in Supabase."""
+class MetadataStore(SupabaseClient):
+    """
+    Store and retrieve semantic layers and metadata in Supabase.
+
+    Inherits automatic retry logic from SupabaseClient for all database operations.
+    """
 
     def __init__(self, supabase_url: str, supabase_key: str):
         """
-        Initialize metadata store connection.
+        Initialize metadata store connection with retry logic.
 
         Args:
             supabase_url: Supabase project URL
             supabase_key: Supabase service role key (for write access)
         """
-        self.client: Client = create_client(supabase_url, supabase_key)
+        super().__init__(supabase_url, supabase_key)
 
     def save_semantic_layer(
         self,

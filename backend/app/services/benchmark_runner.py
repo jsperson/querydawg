@@ -163,7 +163,11 @@ class BenchmarkRunner:
         import re
 
         # Step 1: Convert double-quoted string literals to single quotes
-        # Pattern: operator/keyword followed by optional whitespace and double-quoted string
+        # SQLite allows "value" for strings, PostgreSQL requires 'value'
+        # Note: PostgreSQL uses "identifier" for column/table names (case-sensitive)
+        # We need to distinguish between string literals and identifiers
+
+        # First pass: Convert obvious string literals (after operators)
         patterns = [
             (r'(=\s*)"([^"]+)"', r"\1'\2'"),           # = "value"
             (r'(!=\s*)"([^"]+)"', r"\1'\2'"),          # != "value"
@@ -176,11 +180,28 @@ class BenchmarkRunner:
             (r'(,\s*)"([^"]+)"', r"\1'\2'"),           # , "value" (in IN clause)
             (r'(\bLIKE\s+)"([^"]+)"', r"\1'\2'"),      # LIKE "value"
             (r'(\bNOT\s+LIKE\s+)"([^"]+)"', r"\1'\2'"),# NOT LIKE "value"
+            (r'(\bBETWEEN\s+)"([^"]+)"', r"\1'\2'"),   # BETWEEN "value"
+            (r'(\bAND\s+)"([^"]+)"', r"\1'\2'"),       # AND "value" (in BETWEEN)
         ]
 
         result = sql
         for pattern, replacement in patterns:
             result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+
+        # Second pass: Convert double-quoted strings that don't look like valid identifiers
+        # Valid identifiers typically start with letter/underscore and contain alphanumeric/_
+        # If the content has spaces, special chars, or looks like a value, treat as string literal
+        def convert_suspicious_quotes(match):
+            content = match.group(1)
+            # If content has spaces, numbers only, or special patterns, it's likely a string literal
+            if ' ' in content or content.isdigit() or re.match(r'^\d{4}-\d{2}-\d{2}', content):
+                return f"'{content}'"
+            # Otherwise keep as identifier (or remove quotes if simple)
+            # For simplicity, keep double quotes for identifiers (PostgreSQL supports this)
+            return f'"{content}"'
+
+        # Apply to remaining double-quoted strings (with caution)
+        result = re.sub(r'"([^"]+)"', convert_suspicious_quotes, result)
 
         # Step 2: Fix mixed aggregates without GROUP BY
         # SQLite allows: SELECT MAX(x), y FROM table

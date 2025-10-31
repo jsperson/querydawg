@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface BenchmarkSummary {
   run_id: string;
@@ -69,9 +70,12 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
   const [results, setResults] = useState<BenchmarkResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<BenchmarkResult | null>(null);
   const [showFailuresOnly, setShowFailuresOnly] = useState(false);
+  const [filterBy, setFilterBy] = useState<'all' | 'baseline_fail' | 'baseline_pass' | 'enhanced_fail' | 'enhanced_pass'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [error, setError] = useState('');
+  const [executedResults, setExecutedResults] = useState<{gold?: any[], baseline?: any[], enhanced?: any[]} | null>(null);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {
     loadSummary();
@@ -193,6 +197,48 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}m ${seconds}s`;
   };
+
+  const executeComparison = async (result: BenchmarkResult) => {
+    setIsExecuting(true);
+    setExecutedResults(null);
+
+    try {
+      const response = await fetch('/api/benchmark/execute-compare', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gold_sql: result.gold_sql,
+          baseline_sql: result.baseline_sql || '',
+          enhanced_sql: result.enhanced_sql || '',
+          database: result.database,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to execute queries');
+      }
+
+      const data = await response.json();
+      setExecutedResults(data);
+    } catch (err) {
+      console.error('Execution error:', err);
+      setError(`Failed to execute queries: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsExecuting(false);
+    }
+  };
+
+  // Filter results based on filterBy
+  const filteredResults = results.filter((result) => {
+    if (filterBy === 'all') return true;
+    if (filterBy === 'baseline_fail') return result.baseline_exec_match === false;
+    if (filterBy === 'baseline_pass') return result.baseline_exec_match === true;
+    if (filterBy === 'enhanced_fail') return result.enhanced_exec_match === false;
+    if (filterBy === 'enhanced_pass') return result.enhanced_exec_match === true;
+    return true;
+  });
 
   if (isLoading) {
     return (
@@ -489,6 +535,18 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                     <CardDescription>View detailed SQL for each question</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Select value={filterBy} onValueChange={(value: any) => setFilterBy(value)}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Results</SelectItem>
+                        <SelectItem value="baseline_fail">Baseline Fail</SelectItem>
+                        <SelectItem value="baseline_pass">Baseline Pass</SelectItem>
+                        <SelectItem value="enhanced_fail">Enhanced Fail</SelectItem>
+                        <SelectItem value="enhanced_pass">Enhanced Pass</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button
                       variant="outline"
                       size="sm"
@@ -521,8 +579,8 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                   <div className="grid grid-cols-2 gap-6">
                     {/* Question List */}
                     <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                      <h3 className="font-semibold mb-3">Questions ({results.length})</h3>
-                      {results.map((result) => (
+                      <h3 className="font-semibold mb-3">Questions ({filteredResults.length} {filterBy !== 'all' ? `of ${results.length}` : ''})</h3>
+                      {filteredResults.map((result) => (
                           <div
                             key={result.question_id}
                             onClick={() => setSelectedResult(result)}
@@ -572,7 +630,16 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                       {selectedResult ? (
                         <>
                           <div>
-                            <h3 className="font-semibold mb-2">Question</h3>
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-semibold">Question</h3>
+                              <Button
+                                size="sm"
+                                onClick={() => executeComparison(selectedResult)}
+                                disabled={isExecuting}
+                              >
+                                {isExecuting ? 'Executing...' : 'Execute All SQLs'}
+                              </Button>
+                            </div>
                             <p className="text-sm bg-muted p-3 rounded-md">{selectedResult.question}</p>
                             <p className="text-xs text-muted-foreground mt-1">
                               Database: {selectedResult.database} • ID: {selectedResult.question_id}
@@ -650,6 +717,135 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                                   Error: {selectedResult.enhanced_error}
                                 </div>
                               )}
+                            </div>
+                          )}
+
+                          {/* Execution Results */}
+                          {executedResults && (
+                            <div className="border-t pt-4 mt-4">
+                              <h3 className="font-semibold mb-3">Execution Results</h3>
+                              <div className="space-y-4">
+                                {/* Gold Results */}
+                                <div>
+                                  <h4 className="text-sm font-medium mb-2">Gold SQL Results</h4>
+                                  {executedResults.gold.success ? (
+                                    <div className="text-xs bg-green-50 dark:bg-green-900/20 p-3 rounded">
+                                      <p className="font-medium mb-2">✓ Success ({executedResults.gold.row_count} rows in {executedResults.gold.execution_time_ms}ms)</p>
+                                      {executedResults.gold.results && executedResults.gold.results.length > 0 && (
+                                        <div className="overflow-x-auto">
+                                          <table className="min-w-full divide-y divide-border">
+                                            <thead>
+                                              <tr>
+                                                {executedResults.gold.columns?.map((col: string) => (
+                                                  <th key={col} className="px-2 py-1 text-left font-medium">{col}</th>
+                                                ))}
+                                              </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border">
+                                              {executedResults.gold.results.slice(0, 5).map((row: any, idx: number) => (
+                                                <tr key={idx}>
+                                                  {Object.values(row).map((val: any, i: number) => (
+                                                    <td key={i} className="px-2 py-1">{String(val)}</td>
+                                                  ))}
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                          {executedResults.gold.results.length > 5 && (
+                                            <p className="mt-1 text-muted-foreground">... and {executedResults.gold.results.length - 5} more rows</p>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded text-red-600">
+                                      ✗ Error: {executedResults.gold.error}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Baseline Results */}
+                                {summary.run_type !== 'enhanced' && (
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-2">Baseline SQL Results</h4>
+                                    {executedResults.baseline.success ? (
+                                      <div className="text-xs bg-green-50 dark:bg-green-900/20 p-3 rounded">
+                                        <p className="font-medium mb-2">✓ Success ({executedResults.baseline.row_count} rows in {executedResults.baseline.execution_time_ms}ms)</p>
+                                        {executedResults.baseline.results && executedResults.baseline.results.length > 0 && (
+                                          <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-border">
+                                              <thead>
+                                                <tr>
+                                                  {executedResults.baseline.columns?.map((col: string) => (
+                                                    <th key={col} className="px-2 py-1 text-left font-medium">{col}</th>
+                                                  ))}
+                                                </tr>
+                                              </thead>
+                                              <tbody className="divide-y divide-border">
+                                                {executedResults.baseline.results.slice(0, 5).map((row: any, idx: number) => (
+                                                  <tr key={idx}>
+                                                    {Object.values(row).map((val: any, i: number) => (
+                                                      <td key={i} className="px-2 py-1">{String(val)}</td>
+                                                    ))}
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                            {executedResults.baseline.results.length > 5 && (
+                                              <p className="mt-1 text-muted-foreground">... and {executedResults.baseline.results.length - 5} more rows</p>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded text-red-600">
+                                        ✗ Error: {executedResults.baseline.error}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Enhanced Results */}
+                                {summary.run_type !== 'baseline' && (
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-2">Enhanced SQL Results</h4>
+                                    {executedResults.enhanced.success ? (
+                                      <div className="text-xs bg-green-50 dark:bg-green-900/20 p-3 rounded">
+                                        <p className="font-medium mb-2">✓ Success ({executedResults.enhanced.row_count} rows in {executedResults.enhanced.execution_time_ms}ms)</p>
+                                        {executedResults.enhanced.results && executedResults.enhanced.results.length > 0 && (
+                                          <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-border">
+                                              <thead>
+                                                <tr>
+                                                  {executedResults.enhanced.columns?.map((col: string) => (
+                                                    <th key={col} className="px-2 py-1 text-left font-medium">{col}</th>
+                                                  ))}
+                                                </tr>
+                                              </thead>
+                                              <tbody className="divide-y divide-border">
+                                                {executedResults.enhanced.results.slice(0, 5).map((row: any, idx: number) => (
+                                                  <tr key={idx}>
+                                                    {Object.values(row).map((val: any, i: number) => (
+                                                      <td key={i} className="px-2 py-1">{String(val)}</td>
+                                                    ))}
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                            {executedResults.enhanced.results.length > 5 && (
+                                              <p className="mt-1 text-muted-foreground">... and {executedResults.enhanced.results.length - 5} more rows</p>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded text-red-600">
+                                        ✗ Error: {executedResults.enhanced.error}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </>

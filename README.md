@@ -2,16 +2,19 @@
 
 A cloud-native text-to-SQL system that uses automatically generated natural language semantic layers to improve SQL query generation accuracy.
 
-**📊 Current Status:** Week 2 In Progress - Semantic Layer Generation Functional
+**📊 Current Status:** Week 3 Complete - Benchmark System Operational
 
 **Recent Updates:**
+- ✅ Full Spider 1.0 benchmark system (1,034 questions across 20 databases)
+- ✅ Baseline vs Enhanced comparison with real-time metrics
+- ✅ SQL execution comparison viewer with filtering
+- ✅ SQLite to PostgreSQL conversion layer with automatic fixes
+- ✅ Column-order-independent result matching
+- ✅ Vector search for semantic layer RAG (Pinecone integration)
 - ✅ Semantic layer generation with LLM-powered documentation
-- ✅ Admin interface for managing semantic layers
-- ✅ Supabase integration for metadata storage
-- ✅ Text-to-SQL focused prompting for accurate business context
-- 🔨 Database migration to PostgreSQL (19 Spider databases being migrated)
+- ✅ 20 Spider databases migrated to Supabase PostgreSQL
 
-**Note:** Production deployment can be activated on-demand via Vercel (frontend) and Railway (backend) when needed for testing or demonstration.
+**Note:** Production deployment available on Vercel (frontend) and Railway (backend).
 
 ## What is QueryDawg?
 
@@ -21,33 +24,48 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
 
 ## Key Features
 
-- **Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
-- **Side-by-Side Comparison**: Compare baseline (schema-only) vs enhanced (with semantic layer) performance in real-time
-- **Spider Benchmark Evaluation**: Rigorous testing on the industry-standard Spider 1.0 dataset
-- **Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
+- **🤖 Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
+- **📊 Spider 1.0 Benchmark System**: Full evaluation suite with 1,034 questions across 20 databases
+- **🔍 Advanced SQL Comparison**: Execute and compare gold/baseline/enhanced SQL side-by-side
+- **🎯 Intelligent Filtering**: Filter results by baseline/enhanced pass/fail for detailed analysis
+- **⚡ Real-Time Metrics**: Live tracking of execution match rates during benchmark runs
+- **🔄 SQLite → PostgreSQL Conversion**: Automatic query translation with GROUP BY expansion and mixed aggregate handling
+- **🎨 Column-Order-Independent Matching**: Results comparison ignores column order differences
+- **☁️ Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
 
-## Current Features (Week 2 - Semantic Layer Generation)
+## Current Features (Week 3 - Benchmark System Complete)
 
 **Backend (FastAPI):**
 - Modular LLM architecture supporting multiple providers (OpenAI, Anthropic, Ollama)
 - Database schema extraction from Supabase PostgreSQL
-- Text-to-SQL generation with GPT-4o-mini (baseline)
-- **✨ Semantic Layer Generation:**
+- Text-to-SQL generation with GPT-4o-mini (baseline & enhanced)
+- **✨ Semantic Layer System:**
   - Automated LLM-powered documentation creation
   - Business context extraction (domain, entities, relationships)
   - Column-level semantic descriptions with synonyms
-  - Query pattern identification
-  - Ambiguity detection for text-to-SQL
-  - Optimized for text-to-SQL use cases
-- SQL query execution with safety limits
-- Cost and performance tracking
-- Supabase integration for metadata storage
+  - Query pattern identification and ambiguity detection
+  - Vector embeddings with Pinecone for RAG-based semantic retrieval
+  - Supabase metadata storage with version control
+- **✨ Spider 1.0 Benchmark System:**
+  - Full evaluation suite (1,034 questions, 20 databases)
+  - Baseline vs Enhanced comparison runs
+  - Execution match & exact match scoring
+  - Real-time progress tracking with live metrics
+  - Budget controls and cost monitoring
+  - Supabase storage for benchmark results
+  - SQLite to PostgreSQL automatic conversion:
+    - Double quote → single quote transformation
+    - GROUP BY clause expansion for PostgreSQL strictness
+    - Mixed aggregate function handling
+  - Column-order-independent result matching using frozensets
+- SQL query execution with safety limits (max rows, timeout)
+- Cost and performance tracking per query
+- Background task processing for long-running benchmarks
 
 **Frontend (Next.js 14):**
 - Modern UI with shadcn/ui components and Tailwind CSS
-- Database selector with 19 Spider datasets
-- Natural language query interface
-- Real-time SQL generation with explanation
+- Database selector with 20 Spider datasets
+- Natural language query interface with real-time SQL generation
 - Interactive result display with execution metrics
 - Cost and token usage tracking
 - **✨ Semantic Layer Admin Interface:**
@@ -56,14 +74,27 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
   - Preview LLM prompts before generation
   - Custom instructions for domain-specific context
   - Delete and regenerate semantic layers
-  - Visual metadata display
+  - Visual metadata display with embedding status
+- **✨ Benchmark Control Panel:**
+  - Configure and launch benchmark runs (baseline/enhanced/both)
+  - Database selection and question limit controls
+  - Real-time progress monitoring with auto-refresh
+  - View detailed results with filtering:
+    - Filter by baseline/enhanced pass/fail
+    - Show failures only option
+  - SQL comparison viewer with side-by-side display
+  - Execute and compare all three SQLs (gold/baseline/enhanced)
+  - View actual query results in tabular format
+  - Run management (cancel, delete, view history)
 
 **Infrastructure:**
-- 19 Spider databases migrated to Supabase PostgreSQL
-- Semantic layers stored in Supabase metadata tables
-- RESTful API with OpenAPI documentation
+- 20 Spider databases migrated to Supabase PostgreSQL
+- Semantic layers and benchmark results in Supabase
+- Pinecone vector database for semantic embeddings
+- RESTful API with OpenAPI documentation (/docs)
 - Environment-based configuration
 - Production deployment on Vercel (frontend) + Railway (backend)
+- Background task processing for benchmark runs
 
 ## Expected Results
 

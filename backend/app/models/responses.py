@@ -95,3 +95,29 @@ class ExecuteResponse(BaseModel):
     execution_time_ms: int
     truncated: bool
     database: str
+
+
+class CompareExecuteRequest(BaseModel):
+    """Request for executing multiple SQL queries for comparison"""
+    gold_sql: str
+    baseline_sql: str
+    enhanced_sql: str
+    database: str
+
+
+class QueryExecutionResult(BaseModel):
+    """Result from executing a single query"""
+    success: bool
+    results: Optional[List[Dict[str, Any]]] = None
+    columns: Optional[List[str]] = None
+    row_count: Optional[int] = None
+    execution_time_ms: Optional[int] = None
+    error: Optional[str] = None
+
+
+class CompareExecuteResponse(BaseModel):
+    """Response from executing multiple SQL queries for comparison"""
+    gold: QueryExecutionResult
+    baseline: QueryExecutionResult
+    enhanced: QueryExecutionResult
+    database: str

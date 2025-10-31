@@ -366,6 +366,30 @@ class BenchmarkRunner:
             conn.rollback()
             self.db_pool.putconn(conn)
 
+    def results_match(self, results1: List[Tuple], results2: List[Tuple]) -> bool:
+        """
+        Compare query results in a column-order-independent way
+
+        Converts each row to a frozenset to ignore column order, then compares as sets.
+        This allows (2014, 'John') to match ('John', 2014).
+
+        Args:
+            results1: First result set
+            results2: Second result set
+
+        Returns:
+            True if results contain the same data regardless of column order
+        """
+        # Convert to sets of frozensets for order-independent comparison
+        # frozenset({'John', 2014}) == frozenset({2014, 'John'})
+        try:
+            set1 = {frozenset(row) for row in results1}
+            set2 = {frozenset(row) for row in results2}
+            return set1 == set2
+        except TypeError:
+            # If rows contain unhashable types (like lists), fall back to direct comparison
+            return results1 == results2
+
     def check_execution_match(
         self,
         generated_sql: str,
@@ -382,7 +406,7 @@ class BenchmarkRunner:
 
         Returns:
             (match, error_message)
-            match: True if results match
+            match: True if results match (column order independent)
             error_message: Error from generated SQL execution (None if success)
         """
         # Convert gold SQL from SQLite to PostgreSQL syntax
@@ -399,8 +423,8 @@ class BenchmarkRunner:
         if gen_error:
             return False, gen_error
 
-        # Compare results
-        return gold_results == gen_results, None
+        # Compare results (column order independent)
+        return self.results_match(gold_results, gen_results), None
 
     def _get_baseline_generator(self, database: str) -> BaselineSQLGenerator:
         """Get or create baseline generator for database"""

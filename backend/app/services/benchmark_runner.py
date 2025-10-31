@@ -182,7 +182,55 @@ class BenchmarkRunner:
         for pattern, replacement in patterns:
             result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
 
-        # Step 2: Fix GROUP BY with joined tables
+        # Step 2: Fix mixed aggregates without GROUP BY
+        # SQLite allows: SELECT MAX(x), y FROM table
+        # PostgreSQL requires: SELECT MAX(x), MAX(y) FROM table OR GROUP BY y
+        # Heuristic: If SELECT has aggregates but NO GROUP BY, wrap plain columns in MAX()
+
+        has_group_by = re.search(r'\bGROUP\s+BY\b', result, re.IGNORECASE)
+        if not has_group_by:
+            # Check if SELECT has aggregate functions
+            select_match = re.search(r'SELECT\s+(.*?)\s+FROM', result, re.IGNORECASE | re.DOTALL)
+            if select_match:
+                select_clause = select_match.group(1)
+                has_aggregates = re.search(r'\b(COUNT|SUM|AVG|MIN|MAX)\s*\(', select_clause, re.IGNORECASE)
+
+                if has_aggregates:
+                    # Find plain column references (not inside functions, not *)
+                    # Match: word or table.word, but NOT if preceded by function name
+                    def wrap_plain_columns(match_obj):
+                        full_match = match_obj.group(0)
+                        # Check if already in a function
+                        start_pos = match_obj.start()
+                        preceding = select_clause[max(0, start_pos-30):start_pos]
+                        if re.search(r'(COUNT|SUM|AVG|MIN|MAX|CAST)\s*\(\s*$', preceding, re.IGNORECASE):
+                            return full_match  # Already in function, don't wrap
+
+                        # Don't wrap *, AS aliases, or function names
+                        if full_match == '*' or full_match.upper() in ['AS', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX']:
+                            return full_match
+
+                        # Wrap in MAX() for PostgreSQL compatibility
+                        return f"MAX({full_match})"
+
+                    # Match column references: word or table.word (but not inside quotes)
+                    # This is a heuristic - may need refinement
+                    new_select = re.sub(
+                        r'\b([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?)\b',
+                        wrap_plain_columns,
+                        select_clause
+                    )
+
+                    # Replace SELECT clause if it changed
+                    if new_select != select_clause:
+                        result = re.sub(
+                            r'(SELECT\s+).*?(\s+FROM)',
+                            rf'\1{new_select}\2',
+                            result,
+                            flags=re.IGNORECASE | re.DOTALL
+                        )
+
+        # Step 3: Fix GROUP BY with joined tables
         # PostgreSQL requires all selected non-aggregate columns to be in GROUP BY
         # This is a heuristic fix for common Spider patterns
 

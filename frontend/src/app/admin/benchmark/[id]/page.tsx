@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface BenchmarkSummary {
   run_id: string;
@@ -79,7 +78,7 @@ interface ExecutionResults {
   database: string;
 }
 
-type FilterType = 'all' | 'baseline_fail' | 'baseline_pass' | 'enhanced_fail' | 'enhanced_pass';
+type FilterType = 'all' | 'both_pass' | 'baseline_only' | 'enhanced_only' | 'both_fail';
 
 export default function BenchmarkResultsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -251,10 +250,17 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
   // Filter results based on filterBy
   const filteredResults = results.filter((result) => {
     if (filterBy === 'all') return true;
-    if (filterBy === 'baseline_fail') return result.baseline_exec_match === false;
-    if (filterBy === 'baseline_pass') return result.baseline_exec_match === true;
-    if (filterBy === 'enhanced_fail') return result.enhanced_exec_match === false;
-    if (filterBy === 'enhanced_pass') return result.enhanced_exec_match === true;
+
+    const baselinePass = result.baseline_exec_match === true;
+    const baselineFail = result.baseline_exec_match === false;
+    const enhancedPass = result.enhanced_exec_match === true;
+    const enhancedFail = result.enhanced_exec_match === false;
+
+    if (filterBy === 'both_pass') return baselinePass && enhancedPass;
+    if (filterBy === 'baseline_only') return baselinePass && enhancedFail;
+    if (filterBy === 'enhanced_only') return baselineFail && enhancedPass;
+    if (filterBy === 'both_fail') return baselineFail && enhancedFail;
+
     return true;
   });
 
@@ -552,34 +558,80 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                     <CardTitle>SQL Results</CardTitle>
                     <CardDescription>View detailed SQL for each question</CardDescription>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Select value={filterBy} onValueChange={(value) => setFilterBy(value as FilterType)}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter by..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Results</SelectItem>
-                        <SelectItem value="baseline_fail">Baseline Fail</SelectItem>
-                        <SelectItem value="baseline_pass">Baseline Pass</SelectItem>
-                        <SelectItem value="enhanced_fail">Enhanced Fail</SelectItem>
-                        <SelectItem value="enhanced_pass">Enhanced Pass</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setShowFailuresOnly(!showFailuresOnly);
-                        if (results.length > 0) {
-                          loadResults();
-                        }
-                      }}
-                    >
-                      {showFailuresOnly ? 'Show All' : 'Show Failures Only'}
-                    </Button>
-                    <Button onClick={loadResults} disabled={isLoadingResults}>
-                      {isLoadingResults ? 'Loading...' : results.length > 0 ? 'Refresh Results' : 'Load Results'}
-                    </Button>
+                  <div className="flex items-center gap-4">
+                    {/* 2x2 Matrix Filter */}
+                    <div className="flex flex-col gap-1">
+                      <div className="text-xs font-medium mb-1">Filter by Result:</div>
+                      <div className="grid grid-cols-3 gap-1">
+                        {/* Header row */}
+                        <div></div>
+                        <div className="text-[10px] text-center text-muted-foreground font-medium">Enhanced ✓</div>
+                        <div className="text-[10px] text-center text-muted-foreground font-medium">Enhanced ✗</div>
+
+                        {/* Baseline Pass row */}
+                        <div className="text-[10px] text-right text-muted-foreground font-medium py-1">Baseline ✓</div>
+                        <Button
+                          variant={filterBy === 'both_pass' ? 'default' : 'outline'}
+                          size="sm"
+                          className="h-8 px-2 text-xs"
+                          onClick={() => setFilterBy('both_pass')}
+                        >
+                          Both ✓
+                        </Button>
+                        <Button
+                          variant={filterBy === 'baseline_only' ? 'default' : 'outline'}
+                          size="sm"
+                          className="h-8 px-2 text-xs"
+                          onClick={() => setFilterBy('baseline_only')}
+                        >
+                          Base Only
+                        </Button>
+
+                        {/* Baseline Fail row */}
+                        <div className="text-[10px] text-right text-muted-foreground font-medium py-1">Baseline ✗</div>
+                        <Button
+                          variant={filterBy === 'enhanced_only' ? 'default' : 'outline'}
+                          size="sm"
+                          className="h-8 px-2 text-xs"
+                          onClick={() => setFilterBy('enhanced_only')}
+                        >
+                          Enh Only
+                        </Button>
+                        <Button
+                          variant={filterBy === 'both_fail' ? 'default' : 'outline'}
+                          size="sm"
+                          className="h-8 px-2 text-xs"
+                          onClick={() => setFilterBy('both_fail')}
+                        >
+                          Both ✗
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant={filterBy === 'all' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setFilterBy('all')}
+                      >
+                        Show All
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowFailuresOnly(!showFailuresOnly);
+                          if (results.length > 0) {
+                            loadResults();
+                          }
+                        }}
+                      >
+                        {showFailuresOnly ? 'Include Passes' : 'Failures Only'}
+                      </Button>
+                      <Button onClick={loadResults} disabled={isLoadingResults}>
+                        {isLoadingResults ? 'Loading...' : results.length > 0 ? 'Refresh Results' : 'Load Results'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardHeader>

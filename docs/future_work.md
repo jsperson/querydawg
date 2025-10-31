@@ -450,6 +450,143 @@ Extend semantic layers to support queries in multiple languages.
 
 ---
 
+## 13. Database Architecture Enhancements
+
+### Overview
+Extend the recently refactored database architecture (Phase 1 completed) to support multiple database types for benchmark execution.
+
+### Status
+**✅ Phase 1 Complete (October 2024):**
+- Created `SupabaseClient` base class with automatic retry logic
+- Unified retry handling for all 23 Supabase metadata operations (5 retries, exponential backoff)
+- Fixed `httpx.RemoteProtocolError` connection failures during benchmark runs
+- Created `QueryExecutor` interface for pluggable query execution
+- Implemented `PostgreSQLExecutor` with connection pooling
+- Separated metadata storage (Supabase) from query execution (pluggable)
+- Commit: `51c7d50` - "Phase 1: Refactor database architecture with retry logic"
+
+### Phase 2: Configuration Separation (Pending)
+
+**Goal**: Separate configuration for metadata database vs benchmark query execution database.
+
+**Technical Changes:**
+```python
+# Environment variables
+METADATA_DATABASE_URL=postgresql://...supabase...  # For benchmark runs, results, semantic layers
+BENCHMARK_DATABASE_URL=postgresql://...           # For executing benchmark SQL queries
+BENCHMARK_DATABASE_TYPE=postgresql                # postgresql, mysql, sqlite
+```
+
+**Implementation:**
+- Add new config variables to `backend/app/config.py`
+- Update `BenchmarkRunner.__init__()` to accept database type
+- Factory pattern for `QueryExecutor` selection:
+  ```python
+  if database_type == "postgresql":
+      executor = PostgreSQLExecutor(benchmark_url)
+  elif database_type == "mysql":
+      executor = MySQLExecutor(benchmark_url)
+  elif database_type == "sqlite":
+      executor = SQLiteExecutor(benchmark_url)
+  ```
+
+**Benefits:**
+- Run benchmarks against any PostgreSQL instance (not just Supabase)
+- Prepare for multi-database type support
+- Clear separation of concerns
+
+**Time Estimate:** 2-3 hours
+
+### Phase 3: Multi-Database Support (Pending)
+
+**Goal**: Support MySQL and SQLite benchmarks to enable broader dataset evaluation.
+
+**Implementation Tasks:**
+
+1. **MySQLExecutor** (for Spider MySQL databases):
+   ```python
+   class MySQLExecutor(QueryExecutor):
+       def __init__(self, connection_string: str):
+           self.pool = mysql.connector.pooling.MySQLConnectionPool(
+               pool_size=10,
+               **parse_connection_string(connection_string)
+           )
+
+       def execute_query(self, query: str, database: str):
+           # MySQL-specific implementation
+           # Handle MySQL dialect differences
+           # Set USE database statement
+   ```
+
+2. **SQLiteExecutor** (for local/embedded benchmarks):
+   ```python
+   class SQLiteExecutor(QueryExecutor):
+       def __init__(self, database_path: str):
+           self.connection = sqlite3.connect(
+               database_path,
+               check_same_thread=False
+           )
+
+       def execute_query(self, query: str, database: str):
+           # SQLite-specific implementation
+           # Handle ATTACH DATABASE for multi-schema support
+           # Convert PostgreSQL syntax to SQLite
+   ```
+
+3. **SQL Dialect Translation**:
+   - Use `sqlglot` library (already a dependency)
+   - Translate PostgreSQL-specific syntax:
+     - `LIMIT` → MySQL/SQLite compatible
+     - Schema qualification → Database switching
+     - Data types (SERIAL, TIMESTAMP, etc.)
+
+**Benefits:**
+- Evaluate on original Spider SQLite databases
+- Support enterprise MySQL deployments
+- Test semantic layer portability across database types
+- Broader benchmark coverage
+
+**Challenges:**
+- SQL dialect differences (e.g., `::` casting, `LIMIT` syntax)
+- Schema vs. database handling (PostgreSQL schemas vs. MySQL databases)
+- Connection pooling varies by database type
+- Different timeout mechanisms
+
+**Time Estimate:**
+- MySQLExecutor: 4-6 hours
+- SQLiteExecutor: 4-6 hours
+- SQL translation testing: 2-3 hours
+- Total: ~12-15 hours
+
+### Research Value
+
+**For Publications:**
+- Demonstrate semantic layer approach is **database-agnostic**
+- Compare accuracy across PostgreSQL, MySQL, SQLite
+- Analyze whether semantic layers help more on certain database types
+- Test prompt engineering effectiveness across SQL dialects
+
+**For Practical Deployment:**
+- Support enterprises with mixed database environments
+- Enable local development with SQLite
+- Reduce cloud costs by using lighter databases for testing
+- Broader applicability increases adoption potential
+
+### Integration with Other Extensions
+
+- **Spider 2.0 Evaluation** (#9): Requires MySQL/Snowflake support
+- **Domain Templates** (#5): May need database-specific query patterns
+- **Fine-tuning** (#6): More diverse training data from multiple database types
+
+### Priority
+**Medium-High**: Not critical for current research but valuable for:
+1. Spider 2.0 evaluation (MySQL/Snowflake)
+2. Publication strength (demonstrates generality)
+3. Practical deployment scenarios
+4. Comprehensive benchmark coverage
+
+---
+
 ## Publication Opportunities
 
 1. **Main Paper**: Current 7-week project results

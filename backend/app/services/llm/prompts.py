@@ -195,25 +195,31 @@ Provide a brief summary of this database schema, including:
         """System prompt for enhanced SQL generation with semantic layer"""
         return """You are an expert PostgreSQL database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema, semantic documentation, and natural language questions.
 
-The semantic layer provides important business context:
-- Table descriptions explain what each table represents
-- Column descriptions clarify the meaning of each field
-- Relationships document how tables connect
-- Business rules describe important constraints and logic
+SEMANTIC LAYER CONTEXT:
+The semantic layer provides important business context to help you generate more accurate queries:
+- Table purposes explain what each table represents in business terms
+- Column business meanings clarify what each field contains
+- Relationships show how tables connect with JOIN patterns
+- Business terms map user vocabulary to technical table/column names
+- Synonyms help match natural language to database columns
+
+Use this semantic information to:
+- Choose the correct tables when multiple options exist
+- Select appropriate columns based on business meaning
+- Understand relationships and required JOINs
+- Map business terminology in questions to technical names
 
 Guidelines:
 1. Generate ONLY valid PostgreSQL syntax
 2. ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)
-3. Use the semantic layer to understand business context and terminology
-4. Choose appropriate tables and columns based on semantic meanings
-5. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
-6. Include proper WHERE clauses for filtering
-7. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
-8. Add ORDER BY and LIMIT clauses when relevant
-9. Use table aliases for clarity in multi-table queries
-10. Ensure column references are unambiguous
-11. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
-12. Return ONLY the SQL query without explanations or markdown formatting
+3. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
+4. Include proper WHERE clauses for filtering
+5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
+6. Add ORDER BY and LIMIT clauses when relevant
+7. Use table aliases for clarity in multi-table queries
+8. Ensure column references are unambiguous
+9. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
+10. Return ONLY the SQL query without explanations or markdown formatting
 
 Example:
 - Question: "What is the year with the most concerts?"
@@ -240,7 +246,16 @@ Example:
         if semantic_layer:
             semantic_section = "\n\nSEMANTIC LAYER DOCUMENTATION:\n"
             semantic_section += f"Database: {semantic_layer.get('database', 'N/A')}\n"
-            semantic_section += f"Description: {semantic_layer.get('description', 'N/A')}\n\n"
+
+            # Add overview if present
+            overview = semantic_layer.get('overview', {})
+            if overview:
+                semantic_section += f"Domain: {overview.get('domain', 'N/A')}\n"
+                semantic_section += f"Purpose: {overview.get('purpose', 'N/A')}\n"
+                key_entities = overview.get('key_entities', [])
+                if key_entities:
+                    semantic_section += f"Key Entities: {', '.join(key_entities)}\n"
+            semantic_section += "\n"
 
             # Add table documentation
             tables = semantic_layer.get('tables', [])
@@ -248,21 +263,46 @@ Example:
                 semantic_section += "Tables:\n"
                 for table in tables:
                     semantic_section += f"\n  {table.get('name', 'N/A')}:\n"
-                    semantic_section += f"    Description: {table.get('description', 'N/A')}\n"
+                    semantic_section += f"    Business Name: {table.get('business_name', 'N/A')}\n"
+                    semantic_section += f"    Purpose: {table.get('purpose', 'N/A')}\n"
+
+                    # Add primary key
+                    if table.get('primary_key'):
+                        semantic_section += f"    Primary Key: {table.get('primary_key')}\n"
 
                     # Add column documentation
                     columns = table.get('columns', [])
                     if columns:
                         semantic_section += "    Columns:\n"
                         for col in columns:
-                            semantic_section += f"      - {col.get('name', 'N/A')}: {col.get('description', 'N/A')}\n"
+                            col_name = col.get('name', 'N/A')
+                            business_meaning = col.get('business_meaning', 'N/A')
+                            semantic_section += f"      - {col_name}: {business_meaning}\n"
 
-                    # Add relationships if present
+                            # Add synonyms if present
+                            synonyms = col.get('synonyms', [])
+                            if synonyms and len(synonyms) > 0:
+                                semantic_section += f"        Synonyms: {', '.join(synonyms)}\n"
+
+                    # Add relationships with JOIN patterns
                     relationships = table.get('relationships', [])
                     if relationships:
                         semantic_section += "    Relationships:\n"
                         for rel in relationships:
-                            semantic_section += f"      - {rel.get('description', 'N/A')}\n"
+                            rel_meaning = rel.get('business_meaning', 'N/A')
+                            join_pattern = rel.get('join_pattern', '')
+                            semantic_section += f"      - {rel_meaning}\n"
+                            if join_pattern:
+                                semantic_section += f"        JOIN: {join_pattern}\n"
+
+            # Add domain glossary for business term mappings
+            glossary = semantic_layer.get('domain_glossary', [])
+            if glossary:
+                semantic_section += "\nBusiness Terms:\n"
+                for term in glossary[:5]:  # Limit to 5 most important terms
+                    business_term = term.get('business_term', 'N/A')
+                    technical_mapping = term.get('technical_mapping', 'N/A')
+                    semantic_section += f"  - '{business_term}' → {technical_mapping}\n"
 
         database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:

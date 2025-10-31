@@ -63,6 +63,24 @@ interface BenchmarkStatus {
   enhanced_correct_count: number | null;
 }
 
+interface QueryExecutionResult {
+  success: boolean;
+  results?: Record<string, unknown>[];
+  columns?: string[];
+  row_count?: number;
+  execution_time_ms?: number;
+  error?: string;
+}
+
+interface ExecutionResults {
+  gold: QueryExecutionResult;
+  baseline: QueryExecutionResult;
+  enhanced: QueryExecutionResult;
+  database: string;
+}
+
+type FilterType = 'all' | 'baseline_fail' | 'baseline_pass' | 'enhanced_fail' | 'enhanced_pass';
+
 export default function BenchmarkResultsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [summary, setSummary] = useState<BenchmarkSummary | null>(null);
@@ -70,11 +88,11 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
   const [results, setResults] = useState<BenchmarkResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<BenchmarkResult | null>(null);
   const [showFailuresOnly, setShowFailuresOnly] = useState(false);
-  const [filterBy, setFilterBy] = useState<'all' | 'baseline_fail' | 'baseline_pass' | 'enhanced_fail' | 'enhanced_pass'>('all');
+  const [filterBy, setFilterBy] = useState<FilterType>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [error, setError] = useState('');
-  const [executedResults, setExecutedResults] = useState<{gold?: any[], baseline?: any[], enhanced?: any[]} | null>(null);
+  const [executedResults, setExecutedResults] = useState<ExecutionResults | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
   useEffect(() => {
@@ -535,7 +553,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                     <CardDescription>View detailed SQL for each question</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Select value={filterBy} onValueChange={(value: any) => setFilterBy(value)}>
+                    <Select value={filterBy} onValueChange={(value) => setFilterBy(value as FilterType)}>
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter by..." />
                       </SelectTrigger>
@@ -742,9 +760,9 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                                               </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border">
-                                              {executedResults.gold.results.slice(0, 5).map((row: any, idx: number) => (
+                                              {executedResults.gold.results.slice(0, 5).map((row, idx) => (
                                                 <tr key={idx}>
-                                                  {Object.values(row).map((val: any, i: number) => (
+                                                  {Object.values(row).map((val, i) => (
                                                     <td key={i} className="px-2 py-1">{String(val)}</td>
                                                   ))}
                                                 </tr>
@@ -782,9 +800,9 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-border">
-                                                {executedResults.baseline.results.slice(0, 5).map((row: any, idx: number) => (
+                                                {executedResults.baseline.results.slice(0, 5).map((row, idx) => (
                                                   <tr key={idx}>
-                                                    {Object.values(row).map((val: any, i: number) => (
+                                                    {Object.values(row).map((val, i) => (
                                                       <td key={i} className="px-2 py-1">{String(val)}</td>
                                                     ))}
                                                   </tr>
@@ -823,9 +841,9 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-border">
-                                                {executedResults.enhanced.results.slice(0, 5).map((row: any, idx: number) => (
+                                                {executedResults.enhanced.results.slice(0, 5).map((row, idx) => (
                                                   <tr key={idx}>
-                                                    {Object.values(row).map((val: any, i: number) => (
+                                                    {Object.values(row).map((val, i) => (
                                                       <td key={i} className="px-2 py-1">{String(val)}</td>
                                                     ))}
                                                   </tr>

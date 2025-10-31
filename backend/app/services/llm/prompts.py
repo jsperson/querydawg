@@ -61,12 +61,17 @@ Guidelines:
 7. Use table aliases for clarity in multi-table queries
 8. Ensure column references are unambiguous
 9. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
-10. Return ONLY the SQL query without explanations or markdown formatting
+10. **Order SELECT columns to match the question's word order** - If the question asks "How many cars were sold each year", put COUNT(*) before year to match the natural reading order.
+11. Return ONLY the SQL query without explanations or markdown formatting
 
-Example:
+Examples:
 - Question: "What is the year with the most concerts?"
 - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
+- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+
+- Question: "How many cars were sold each year?"
+- WRONG: SELECT year, COUNT(*) FROM sales GROUP BY year
+- CORRECT: SELECT COUNT(*), year FROM sales GROUP BY year"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
@@ -213,12 +218,17 @@ Guidelines:
 9. Use table aliases for clarity in multi-table queries
 10. Ensure column references are unambiguous
 11. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
-12. Return ONLY the SQL query without explanations or markdown formatting
+12. **Order SELECT columns to match the question's word order** - If the question asks "How many cars were sold each year", put COUNT(*) before year to match the natural reading order.
+13. Return ONLY the SQL query without explanations or markdown formatting
 
-Example:
+Examples:
 - Question: "What is the year with the most concerts?"
 - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
+- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+
+- Question: "How many cars were sold each year?"
+- WRONG: SELECT year, COUNT(*) FROM sales GROUP BY year
+- CORRECT: SELECT COUNT(*), year FROM sales GROUP BY year"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:

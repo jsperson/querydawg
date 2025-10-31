@@ -13,8 +13,14 @@ from ..models.benchmark import (
     BenchmarkResultsResponse,
     BenchmarkSummaryStats
 )
+from ..models.responses import (
+    CompareExecuteRequest,
+    CompareExecuteResponse,
+    QueryExecutionResult
+)
 from ..database.benchmark_store import get_benchmark_store, BenchmarkStore
 from ..services.benchmark_runner import BenchmarkRunner, BudgetExceededError
+from ..services.executor import SQLExecutor, SQLExecutionError
 from ..dependencies import verify_api_key
 
 
@@ -283,6 +289,81 @@ async def cancel_run(
             content={"message": "Benchmark cancelled", "run_id": run_id}
         )
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/execute-compare", response_model=CompareExecuteResponse)
+async def execute_compare(
+    request: CompareExecuteRequest,
+    _: str = Depends(verify_api_key)
+):
+    """
+    Execute three SQL queries (gold, baseline, enhanced) for comparison
+
+    Returns results for all three queries, with errors captured individually
+    """
+    try:
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            raise HTTPException(status_code=500, detail="Server configuration error")
+
+        # Validate request
+        if not request.database or not request.database.strip():
+            raise HTTPException(status_code=400, detail="Database name cannot be empty")
+
+        # Helper function to execute a single query
+        def execute_query(sql: str) -> QueryExecutionResult:
+            """Execute SQL and return result or error"""
+            if not sql or not sql.strip():
+                return QueryExecutionResult(
+                    success=False,
+                    error="Empty SQL query"
+                )
+
+            try:
+                executor = SQLExecutor(
+                    database_url=database_url,
+                    schema_name=request.database,
+                    max_rows=100,  # Limit for comparison view
+                    timeout_seconds=10
+                )
+
+                result = executor.execute(sql)
+
+                return QueryExecutionResult(
+                    success=True,
+                    results=result["results"],
+                    columns=result["columns"],
+                    row_count=result["row_count"],
+                    execution_time_ms=result["execution_time_ms"]
+                )
+
+            except SQLExecutionError as e:
+                return QueryExecutionResult(
+                    success=False,
+                    error=str(e)
+                )
+            except Exception as e:
+                return QueryExecutionResult(
+                    success=False,
+                    error=f"Execution failed: {str(e)}"
+                )
+
+        # Execute all three queries
+        gold_result = execute_query(request.gold_sql)
+        baseline_result = execute_query(request.baseline_sql)
+        enhanced_result = execute_query(request.enhanced_sql)
+
+        return CompareExecuteResponse(
+            gold=gold_result,
+            baseline=baseline_result,
+            enhanced=enhanced_result,
+            database=request.database
+        )
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

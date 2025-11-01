@@ -556,8 +556,9 @@ class BenchmarkRunner:
 
             execution_time_ms = int((time.time() - start_time) * 1000)
 
-            # Get number of semantic chunks used
-            semantic_chunks = metadata.get('semantic_chunks_used', 0)
+            # Get semantic layer retrieval tracking
+            semantic_chunks = metadata.get('semantic_chunks_retrieved', 0)
+            retrieval_method = metadata.get('semantic_retrieval_method', None)
 
             return {
                 "enhanced_sql": generated_sql,
@@ -568,6 +569,7 @@ class BenchmarkRunner:
                 "enhanced_cost_usd": Decimal(str(cost)),
                 "enhanced_tokens_used": metadata["tokens_used"],
                 "enhanced_semantic_chunks_used": semantic_chunks,
+                "enhanced_semantic_retrieval_method": retrieval_method,
                 "enhanced_retry_count": retry_count
             }
 
@@ -582,6 +584,7 @@ class BenchmarkRunner:
                 "enhanced_cost_usd": Decimal("0"),
                 "enhanced_tokens_used": 0,
                 "enhanced_semantic_chunks_used": 0,
+                "enhanced_semantic_retrieval_method": None,
                 "enhanced_retry_count": retry_count
             }
 

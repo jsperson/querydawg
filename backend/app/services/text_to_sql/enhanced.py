@@ -47,6 +47,10 @@ class EnhancedSQLGenerator:
         self._semantic_layer_cache: Optional[Dict[str, Any]] = None
         self._embedding_service: Optional[EmbeddingService] = None
 
+        # Tracking for last retrieval
+        self._last_retrieval_method: Optional[str] = None
+        self._last_chunks_retrieved: int = 0
+
     def _get_schema(self) -> Dict[str, Any]:
         """
         Get database schema (cached)
@@ -88,6 +92,13 @@ class EnhancedSQLGenerator:
         If use_vector_search is True, retrieves relevant chunks via vector search.
         Otherwise, loads the full semantic layer from metadata store.
 
+        Tracks retrieval method for analysis:
+        - "vector_search_success": Successfully retrieved chunks from Pinecone
+        - "vector_search_empty_fallback": Pinecone returned 0 results, used full layer
+        - "vector_search_error_fallback": Pinecone error, used full layer
+        - "full_layer_direct": Configured to use full layer (no vector search)
+        - "none": No semantic layer available
+
         Args:
             question: Natural language question
 
@@ -105,7 +116,15 @@ class EnhancedSQLGenerator:
                 )
 
                 if not chunks:
-                    return None
+                    # No chunks found in Pinecone - fall back to full semantic layer
+                    print(f"Warning: Vector search returned 0 chunks for {self.database_name}, falling back to full semantic layer")
+                    self._last_retrieval_method = "vector_search_empty_fallback"
+                    self._last_chunks_retrieved = 0
+                    return self._get_full_semantic_layer_text()
+
+                # Successfully retrieved chunks
+                self._last_retrieval_method = "vector_search_success"
+                self._last_chunks_retrieved = len(chunks)
 
                 # Format chunks into a readable context
                 context_parts = [f"Relevant semantic information for {self.database_name}:\n"]
@@ -119,12 +138,17 @@ class EnhancedSQLGenerator:
                 return "\n".join(context_parts)
 
             except Exception as e:
-                print(f"Warning: Vector search failed: {e}")
-                # Fall back to full semantic layer
+                print(f"Warning: Vector search failed with error: {e}")
+                print(f"Falling back to full semantic layer for {self.database_name}")
+                # Fall back to full semantic layer on error
+                self._last_retrieval_method = "vector_search_error_fallback"
+                self._last_chunks_retrieved = 0
                 return self._get_full_semantic_layer_text()
 
         else:
-            # Load full semantic layer
+            # Configured to use full semantic layer directly
+            self._last_retrieval_method = "full_layer_direct"
+            self._last_chunks_retrieved = 0
             return self._get_full_semantic_layer_text()
 
     def _get_full_semantic_layer_text(self) -> Optional[str]:
@@ -150,6 +174,9 @@ class EnhancedSQLGenerator:
                 self._semantic_layer_cache = result.get("semantic_layer")
 
         if not self._semantic_layer_cache:
+            # Track when no semantic layer is available
+            if self._last_retrieval_method is None:
+                self._last_retrieval_method = "none"
             return None
 
         # Convert semantic layer to formatted text
@@ -166,15 +193,19 @@ class EnhancedSQLGenerator:
             Dictionary with:
                 - sql: Generated SQL query
                 - explanation: Natural language explanation
-                - metadata: Token usage, cost, timing, model info
-                - has_semantic_context: Whether semantic context was used
-                - used_vector_search: Whether vector search was used for context retrieval
+                - metadata: Token usage, cost, timing, model info, retrieval tracking
         """
         # Get schema
         schema = self._get_schema()
 
         # Get semantic context (may be None)
+        # This also sets self._last_retrieval_method and self._last_chunks_retrieved
         semantic_context = self._get_semantic_context(question)
+
+        # Track if no semantic layer was available
+        if semantic_context is None and self._last_retrieval_method is None:
+            self._last_retrieval_method = "none"
+            self._last_chunks_retrieved = 0
 
         # Get LLM provider for enhanced SQL generation
         llm = LLMConfig.get_provider_for_task("enhanced_sql")
@@ -209,7 +240,10 @@ class EnhancedSQLGenerator:
                 "provider": response.provider,
                 "database": self.database_name,
                 "has_semantic_context": semantic_context is not None,
-                "used_vector_search": self.use_vector_search
+                "used_vector_search": self.use_vector_search,
+                # New tracking fields
+                "semantic_retrieval_method": self._last_retrieval_method,
+                "semantic_chunks_retrieved": self._last_chunks_retrieved
             }
         }
 

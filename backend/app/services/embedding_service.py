@@ -281,8 +281,11 @@ Typical Questions:
         Returns:
             Dictionary with upload statistics
         """
-        # Chunk the semantic layer
-        chunks = self.chunk_semantic_layer(semantic_layer, database_name)
+        # Normalize database name to lowercase for consistency with Pinecone indexing
+        normalized_db_name = database_name.lower()
+
+        # Chunk the semantic layer (will use normalized name in metadata)
+        chunks = self.chunk_semantic_layer(semantic_layer, normalized_db_name)
 
         print(f"Created {len(chunks)} chunks for {database_name}")
 
@@ -360,10 +363,14 @@ Typical Questions:
         # Embed the query
         query_embedding = self.embed_text(query)
 
+        # Normalize database name to lowercase for Pinecone filter
+        # (vectors are indexed with lowercase database names from semantic_layers table)
+        normalized_db_name = database_name.lower()
+
         # Search Pinecone
         results = self.index.query(
             vector=query_embedding,
-            filter={"database": {"$eq": database_name}},
+            filter={"database": {"$eq": normalized_db_name}},
             top_k=top_k,
             include_metadata=True
         )

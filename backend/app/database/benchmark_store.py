@@ -48,7 +48,9 @@ class BenchmarkStore(SupabaseClient):
             "notes": config.notes
         }
 
-        result = self.client.table("benchmark_runs").insert(data).execute()
+        result = self._execute_with_retry(
+            self.client.table("benchmark_runs").insert(data)
+        )
         return result.data[0]["id"]
 
     def update_run_status(
@@ -75,7 +77,10 @@ class BenchmarkStore(SupabaseClient):
         elif status == "cancelled":
             updates["cancelled_at"] = datetime.utcnow().isoformat()
 
-        self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
+        # Use retry wrapper to handle transient connection errors
+        self._execute_with_retry(
+            self.client.table("benchmark_runs").update(updates).eq("id", run_id)
+        )
 
     def update_run_progress(
         self,
@@ -93,16 +98,17 @@ class BenchmarkStore(SupabaseClient):
         # Always update current_question (None clears it)
         updates["current_question"] = current_question
 
-        self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
+        self._execute_with_retry(
+            self.client.table("benchmark_runs").update(updates).eq("id", run_id)
+        )
 
     def update_run_cost(self, run_id: str, additional_cost: float, approach: str):
         """Add cost to running total"""
         # Get current costs
-        result = (
+        result = self._execute_with_retry(
             self.client.table("benchmark_runs")
             .select("total_cost_usd, baseline_cost_usd, enhanced_cost_usd")
             .eq("id", run_id)
-            .execute()
         )
 
         if not result.data:
@@ -120,7 +126,9 @@ class BenchmarkStore(SupabaseClient):
             enhanced = float(current["enhanced_cost_usd"] or 0) + additional_cost
             updates["enhanced_cost_usd"] = enhanced
 
-        self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
+        self._execute_with_retry(
+            self.client.table("benchmark_runs").update(updates).eq("id", run_id)
+        )
 
     def save_result(self, result: BenchmarkResult):
         """Save individual question result"""
@@ -131,15 +139,16 @@ class BenchmarkStore(SupabaseClient):
             if isinstance(data[key], Decimal):
                 data[key] = float(data[key])
 
-        self.client.table("benchmark_results").insert(data).execute()
+        self._execute_with_retry(
+            self.client.table("benchmark_results").insert(data)
+        )
 
     def get_run_status(self, run_id: str) -> Optional[BenchmarkRunResponse]:
         """Get current run status for progress monitoring"""
-        result = (
+        result = self._execute_with_retry(
             self.client.table("benchmark_runs")
             .select("*")
             .eq("id", run_id)
-            .execute()
         )
 
         if not result.data:
@@ -162,12 +171,11 @@ class BenchmarkStore(SupabaseClient):
             # Use limited fetch with aggregation to avoid Supabase timeouts
             # Fetch only the match columns (small payload) with limit
             try:
-                results = (
+                results = self._execute_with_retry(
                     self.client.table("benchmark_results")
                     .select("baseline_exec_match, enhanced_exec_match")
                     .eq("run_id", run_id)
                     .limit(1000)  # Limit to most recent 1000 for performance
-                    .execute()
                 )
 
                 if results.data:
@@ -209,11 +217,10 @@ class BenchmarkStore(SupabaseClient):
     def calculate_and_save_metrics(self, run_id: str):
         """Calculate final metrics and save to benchmark_runs"""
         # Get all results for this run
-        results = (
+        results = self._execute_with_retry(
             self.client.table("benchmark_results")
             .select("*")
             .eq("run_id", run_id)
-            .execute()
         )
 
         if not results.data:
@@ -248,15 +255,16 @@ class BenchmarkStore(SupabaseClient):
         print(f"  Enhanced exact: {enhanced_exact_count}/{enhanced_exact_total} = {updates['enhanced_exact_match']}")
         print(f"  Enhanced exec: {enhanced_exec_count}/{enhanced_exec_total} = {updates['enhanced_exec_match']}")
 
-        self.client.table("benchmark_runs").update(updates).eq("id", run_id).execute()
+        self._execute_with_retry(
+            self.client.table("benchmark_runs").update(updates).eq("id", run_id)
+        )
 
     def get_run_summary(self, run_id: str) -> Optional[BenchmarkSummary]:
         """Get complete summary with all metrics"""
-        result = (
+        result = self._execute_with_retry(
             self.client.table("benchmark_runs")
             .select("*")
             .eq("id", run_id)
-            .execute()
         )
 
         if not result.data:
@@ -289,11 +297,10 @@ class BenchmarkStore(SupabaseClient):
         """Get pre-aggregated statistics for charts"""
         # This would ideally be done with SQL aggregation queries
         # For now, we'll fetch all results and aggregate in Python
-        results = (
+        results = self._execute_with_retry(
             self.client.table("benchmark_results")
             .select("*")
             .eq("run_id", run_id)
-            .execute()
         )
 
         if not results.data:
@@ -399,11 +406,11 @@ class BenchmarkStore(SupabaseClient):
             query = query.or_("baseline_exact_match.eq.false,enhanced_exact_match.eq.false")
 
         # Get total count for pagination
-        count_result = query.execute()
+        count_result = self._execute_with_retry(query)
         total = count_result.count if hasattr(count_result, 'count') else 0
 
         # Apply pagination
-        result = query.range(offset, offset + limit - 1).execute()
+        result = self._execute_with_retry(query.range(offset, offset + limit - 1))
 
         results = [BenchmarkResult(**r) for r in result.data]
 
@@ -411,12 +418,11 @@ class BenchmarkStore(SupabaseClient):
 
     def list_runs(self, limit: int = 50) -> List[BenchmarkSummary]:
         """List all benchmark runs, most recent first"""
-        results = (
+        results = self._execute_with_retry(
             self.client.table("benchmark_runs")
             .select("*")
             .order("created_at", desc=True)
             .limit(limit)
-            .execute()
         )
 
         return [
@@ -450,7 +456,9 @@ class BenchmarkStore(SupabaseClient):
         Returns:
             True if deleted, False if not found
         """
-        result = self.client.table("benchmark_runs").delete().eq("id", run_id).execute()
+        result = self._execute_with_retry(
+            self.client.table("benchmark_runs").delete().eq("id", run_id)
+        )
         return len(result.data) > 0
 
 

@@ -110,6 +110,7 @@ class BenchmarkResult(BaseModel):
     enhanced_cost_usd: Optional[Decimal] = None
     enhanced_tokens_used: Optional[int] = None
     enhanced_semantic_chunks_used: Optional[int] = None
+    enhanced_semantic_retrieval_method: Optional[str] = None
     enhanced_retry_count: int = 0
 
     processed_at: Optional[str] = None  # ISO format datetime string

@@ -474,7 +474,7 @@ export default function ComparePage() {
           enhancedUserPrompt={(result.enhanced.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
           enhancedSemanticChunks={
             (result.enhanced.sql?.metadata as { semantic_chunks?: unknown[] })?.semantic_chunks
-              ? JSON.stringify((result.enhanced.sql.metadata as { semantic_chunks: unknown[] }).semantic_chunks)
+              ? JSON.stringify((result.enhanced.sql?.metadata as { semantic_chunks: unknown[] }).semantic_chunks)
               : null
           }
           questionId={question.substring(0, 50) + '...'}

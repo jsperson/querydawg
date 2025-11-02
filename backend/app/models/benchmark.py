@@ -113,6 +113,13 @@ class BenchmarkResult(BaseModel):
     enhanced_semantic_retrieval_method: Optional[str] = None
     enhanced_retry_count: int = 0
 
+    # Prompt logging (for debugging and analysis)
+    baseline_system_prompt: Optional[str] = None
+    baseline_user_prompt: Optional[str] = None
+    enhanced_system_prompt: Optional[str] = None
+    enhanced_user_prompt: Optional[str] = None
+    enhanced_semantic_chunks: Optional[str] = None  # JSON string of retrieved chunks
+
     processed_at: Optional[str] = None  # ISO format datetime string
 
 

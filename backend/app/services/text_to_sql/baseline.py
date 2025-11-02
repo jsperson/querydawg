@@ -89,7 +89,9 @@ class BaselineSQLGenerator:
                 "generation_time_ms": response.generation_time_ms,
                 "model": response.model,
                 "provider": response.provider,
-                "database": self.database_name
+                "database": self.database_name,
+                "system_prompt": system_prompt,
+                "user_prompt": user_prompt
             }
         }
 

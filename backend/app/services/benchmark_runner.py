@@ -500,7 +500,9 @@ class BenchmarkRunner:
                 "baseline_execution_time_ms": execution_time_ms,
                 "baseline_cost_usd": Decimal(str(cost)),
                 "baseline_tokens_used": metadata["tokens_used"],
-                "baseline_retry_count": retry_count
+                "baseline_retry_count": retry_count,
+                "baseline_system_prompt": metadata.get("system_prompt"),
+                "baseline_user_prompt": metadata.get("user_prompt")
             }
 
         except Exception as e:
@@ -560,6 +562,12 @@ class BenchmarkRunner:
             semantic_chunks = metadata.get('semantic_chunks_retrieved', 0)
             retrieval_method = metadata.get('semantic_retrieval_method', None)
 
+            # Get semantic chunks as JSON string for storage
+            import json
+            semantic_chunks_json = None
+            if metadata.get('semantic_chunks'):
+                semantic_chunks_json = json.dumps(metadata['semantic_chunks'])
+
             return {
                 "enhanced_sql": generated_sql,
                 "enhanced_exact_match": exact_match,
@@ -570,7 +578,10 @@ class BenchmarkRunner:
                 "enhanced_tokens_used": metadata["tokens_used"],
                 "enhanced_semantic_chunks_used": semantic_chunks,
                 "enhanced_semantic_retrieval_method": retrieval_method,
-                "enhanced_retry_count": retry_count
+                "enhanced_retry_count": retry_count,
+                "enhanced_system_prompt": metadata.get("system_prompt"),
+                "enhanced_user_prompt": metadata.get("user_prompt"),
+                "enhanced_semantic_chunks": semantic_chunks_json
             }
 
         except Exception as e:

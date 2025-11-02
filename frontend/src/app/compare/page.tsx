@@ -473,9 +473,10 @@ export default function ComparePage() {
           enhancedSystemPrompt={(result.enhanced.sql?.metadata as { system_prompt?: string })?.system_prompt || null}
           enhancedUserPrompt={(result.enhanced.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
           enhancedSemanticChunks={
-            (result.enhanced.sql?.metadata as { semantic_chunks?: unknown[] })?.semantic_chunks
-              ? JSON.stringify((result.enhanced.sql?.metadata as { semantic_chunks: unknown[] }).semantic_chunks)
-              : null
+            (() => {
+              const metadata = result.enhanced.sql?.metadata as { semantic_chunks?: unknown[] } | undefined;
+              return metadata?.semantic_chunks ? JSON.stringify(metadata.semantic_chunks) : null;
+            })()
           }
           questionId={question.substring(0, 50) + '...'}
           database={selectedDatabase}

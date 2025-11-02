@@ -261,36 +261,27 @@ Generate a JSON object with this structure:
   "tables": [
     {{
       "name": "string - technical table name",
-      "row_count": number,
       "business_name": "string - human-friendly name",
       "purpose": "string - what this table represents in business terms",
-      "primary_key": "string - primary key column(s)",
 
       "columns": [
         {{
           "name": "string - technical column name",
-          "type": "string - SQL data type",
-          "nullable": boolean,
           "business_name": "string - human-friendly name",
           "business_meaning": "string - what this represents in plain English",
           "synonyms": ["string - 3-5 alternate terms users might use"],
-          "sample_values": ["values from sample data provided"],
-          "typical_filters": ["string - common WHERE clause patterns"],
-          "aggregations": ["string - common aggregation patterns if numeric/date"],
-          "value_constraints": "string - any known constraints or ranges"
+          "typical_filters": ["string - common WHERE clause patterns like 'column = ?' or 'column > ?'"],
+          "aggregations": ["string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'"],
+          "common_values": ["string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'"]
         }}
       ],
 
       "relationships": [
         {{
-          "type": "foreign_key",
-          "column": "string",
-          "references_table": "string",
-          "references_column": "string",
-          "business_meaning": "string - what this relationship represents",
-          "cardinality": "string - one-to-many, many-to-one, etc.",
-          "join_pattern": "string - typical SQL join syntax",
-          "common_uses": ["string - when users would query across these tables"]
+          "column": "string - FK column name",
+          "references_table": "string - target table name",
+          "business_meaning": "string - what this relationship represents in business terms",
+          "common_uses": ["string - when/why users would query across these tables"]
         }}
       ],
 
@@ -314,16 +305,6 @@ Generate a JSON object with this structure:
     }}
   ],
 
-  "domain_glossary": [
-    {{
-      "business_term": "string - term users would use",
-      "technical_mapping": "string - which table.column represents this",
-      "definition": "string - clear definition",
-      "synonyms": ["string - alternate phrasings"],
-      "example_usage": "string - how users would reference this in questions"
-    }}
-  ],
-
   "ambiguities": [
     {{
       "issue": "string - potential confusion for text-to-SQL",
@@ -341,13 +322,14 @@ Generate a JSON object with this structure:
 }}
 
 QUALITY REQUIREMENTS:
-- Business language: Write for non-technical users
-- Completeness: Cover all tables and meaningful columns
+- Business language: Write for non-technical users, focus on WHAT data means, not HOW it's stored
+- NO technical schema details: Do NOT include data types, row counts, primary keys, nullability, or FK references - these will be provided separately from the live database schema
+- Completeness: Cover all tables and meaningful columns with business context
 - Specificity: Be concrete (e.g., "customer's shipping address" not just "address")
-- Rich synonyms: Include 3-5 alternate terms for each key concept
-- Realistic examples: Provide 2-3 actual sample values from the data
-- Query context: Explain how each element is commonly queried
-- Clear relationships: State the business meaning of every foreign key
+- Rich synonyms: Include 3-5 alternate terms users might use for each concept
+- Query context: Explain how users typically filter/aggregate each field
+- Clear relationships: State the BUSINESS MEANING of each relationship (e.g., "links orders to customers")
+- Common values: Provide realistic example values users might reference (e.g., 'Active', 'Pending', 'USA')
 - Pattern variety: Identify 5-10 common query patterns for this domain
 
 Generate ONLY the JSON object, no additional text or markdown formatting.

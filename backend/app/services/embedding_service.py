@@ -58,9 +58,8 @@ class EmbeddingService:
         1. Database Overview - Single chunk with domain, purpose, key entities
         2. Table Documentation - One chunk per table with all its details
         3. Cross-Table Patterns - One chunk per pattern
-        4. Domain Glossary - One chunk with all glossary terms
+        4. Ambiguities - One chunk with all ambiguities
         5. Query Guidelines - One chunk with all guidelines
-        6. Ambiguities - One chunk with all ambiguities
 
         Args:
             semantic_layer: The semantic layer JSON
@@ -102,18 +101,15 @@ Typical Questions:
                 f"Table: {table_name}",
                 f"Business Name: {table.get('business_name', table_name)}",
                 f"Purpose: {table.get('purpose', 'N/A')}",
-                f"Row Count: {table.get('row_count', 0):,}",
-                f"Primary Key: {table.get('primary_key', 'N/A')}",
                 "",
                 "Columns:"
             ]
 
-            # Column details
+            # Column details - business context only
             for col in table.get("columns", []):
                 col_text = [
-                    f"  - {col['name']} ({col.get('type', 'unknown')})",
-                    f"    Business Name: {col.get('business_name', col['name'])}",
-                    f"    Meaning: {col.get('business_meaning', 'N/A')}",
+                    f"  {col['name']} → {col.get('business_name', col['name'])}",
+                    f"    {col.get('business_meaning', 'N/A')}",
                 ]
 
                 if col.get('synonyms'):
@@ -125,15 +121,19 @@ Typical Questions:
                 if col.get('aggregations'):
                     col_text.append(f"    Aggregations: {', '.join(col['aggregations'])}")
 
+                if col.get('common_values'):
+                    col_text.append(f"    Example Values: {', '.join(col['common_values'])}")
+
                 text_parts.extend(col_text)
 
-            # Relationships
+            # Relationships - business meaning only
             if table.get("relationships"):
                 text_parts.append("\nRelationships:")
                 for rel in table["relationships"]:
-                    rel_text = f"  - {rel.get('column')} → {rel.get('references_table')}.{rel.get('references_column')}"
-                    rel_text += f"\n    Meaning: {rel.get('business_meaning', 'N/A')}"
-                    rel_text += f"\n    Cardinality: {rel.get('cardinality', 'unknown')}"
+                    rel_text = f"  - {rel.get('column')} → {rel.get('references_table')}"
+                    rel_text += f"\n    {rel.get('business_meaning', 'N/A')}"
+                    if rel.get('common_uses'):
+                        rel_text += f"\n    When to use: {'; '.join(rel['common_uses'])}"
                     text_parts.append(rel_text)
 
             # Common query patterns
@@ -152,7 +152,6 @@ Typical Questions:
                     "database": database_name,
                     "chunk_type": "table",
                     "table_name": table_name,
-                    "row_count": table.get('row_count', 0),
                     "timestamp": datetime.utcnow().isoformat()
                 }
             })
@@ -181,31 +180,7 @@ Typical Questions:
                 }
             })
 
-        # 4. Domain Glossary
-        if semantic_layer.get("domain_glossary"):
-            text_parts = [f"Domain Glossary for {database_name}:", ""]
-
-            for term in semantic_layer["domain_glossary"]:
-                text_parts.extend([
-                    f"Term: {term.get('business_term', 'N/A')}",
-                    f"  Technical Mapping: {term.get('technical_mapping', 'N/A')}",
-                    f"  Definition: {term.get('definition', 'N/A')}",
-                    f"  Synonyms: {', '.join(term.get('synonyms', []))}",
-                    f"  Example Usage: {term.get('example_usage', 'N/A')}",
-                    ""
-                ])
-
-            chunks.append({
-                "id": self._generate_id(database_name, "glossary"),
-                "text": "\n".join(text_parts),
-                "metadata": {
-                    "database": database_name,
-                    "chunk_type": "glossary",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            })
-
-        # 5. Ambiguities
+        # 4. Ambiguities
         if semantic_layer.get("ambiguities"):
             text_parts = [f"Potential Ambiguities for {database_name}:", ""]
 
@@ -228,7 +203,7 @@ Typical Questions:
                 }
             })
 
-        # 6. Query Guidelines
+        # 5. Query Guidelines
         if semantic_layer.get("query_guidelines"):
             text_parts = [f"Query Guidelines for {database_name}:", ""]
 

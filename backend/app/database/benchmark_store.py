@@ -173,20 +173,28 @@ class BenchmarkStore(SupabaseClient):
             try:
                 results = self._execute_with_retry(
                     self.client.table("benchmark_results")
-                    .select("baseline_exec_match, enhanced_exec_match")
+                    .select("baseline_exec_match, enhanced_exec_match, baseline_error, enhanced_error")
                     .eq("run_id", run_id)
                     .limit(1000)  # Limit to most recent 1000 for performance
                 )
 
                 if results.data:
+                    # Filter out gold SQL failures
+                    def gold_sql_failed(result: dict) -> bool:
+                        baseline_error = result.get("baseline_error") or ""
+                        enhanced_error = result.get("enhanced_error") or ""
+                        return "Gold SQL failed" in baseline_error or "Gold SQL failed" in enhanced_error
+
+                    valid_results = [r for r in results.data if not gold_sql_failed(r)]
+
                     # Calculate baseline metrics
-                    baseline_results = [r for r in results.data if r.get("baseline_exec_match") is not None]
+                    baseline_results = [r for r in valid_results if r.get("baseline_exec_match") is not None]
                     if baseline_results:
                         baseline_correct_count = sum(1 for r in baseline_results if r.get("baseline_exec_match") is True)
                         baseline_exec_match_rate = baseline_correct_count / len(baseline_results)
 
                     # Calculate enhanced metrics
-                    enhanced_results = [r for r in results.data if r.get("enhanced_exec_match") is not None]
+                    enhanced_results = [r for r in valid_results if r.get("enhanced_exec_match") is not None]
                     if enhanced_results:
                         enhanced_correct_count = sum(1 for r in enhanced_results if r.get("enhanced_exec_match") is True)
                         enhanced_exec_match_rate = enhanced_correct_count / len(enhanced_results)
@@ -228,17 +236,28 @@ class BenchmarkStore(SupabaseClient):
 
         total = len(results.data)
 
+        # Helper function to check if gold SQL failed
+        def gold_sql_failed(result: dict) -> bool:
+            """Check if gold SQL execution failed (should be excluded from metrics)"""
+            baseline_error = result.get("baseline_error") or ""
+            enhanced_error = result.get("enhanced_error") or ""
+            return "Gold SQL failed" in baseline_error or "Gold SQL failed" in enhanced_error
+
+        # Filter out results where gold SQL failed
+        valid_results = [r for r in results.data if not gold_sql_failed(r)]
+        gold_failures = len(results.data) - len(valid_results)
+
         # Calculate baseline metrics (count True values, handle None properly)
-        baseline_exact_count = sum(1 for r in results.data if r.get("baseline_exact_match") is True)
-        baseline_exact_total = sum(1 for r in results.data if r.get("baseline_exact_match") is not None)
-        baseline_exec_count = sum(1 for r in results.data if r.get("baseline_exec_match") is True)
-        baseline_exec_total = sum(1 for r in results.data if r.get("baseline_exec_match") is not None)
+        baseline_exact_count = sum(1 for r in valid_results if r.get("baseline_exact_match") is True)
+        baseline_exact_total = sum(1 for r in valid_results if r.get("baseline_exact_match") is not None)
+        baseline_exec_count = sum(1 for r in valid_results if r.get("baseline_exec_match") is True)
+        baseline_exec_total = sum(1 for r in valid_results if r.get("baseline_exec_match") is not None)
 
         # Calculate enhanced metrics (count True values, handle None properly)
-        enhanced_exact_count = sum(1 for r in results.data if r.get("enhanced_exact_match") is True)
-        enhanced_exact_total = sum(1 for r in results.data if r.get("enhanced_exact_match") is not None)
-        enhanced_exec_count = sum(1 for r in results.data if r.get("enhanced_exec_match") is True)
-        enhanced_exec_total = sum(1 for r in results.data if r.get("enhanced_exec_match") is not None)
+        enhanced_exact_count = sum(1 for r in valid_results if r.get("enhanced_exact_match") is True)
+        enhanced_exact_total = sum(1 for r in valid_results if r.get("enhanced_exact_match") is not None)
+        enhanced_exec_count = sum(1 for r in valid_results if r.get("enhanced_exec_match") is True)
+        enhanced_exec_total = sum(1 for r in valid_results if r.get("enhanced_exec_match") is not None)
 
         updates = {
             "baseline_exact_match": baseline_exact_count / baseline_exact_total if baseline_exact_total > 0 else None,
@@ -250,6 +269,8 @@ class BenchmarkStore(SupabaseClient):
         # Debug logging
         print(f"Metrics calculation for run {run_id}:")
         print(f"  Total results: {total}")
+        print(f"  Gold SQL failures (excluded): {gold_failures}")
+        print(f"  Valid results: {len(valid_results)}")
         print(f"  Baseline exact: {baseline_exact_count}/{baseline_exact_total} = {updates['baseline_exact_match']}")
         print(f"  Baseline exec: {baseline_exec_count}/{baseline_exec_total} = {updates['baseline_exec_match']}")
         print(f"  Enhanced exact: {enhanced_exact_count}/{enhanced_exact_total} = {updates['enhanced_exact_match']}")

@@ -468,15 +468,14 @@ export default function ComparePage() {
         <PromptDiffViewer
           open={showPromptViewer}
           onOpenChange={setShowPromptViewer}
-          baselineSystemPrompt={(result.baseline.sql?.metadata as { system_prompt?: string })?.system_prompt || null}
-          baselineUserPrompt={(result.baseline.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
-          enhancedSystemPrompt={(result.enhanced.sql?.metadata as { system_prompt?: string })?.system_prompt || null}
-          enhancedUserPrompt={(result.enhanced.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
+          baselineSystemPrompt={result.baseline.sql?.metadata.system_prompt || null}
+          baselineUserPrompt={result.baseline.sql?.metadata.user_prompt || null}
+          enhancedSystemPrompt={result.enhanced.sql?.metadata.system_prompt || null}
+          enhancedUserPrompt={result.enhanced.sql?.metadata.user_prompt || null}
           enhancedSemanticChunks={
-            (() => {
-              const metadata = result.enhanced.sql?.metadata as { semantic_chunks?: unknown[] } | undefined;
-              return metadata?.semantic_chunks ? JSON.stringify(metadata.semantic_chunks) : null;
-            })()
+            result.enhanced.sql?.metadata.semantic_chunks
+              ? JSON.stringify(result.enhanced.sql.metadata.semantic_chunks)
+              : null
           }
           questionId={question.substring(0, 50) + '...'}
           database={selectedDatabase}

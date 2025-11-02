@@ -72,6 +72,10 @@ class SQLMetadata(BaseModel):
     provider: str
     database: str
     has_semantic_layer: bool = False  # Whether semantic layer was used (enhanced mode only)
+    # Prompt logging fields (for debugging and analysis)
+    system_prompt: Optional[str] = None
+    user_prompt: Optional[str] = None
+    semantic_chunks: Optional[List[Dict[str, Any]]] = None  # Retrieved semantic chunks for enhanced mode
 
 
 class TextToSQLResponse(BaseModel):

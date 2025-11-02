@@ -54,6 +54,10 @@ export interface SQLMetadata {
   provider: string;
   database: string;
   has_semantic_layer?: boolean;
+  // Prompt logging fields (for debugging and analysis)
+  system_prompt?: string;
+  user_prompt?: string;
+  semantic_chunks?: Array<Record<string, unknown>>;
 }
 
 export interface TextToSQLResponse {

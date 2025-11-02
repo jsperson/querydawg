@@ -313,9 +313,14 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
               Benchmark Results • {summary.run_type.charAt(0).toUpperCase() + summary.run_type.slice(1)} Mode
             </p>
           </div>
-          <Button onClick={() => router.push('/admin/benchmark')} variant="outline">
-            Back to Control Panel
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => router.push('/compare')} variant="outline">
+              Compare Mode
+            </Button>
+            <Button onClick={() => router.push('/admin/benchmark')} variant="outline">
+              Control Panel
+            </Button>
+          </div>
         </div>
 
         {/* Status Card */}

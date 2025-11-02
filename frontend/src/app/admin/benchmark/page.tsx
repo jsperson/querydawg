@@ -134,11 +134,16 @@ export default function BenchmarkControlPanel() {
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Benchmark Control Panel</h1>
-          <p className="text-lg text-muted-foreground">
-            Run Spider 1.0 evaluation benchmarks to compare baseline vs enhanced approaches
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Benchmark Control Panel</h1>
+            <p className="text-lg text-muted-foreground">
+              Run Spider 1.0 evaluation benchmarks to compare baseline vs enhanced approaches
+            </p>
+          </div>
+          <Button onClick={() => router.push('/compare')} variant="outline">
+            Back to Compare Mode
+          </Button>
         </div>
 
         {/* Start New Benchmark */}

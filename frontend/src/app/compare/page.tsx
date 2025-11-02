@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { QueryNavigation } from '@/components/QueryNavigation';
+import { PromptDiffViewer } from '@/components/PromptDiffViewer';
 import type { TextToSQLResponse, ExecuteResponse, DatabaseOverview } from '@/lib/api-types';
 
 interface ComparisonResult {
@@ -42,6 +43,7 @@ export default function ComparePage() {
   const [isLoadingDatabases, setIsLoadingDatabases] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string>('');
+  const [showPromptViewer, setShowPromptViewer] = useState(false);
 
   // Load databases on mount
   useEffect(() => {
@@ -422,32 +424,63 @@ export default function ComparePage() {
 
           {/* Comparison Results */}
           {result && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Baseline Results */}
-              <div>
-                {renderSQLResult(
-                  'Baseline',
-                  'GPT-4o-mini, schema only',
-                  result.baseline.sql,
-                  result.baseline.execution,
-                  result.baseline.error
-                )}
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-semibold">Results</h2>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPromptViewer(true)}
+                  disabled={!result.baseline.sql && !result.enhanced.sql}
+                >
+                  View Prompt Comparison
+                </Button>
               </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Baseline Results */}
+                <div>
+                  {renderSQLResult(
+                    'Baseline',
+                    'GPT-4o-mini, schema only',
+                    result.baseline.sql,
+                    result.baseline.execution,
+                    result.baseline.error
+                  )}
+                </div>
 
-              {/* Enhanced Results */}
-              <div>
-                {renderSQLResult(
-                  'Enhanced',
-                  'GPT-4o-mini, schema + semantic layer',
-                  result.enhanced.sql,
-                  result.enhanced.execution,
-                  result.enhanced.error
-                )}
+                {/* Enhanced Results */}
+                <div>
+                  {renderSQLResult(
+                    'Enhanced',
+                    'GPT-4o-mini, schema + semantic layer',
+                    result.enhanced.sql,
+                    result.enhanced.execution,
+                    result.enhanced.error
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
+
+      {/* Prompt Diff Viewer */}
+      {result && (
+        <PromptDiffViewer
+          open={showPromptViewer}
+          onOpenChange={setShowPromptViewer}
+          baselineSystemPrompt={(result.baseline.sql?.metadata as { system_prompt?: string })?.system_prompt || null}
+          baselineUserPrompt={(result.baseline.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
+          enhancedSystemPrompt={(result.enhanced.sql?.metadata as { system_prompt?: string })?.system_prompt || null}
+          enhancedUserPrompt={(result.enhanced.sql?.metadata as { user_prompt?: string })?.user_prompt || null}
+          enhancedSemanticChunks={
+            (result.enhanced.sql?.metadata as { semantic_chunks?: unknown[] })?.semantic_chunks
+              ? JSON.stringify((result.enhanced.sql.metadata as { semantic_chunks: unknown[] }).semantic_chunks)
+              : null
+          }
+          questionId={question.substring(0, 50) + '...'}
+          database={selectedDatabase}
+        />
+      )}
     </main>
   );
 }

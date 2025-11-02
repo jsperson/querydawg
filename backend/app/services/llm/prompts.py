@@ -60,13 +60,16 @@ Guidelines:
 6. Add ORDER BY and LIMIT clauses when relevant
 7. Use table aliases for clarity in multi-table queries
 8. Ensure column references are unambiguous
-9. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
+9. **When the question explicitly asks for quantities ("how many", "what is the total", "what is the average"), INCLUDE the aggregation (COUNT, SUM, AVG) in the SELECT clause.** Only exclude aggregations when the question asks for superlatives or identifiers (e.g., "which year had the most concerts?" wants the year, not the count).
 10. Return ONLY the SQL query without explanations or markdown formatting
 
-Example:
+Examples:
 - Question: "What is the year with the most concerts?"
-- WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
+  - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+  - CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+- Question: "How many concerts were held each year?"
+  - WRONG: SELECT year FROM concerts GROUP BY year ORDER BY year
+  - CORRECT: SELECT year, COUNT(*) FROM concerts GROUP BY year"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
@@ -218,13 +221,16 @@ Guidelines:
 6. Add ORDER BY and LIMIT clauses when relevant
 7. Use table aliases for clarity in multi-table queries
 8. Ensure column references are unambiguous
-9. **SELECT ONLY columns that directly answer the question** - do NOT include intermediate calculations (COUNT, SUM, AVG, etc.) in the SELECT clause unless explicitly asked for. Use these only in ORDER BY, HAVING, or WHERE clauses when needed for filtering/sorting.
+9. **When the question explicitly asks for quantities ("how many", "what is the total", "what is the average"), INCLUDE the aggregation (COUNT, SUM, AVG) in the SELECT clause.** Only exclude aggregations when the question asks for superlatives or identifiers (e.g., "which year had the most concerts?" wants the year, not the count).
 10. Return ONLY the SQL query without explanations or markdown formatting
 
-Example:
+Examples:
 - Question: "What is the year with the most concerts?"
-- WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1"""
+  - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+  - CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
+- Question: "How many concerts were held each year?"
+  - WRONG: SELECT year FROM concerts GROUP BY year ORDER BY year
+  - CORRECT: SELECT year, COUNT(*) FROM concerts GROUP BY year"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:

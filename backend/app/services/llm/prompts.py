@@ -64,12 +64,12 @@ Guidelines:
 10. Return ONLY the SQL query without explanations or markdown formatting
 
 Examples:
-- Question: "What is the year with the most concerts?"
-  - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-  - CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- Question: "How many concerts were held each year?"
-  - WRONG: SELECT year FROM concerts GROUP BY year ORDER BY year
-  - CORRECT: SELECT year, COUNT(*) FROM concerts GROUP BY year"""
+- Question: "What city has the most customers?"
+  - WRONG: SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
+  - CORRECT: SELECT city FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
+- Question: "How many orders were placed each month?"
+  - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
+  - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
@@ -225,12 +225,12 @@ Guidelines:
 10. Return ONLY the SQL query without explanations or markdown formatting
 
 Examples:
-- Question: "What is the year with the most concerts?"
-  - WRONG: SELECT year, COUNT(*) FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-  - CORRECT: SELECT year FROM concerts GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1
-- Question: "How many concerts were held each year?"
-  - WRONG: SELECT year FROM concerts GROUP BY year ORDER BY year
-  - CORRECT: SELECT year, COUNT(*) FROM concerts GROUP BY year"""
+- Question: "What city has the most customers?"
+  - WRONG: SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
+  - CORRECT: SELECT city FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
+- Question: "How many orders were placed each month?"
+  - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
+  - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:

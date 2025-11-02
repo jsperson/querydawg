@@ -37,11 +37,14 @@ export default function BenchmarkControlPanel() {
   const [name, setName] = useState('');
   const [runType, setRunType] = useState<'baseline' | 'enhanced' | 'both'>('both');
   const [questionLimit, setQuestionLimit] = useState<number | null>(null);
+  const [selectedDatabase, setSelectedDatabase] = useState<string>('all');
 
   // UI state
   const [isStarting, setIsStarting] = useState(false);
   const [isLoadingRuns, setIsLoadingRuns] = useState(true);
+  const [isLoadingDatabases, setIsLoadingDatabases] = useState(true);
   const [runs, setRuns] = useState<BenchmarkRun[]>([]);
+  const [databases, setDatabases] = useState<string[]>([]);
   const [error, setError] = useState('');
 
   // Load recent runs
@@ -49,6 +52,11 @@ export default function BenchmarkControlPanel() {
     loadRuns();
     const interval = setInterval(loadRuns, 5000); // Refresh every 5s
     return () => clearInterval(interval);
+  }, []);
+
+  // Load databases on mount
+  useEffect(() => {
+    loadDatabases();
   }, []);
 
   const loadRuns = async () => {
@@ -65,6 +73,19 @@ export default function BenchmarkControlPanel() {
     }
   };
 
+  const loadDatabases = async () => {
+    try {
+      const response = await fetch('/api/databases');
+      if (!response.ok) throw new Error('Failed to load databases');
+      const data = await response.json();
+      setDatabases(data.databases);
+    } catch {
+      setError('Failed to load databases');
+    } finally {
+      setIsLoadingDatabases(false);
+    }
+  };
+
   const handleStartBenchmark = async () => {
     if (!name.trim()) {
       setError('Please enter a name for this benchmark run');
@@ -78,7 +99,7 @@ export default function BenchmarkControlPanel() {
       const config = {
         name: name.trim(),
         run_type: runType,
-        databases: null, // null = all 20 databases
+        databases: selectedDatabase === 'all' ? null : [selectedDatabase], // null = all databases
         question_limit: questionLimit
       };
 
@@ -184,6 +205,31 @@ export default function BenchmarkControlPanel() {
                   <SelectItem value="both">Both (compare side-by-side)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Database Selector */}
+            <div>
+              <Label htmlFor="database">Database</Label>
+              <Select
+                value={selectedDatabase}
+                onValueChange={setSelectedDatabase}
+                disabled={isStarting || isLoadingDatabases}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={isLoadingDatabases ? "Loading databases..." : "Select database"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Databases (20 databases)</SelectItem>
+                  {databases.map((db) => (
+                    <SelectItem key={db} value={db}>
+                      {db}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Select a single database or run on all 20 databases
+              </p>
             </div>
 
             {/* Question Limit */}

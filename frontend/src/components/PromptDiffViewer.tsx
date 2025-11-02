@@ -8,6 +8,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Copy, Check } from "lucide-react"
 
+interface SemanticChunk {
+  chunk_type: string
+  table_name?: string
+  score: number
+  text: string
+}
+
 interface PromptDiffViewerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -167,7 +174,7 @@ export function PromptDiffViewer({
     }
 
     try {
-      const chunks = JSON.parse(enhancedSemanticChunks)
+      const chunks = JSON.parse(enhancedSemanticChunks) as SemanticChunk[]
       return (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -176,7 +183,7 @@ export function PromptDiffViewer({
           </div>
           <ScrollArea className="h-[600px]">
             <div className="space-y-4 pr-4">
-              {chunks.map((chunk: any, idx: number) => (
+              {chunks.map((chunk: SemanticChunk, idx: number) => (
                 <div key={idx} className="border rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">{chunk.chunk_type}</Badge>
@@ -194,7 +201,7 @@ export function PromptDiffViewer({
           </ScrollArea>
         </div>
       )
-    } catch (e) {
+    } catch {
       return <div className="text-destructive p-4">Error parsing semantic chunks</div>
     }
   }

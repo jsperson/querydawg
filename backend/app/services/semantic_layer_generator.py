@@ -212,11 +212,23 @@ CRITICAL CONSTRAINTS:
 - Use your general domain knowledge to infer meaning (e.g., what "population" typically means in databases)
 - Reason about business patterns from the schema structure itself
 
+FOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):
+The schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.
+
+**RULES FOR RELATIONSHIPS:**
+1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any
+2. Document the EXACT join pattern for each FK
+3. Explain WHEN this join is needed (what questions require it)
+4. Do NOT invent relationships not shown in the schema
+5. Each FK MUST appear in your "relationships" array with complete join_pattern
+
+**Missing a documented foreign key will cause query failures!**
+
 ANALYSIS APPROACH:
 Think step-by-step before generating output:
 1. Domain identification: What business domain does this database serve?
 2. Entity analysis: What are the main business objects being tracked?
-3. Relationship mapping: How do these entities relate to each other?
+3. **Relationship mapping: Document EVERY foreign key shown in schema below**
 4. Column semantics: What business concept does each column represent?
 5. Query patterns: What questions would users typically ask?
 6. Ambiguities: What might confuse an LLM during text-to-SQL translation?
@@ -347,22 +359,34 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
         lines = []
 
         for table in schema_info["tables"]:
-            lines.append(f"\nTable: {table['name']}")
-            lines.append(f"  Row count: {table['row_count']}")
-            lines.append("  Columns:")
+            lines.append(f"\n===== Table: {table['name']} =====")
+            lines.append(f"Row count: {table['row_count']}")
+
+            # Find primary key column name
+            pk_cols = [col['name'] for col in table['columns'] if col.get('primary_key')]
+            pk_name = ', '.join(pk_cols) if pk_cols else 'unknown'
+            lines.append(f"Primary key: {pk_name}")
+
+            lines.append("\nColumns:")
 
             for col in table["columns"]:
                 pk = " [PRIMARY KEY]" if col["primary_key"] else ""
                 nullable = " NULL" if col["nullable"] else " NOT NULL"
-                default = f" DEFAULT {col.get('default', '')}" if col.get("default") else ""
-                lines.append(f"    - {col['name']}: {col['type']}{pk}{nullable}{default}")
+                lines.append(f"  • {col['name']}: {col['type']}{pk}{nullable}")
 
             if table["foreign_keys"]:
-                lines.append("  Foreign Keys:")
+                lines.append("\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):")
                 for fk in table["foreign_keys"]:
+                    source = fk.get('source', 'database')
                     lines.append(
-                        f"    - {fk['column']} -> {fk['referenced_table']}.{fk['referenced_column']}"
+                        f"  → {fk['column']} REFERENCES {fk['referenced_table']}.{fk['referenced_column']}"
                     )
+                    lines.append(
+                        f"     JOIN: JOIN {fk['referenced_table']} ON {table['name']}.{fk['column']} = {fk['referenced_table']}.{fk['referenced_column']}"
+                    )
+                    lines.append(f"     Source: {source}")
+            else:
+                lines.append("\n(No foreign keys)")
 
         return "\n".join(lines)
 

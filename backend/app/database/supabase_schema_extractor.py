@@ -7,19 +7,28 @@ Each Spider database is stored as a separate schema in the same Supabase Postgre
 
 import psycopg2
 from typing import Dict, List, Any, Optional
+from ..services.spider_metadata_loader import get_spider_metadata_loader
 
 
 class SupabaseSchemaExtractor:
     """Extract schema and sample data from Supabase PostgreSQL databases."""
 
-    def __init__(self, database_url: str):
+    def __init__(self, database_url: str, use_spider_metadata: bool = True):
         """
         Initialize with Supabase database connection.
 
         Args:
             database_url: PostgreSQL connection string (use Transaction Pooler)
+            use_spider_metadata: If True, enrich schema with Spider's FK metadata
         """
         self.database_url = database_url
+        self.use_spider_metadata = use_spider_metadata
+        if use_spider_metadata:
+            try:
+                self.spider_loader = get_spider_metadata_loader()
+            except Exception as e:
+                print(f"Warning: Could not load Spider metadata: {e}")
+                self.use_spider_metadata = False
 
     def extract_schema(self, schema_name: str) -> Dict[str, Any]:
         """
@@ -48,6 +57,33 @@ class SupabaseSchemaExtractor:
             for (table_name,) in cursor.fetchall():
                 table_info = self._extract_table_info(cursor, schema_name, table_name)
                 tables.append(table_info)
+
+            # Enrich with Spider metadata if available
+            if self.use_spider_metadata and hasattr(self, 'spider_loader'):
+                if self.spider_loader.database_exists(schema_name):
+                    spider_fks = self.spider_loader.get_foreign_keys(schema_name)
+
+                    # Add Spider FKs to each table
+                    for table in tables:
+                        # Find FKs where this table is the source
+                        table_fks = [fk for fk in spider_fks if fk['from_table'] == table['name']]
+
+                        # Add Spider FKs that aren't already in PostgreSQL schema
+                        existing_fk_pairs = {
+                            (fk['column'], fk['referenced_table'])
+                            for fk in table['foreign_keys']
+                        }
+
+                        for spider_fk in table_fks:
+                            fk_pair = (spider_fk['from_column'], spider_fk['to_table'])
+                            if fk_pair not in existing_fk_pairs:
+                                table['foreign_keys'].append({
+                                    'column': spider_fk['from_column'],
+                                    'referenced_table': spider_fk['to_table'],
+                                    'referenced_column': spider_fk['to_column'],
+                                    'source': 'spider_metadata'
+                                })
+                                print(f"  Added Spider FK: {table['name']}.{spider_fk['from_column']} -> {spider_fk['to_table']}.{spider_fk['to_column']}")
 
             return {
                 "database": schema_name,

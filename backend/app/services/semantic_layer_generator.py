@@ -39,7 +39,8 @@ class SemanticLayerGenerator:
         self.database_url = database_url
         self.custom_instructions = custom_instructions or ""
         self.sample_rows = sample_rows
-        self.schema_extractor = SupabaseSchemaExtractor(database_url)
+        # Don't use Spider metadata files - Supabase already has all FKs from data load
+        self.schema_extractor = SupabaseSchemaExtractor(database_url, use_spider_metadata=False)
 
     def generate(
         self,

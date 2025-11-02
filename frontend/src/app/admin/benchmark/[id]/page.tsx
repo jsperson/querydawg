@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { PromptDiffViewer } from '@/components/PromptDiffViewer';
 
 interface BenchmarkSummary {
   run_id: string;
@@ -43,6 +44,11 @@ interface BenchmarkResult {
   enhanced_exact_match: boolean | null;
   enhanced_exec_match: boolean | null;
   enhanced_error: string | null;
+  baseline_system_prompt: string | null;
+  baseline_user_prompt: string | null;
+  enhanced_system_prompt: string | null;
+  enhanced_user_prompt: string | null;
+  enhanced_semantic_chunks: string | null;
 }
 
 interface BenchmarkStatus {
@@ -93,6 +99,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
   const [error, setError] = useState('');
   const [executedResults, setExecutedResults] = useState<ExecutionResults | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [showPromptViewer, setShowPromptViewer] = useState(false);
 
   useEffect(() => {
     loadSummary();
@@ -702,13 +709,23 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="font-semibold">Question</h3>
-                              <Button
-                                size="sm"
-                                onClick={() => executeComparison(selectedResult)}
-                                disabled={isExecuting}
-                              >
-                                {isExecuting ? 'Executing...' : 'Execute All SQLs'}
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setShowPromptViewer(true)}
+                                  disabled={!selectedResult.baseline_system_prompt && !selectedResult.enhanced_system_prompt}
+                                >
+                                  View Prompts
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => executeComparison(selectedResult)}
+                                  disabled={isExecuting}
+                                >
+                                  {isExecuting ? 'Executing...' : 'Execute All SQLs'}
+                                </Button>
+                              </div>
                             </div>
                             <p className="text-sm bg-muted p-3 rounded-md">{selectedResult.question}</p>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -930,6 +947,21 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
               </CardContent>
             </Card>
       </div>
+
+      {/* Prompt Diff Viewer */}
+      {selectedResult && (
+        <PromptDiffViewer
+          open={showPromptViewer}
+          onOpenChange={setShowPromptViewer}
+          baselineSystemPrompt={selectedResult.baseline_system_prompt}
+          baselineUserPrompt={selectedResult.baseline_user_prompt}
+          enhancedSystemPrompt={selectedResult.enhanced_system_prompt}
+          enhancedUserPrompt={selectedResult.enhanced_user_prompt}
+          enhancedSemanticChunks={selectedResult.enhanced_semantic_chunks}
+          questionId={selectedResult.question_id}
+          database={selectedResult.database}
+        />
+      )}
     </main>
   );
 }

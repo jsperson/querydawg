@@ -392,6 +392,17 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
 
     def _format_samples(self, sample_data: Dict[str, List[Dict[str, Any]]]) -> str:
         """Format sample data for the prompt."""
+        from decimal import Decimal
+
+        def make_json_serializable(value):
+            """Convert value to JSON-serializable type."""
+            if isinstance(value, Decimal):
+                return float(value)
+            elif value is None:
+                return None
+            else:
+                return value
+
         lines = []
 
         for table_name, rows in sample_data.items():
@@ -402,9 +413,9 @@ Generate ONLY the JSON object, no additional text or markdown formatting.
 
             lines.append(f"  Sample rows ({len(rows)}):")
             for i, row in enumerate(rows[:5], 1):  # Show max 5 rows in prompt
-                # Truncate long values
+                # Convert to JSON-serializable and truncate long values
                 formatted_row = {
-                    k: (str(v)[:50] + "..." if len(str(v)) > 50 else v)
+                    k: (str(v)[:50] + "..." if len(str(v)) > 50 else make_json_serializable(v))
                     for k, v in row.items()
                 }
                 lines.append(f"    {i}. {json.dumps(formatted_row, ensure_ascii=False)}")

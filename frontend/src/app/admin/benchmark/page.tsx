@@ -25,8 +25,8 @@ interface BenchmarkRun {
   total_questions: number;
   completed: number;
   failed: number;
-  baseline_exact_match_rate: number | null;
-  enhanced_exact_match_rate: number | null;
+  baseline_exec_match_rate: number | null;
+  enhanced_exec_match_rate: number | null;
   created_at: string;
 }
 
@@ -329,13 +329,13 @@ export default function BenchmarkControlPanel() {
                             {run.failed > 0 && <span className="text-red-600 ml-1">({run.failed} failed)</span>}
                           </TableCell>
                           <TableCell>
-                            {run.baseline_exact_match_rate !== null
-                              ? `${(run.baseline_exact_match_rate * 100).toFixed(1)}%`
+                            {run.baseline_exec_match_rate !== null
+                              ? `${(run.baseline_exec_match_rate * 100).toFixed(1)}%`
                               : '-'}
                           </TableCell>
                           <TableCell>
-                            {run.enhanced_exact_match_rate !== null
-                              ? `${(run.enhanced_exact_match_rate * 100).toFixed(1)}%`
+                            {run.enhanced_exec_match_rate !== null
+                              ? `${(run.enhanced_exec_match_rate * 100).toFixed(1)}%`
                               : '-'}
                           </TableCell>
                           <TableCell>

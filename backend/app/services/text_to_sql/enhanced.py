@@ -50,6 +50,7 @@ class EnhancedSQLGenerator:
         # Tracking for last retrieval
         self._last_retrieval_method: Optional[str] = None
         self._last_chunks_retrieved: int = 0
+        self._last_semantic_chunks: Optional[List[Dict[str, Any]]] = None
 
     def _get_schema(self) -> Dict[str, Any]:
         """
@@ -125,6 +126,7 @@ class EnhancedSQLGenerator:
                 # Successfully retrieved chunks
                 self._last_retrieval_method = "vector_search_success"
                 self._last_chunks_retrieved = len(chunks)
+                self._last_semantic_chunks = chunks
 
                 # Format chunks into a readable context
                 context_parts = [f"Relevant semantic information for {self.database_name}:\n"]
@@ -243,7 +245,10 @@ class EnhancedSQLGenerator:
                 "used_vector_search": self.use_vector_search,
                 # New tracking fields
                 "semantic_retrieval_method": self._last_retrieval_method,
-                "semantic_chunks_retrieved": self._last_chunks_retrieved
+                "semantic_chunks_retrieved": self._last_chunks_retrieved,
+                "system_prompt": system_prompt,
+                "user_prompt": user_prompt,
+                "semantic_chunks": self._last_semantic_chunks
             }
         }
 

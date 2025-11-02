@@ -272,43 +272,40 @@ Examples:
                     semantic_section += f"    Business Name: {table.get('business_name', 'N/A')}\n"
                     semantic_section += f"    Purpose: {table.get('purpose', 'N/A')}\n"
 
-                    # Add primary key
-                    if table.get('primary_key'):
-                        semantic_section += f"    Primary Key: {table.get('primary_key')}\n"
-
                     # Add column documentation
                     columns = table.get('columns', [])
                     if columns:
                         semantic_section += "    Columns:\n"
                         for col in columns:
                             col_name = col.get('name', 'N/A')
+                            business_name = col.get('business_name', col_name)
                             business_meaning = col.get('business_meaning', 'N/A')
-                            semantic_section += f"      - {col_name}: {business_meaning}\n"
+                            semantic_section += f"      {col_name} → {business_name}: {business_meaning}\n"
 
                             # Add synonyms if present
                             synonyms = col.get('synonyms', [])
                             if synonyms and len(synonyms) > 0:
                                 semantic_section += f"        Synonyms: {', '.join(synonyms)}\n"
 
-                    # Add relationships with JOIN patterns
+                            # Add filters if present
+                            filters = col.get('typical_filters', [])
+                            if filters and len(filters) > 0:
+                                semantic_section += f"        Filters: {', '.join(filters)}\n"
+
+                            # Add aggregations if present
+                            aggs = col.get('aggregations', [])
+                            if aggs and len(aggs) > 0:
+                                semantic_section += f"        Aggregations: {', '.join(aggs)}\n"
+
+                    # Add relationships
                     relationships = table.get('relationships', [])
                     if relationships:
                         semantic_section += "    Relationships:\n"
                         for rel in relationships:
+                            col = rel.get('column', 'N/A')
+                            ref_table = rel.get('references_table', 'N/A')
                             rel_meaning = rel.get('business_meaning', 'N/A')
-                            join_pattern = rel.get('join_pattern', '')
-                            semantic_section += f"      - {rel_meaning}\n"
-                            if join_pattern:
-                                semantic_section += f"        JOIN: {join_pattern}\n"
-
-            # Add domain glossary for business term mappings
-            glossary = semantic_layer.get('domain_glossary', [])
-            if glossary:
-                semantic_section += "\nBusiness Terms:\n"
-                for term in glossary[:5]:  # Limit to 5 most important terms
-                    business_term = term.get('business_term', 'N/A')
-                    technical_mapping = term.get('technical_mapping', 'N/A')
-                    semantic_section += f"  - '{business_term}' → {technical_mapping}\n"
+                            semantic_section += f"      {col} → {ref_table}: {rel_meaning}\n"
 
         database_name = schema.get('database', 'unknown')
         return f"""DATABASE SCHEMA:

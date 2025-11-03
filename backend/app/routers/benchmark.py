@@ -76,7 +76,7 @@ async def start_benchmark(
             benchmark_store=store,
             budget_limit_usd=5.0,
             connection_string=database_url if config.data_source == 'supabase' else None,
-            data_source=config.data_source or 'supabase'
+            data_source=config.data_source or 'turso'
         )
 
         # Get question count for response
@@ -99,7 +99,7 @@ async def start_benchmark(
                     benchmark_store=store_bg,
                     budget_limit_usd=5.0,
                     connection_string=database_url if config_copy.data_source == 'supabase' else None,
-                    data_source=config_copy.data_source or 'supabase'
+                    data_source=config_copy.data_source or 'turso'
                 )
                 run_id = runner_bg.run_benchmark(config_copy)
                 print(f"Benchmark {run_id} completed successfully using {config_copy.data_source}")

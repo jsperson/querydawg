@@ -1,0 +1,434 @@
+{
+  "database": "voter_1",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:34:21.907525",
+    "overview": {
+      "domain": "Voting and Contest Management",
+      "purpose": "This database is used to track contestants in a voting contest, the votes they receive, and the states from which the votes are cast.",
+      "key_entities": [
+        "Contestants",
+        "Votes",
+        "Area Codes and States"
+      ],
+      "typical_questions": [
+        "Who are the contestants in the contest?",
+        "How many votes did each contestant receive?",
+        "What states are represented in the voting data?",
+        "When were the votes cast?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "area_code_state",
+        "row_count": 305,
+        "business_name": "Area Code and State Mapping",
+        "purpose": "This table maps area codes to their corresponding states.",
+        "primary_key": "area_code",
+        "columns": [
+          {
+            "name": "area_code",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Area Code",
+            "business_meaning": "A unique identifier for a geographic area used in phone numbers.",
+            "synonyms": [
+              "phone area code",
+              "dialing code",
+              "region code"
+            ],
+            "sample_values": [
+              "201",
+              "202",
+              "203",
+              "205",
+              "206"
+            ],
+            "typical_filters": [
+              "area_code = ?",
+              "area_code IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid area code."
+          },
+          {
+            "name": "state",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "State",
+            "business_meaning": "The name of the state associated with the area code.",
+            "synonyms": [
+              "state name",
+              "region",
+              "location"
+            ],
+            "sample_values": [
+              "NJ",
+              "DC",
+              "CT",
+              "AL",
+              "WA"
+            ],
+            "typical_filters": [
+              "state = ?",
+              "state IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid state abbreviation."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What states are associated with specific area codes?",
+            "explanation": "Query the area_code_state table to find states based on area codes.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "contestants",
+        "row_count": 11,
+        "business_name": "Contestants",
+        "purpose": "This table contains information about the contestants participating in the voting contest.",
+        "primary_key": "contestant_number",
+        "columns": [
+          {
+            "name": "contestant_number",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Contestant Number",
+            "business_meaning": "A unique identifier for each contestant.",
+            "synonyms": [
+              "contestant ID",
+              "participant number",
+              "contestant key"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "typical_filters": [
+              "contestant_number = ?",
+              "contestant_number IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique number for each contestant."
+          },
+          {
+            "name": "contestant_name",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Contestant Name",
+            "business_meaning": "The name of the contestant.",
+            "synonyms": [
+              "participant name",
+              "contestant title",
+              "entrant name"
+            ],
+            "sample_values": [
+              "Edwina Burnam",
+              "Tabatha Gehling",
+              "Kelly Clauss"
+            ],
+            "typical_filters": [
+              "contestant_name = ?",
+              "contestant_name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid name."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "Who are the contestants in the contest?",
+            "explanation": "Query the contestants table to list all contestants.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "votes",
+        "row_count": 4,
+        "business_name": "Votes",
+        "purpose": "This table records the votes cast for each contestant, including the state and time of voting.",
+        "primary_key": "vote_id",
+        "columns": [
+          {
+            "name": "vote_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Vote ID",
+            "business_meaning": "A unique identifier for each vote.",
+            "synonyms": [
+              "vote key",
+              "voting ID",
+              "vote reference"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3",
+              "5"
+            ],
+            "typical_filters": [
+              "vote_id = ?",
+              "vote_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique number for each vote."
+          },
+          {
+            "name": "phone_number",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Phone Number",
+            "business_meaning": "The phone number used to cast the vote.",
+            "synonyms": [
+              "voter phone",
+              "contact number",
+              "voting phone"
+            ],
+            "sample_values": [
+              "7182887233",
+              "7148407040",
+              "6209222712"
+            ],
+            "typical_filters": [
+              "phone_number = ?",
+              "phone_number IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid phone number."
+          },
+          {
+            "name": "state",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "State",
+            "business_meaning": "The state from which the vote was cast.",
+            "synonyms": [
+              "voting state",
+              "state of origin",
+              "state code"
+            ],
+            "sample_values": [
+              "NY",
+              "CA",
+              "NJ"
+            ],
+            "typical_filters": [
+              "state = ?",
+              "state IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid state abbreviation."
+          },
+          {
+            "name": "contestant_number",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Contestant Number",
+            "business_meaning": "The contestant for whom the vote was cast.",
+            "synonyms": [
+              "voted contestant",
+              "contestant ID",
+              "participant number"
+            ],
+            "sample_values": [
+              "2",
+              "3",
+              "3",
+              "5"
+            ],
+            "typical_filters": [
+              "contestant_number = ?",
+              "contestant_number IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must correspond to a valid contestant number."
+          },
+          {
+            "name": "created",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Vote Timestamp",
+            "business_meaning": "The date and time when the vote was cast.",
+            "synonyms": [
+              "voting time",
+              "timestamp",
+              "vote date"
+            ],
+            "sample_values": [
+              "2018-03-09 19:03:21",
+              "2018-03-09 19:03:36"
+            ],
+            "typical_filters": [
+              "created >= ?",
+              "created <= ?"
+            ],
+            "aggregations": [
+              "COUNT(*)",
+              "MAX(created)",
+              "MIN(created)"
+            ],
+            "value_constraints": "Must be a valid timestamp format."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "contestant_number",
+            "references_table": "contestants",
+            "references_column": "contestant_number",
+            "business_meaning": "This relationship links each vote to the specific contestant that received it.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN contestants ON votes.contestant_number = contestants.contestant_number",
+            "common_uses": [
+              "To find out how many votes each contestant received.",
+              "To get the names of contestants along with their vote counts."
+            ]
+          },
+          {
+            "type": "foreign_key",
+            "column": "state",
+            "references_table": "area_code_state",
+            "references_column": "state",
+            "business_meaning": "This relationship connects votes to the states from which they were cast.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN area_code_state ON votes.state = area_code_state.state",
+            "common_uses": [
+              "To analyze voting patterns by state.",
+              "To get the area codes associated with the states of the votes."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "How many votes did each contestant receive?",
+            "explanation": "Aggregate the votes table by contestant_number and join with contestants to get names.",
+            "involves_joins": [
+              "contestants"
+            ]
+          },
+          {
+            "question": "What are the voting statistics by state?",
+            "explanation": "Group votes by state and count the number of votes, joining with area_code_state for state names.",
+            "involves_joins": [
+              "area_code_state"
+            ]
+          },
+          {
+            "question": "When were the votes cast for a specific contestant?",
+            "explanation": "Filter the votes table by contestant_number and select the created timestamp.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Vote Aggregation by State",
+        "example_question": "How many votes were cast in each state?",
+        "tables_involved": [
+          "votes",
+          "area_code_state"
+        ],
+        "typical_structure": "SELECT state, COUNT(*) FROM votes JOIN area_code_state ON votes.state = area_code_state.state GROUP BY state",
+        "key_considerations": [
+          "Ensure state abbreviations match those in area_code_state."
+        ]
+      },
+      {
+        "pattern_type": "Contestant Vote Count",
+        "example_question": "Which contestant received the most votes?",
+        "tables_involved": [
+          "votes",
+          "contestants"
+        ],
+        "typical_structure": "SELECT contestant_name, COUNT(*) FROM votes JOIN contestants ON votes.contestant_number = contestants.contestant_number GROUP BY contestant_name ORDER BY COUNT(*) DESC",
+        "key_considerations": [
+          "Consider ties in vote counts."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Vote",
+        "technical_mapping": "votes.vote_id",
+        "definition": "A record of a single voting action for a contestant.",
+        "synonyms": [
+          "voting record",
+          "ballot",
+          "cast vote"
+        ],
+        "example_usage": "How many votes did contestant X receive?"
+      },
+      {
+        "business_term": "Contestant",
+        "technical_mapping": "contestants.contestant_name",
+        "definition": "A participant in the voting contest.",
+        "synonyms": [
+          "participant",
+          "entrant",
+          "competitor"
+        ],
+        "example_usage": "Who are the contestants in the contest?"
+      },
+      {
+        "business_term": "State",
+        "technical_mapping": "area_code_state.state",
+        "definition": "A geographical area from which votes are cast.",
+        "synonyms": [
+          "region",
+          "location",
+          "state code"
+        ],
+        "example_usage": "What states are represented in the voting data?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "State abbreviation may vary in format.",
+        "example": "What votes were cast in NY?",
+        "clarification": "Ensure the state abbreviation matches the format in the area_code_state table.",
+        "affected_elements": [
+          "votes.state",
+          "area_code_state.state"
+        ]
+      },
+      {
+        "issue": "Contestant names may be similar.",
+        "example": "How many votes did Kelly receive?",
+        "clarification": "Specify the contestant number or provide additional context to avoid confusion.",
+        "affected_elements": [
+          "votes.contestant_number",
+          "contestants.contestant_name"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use JOINs to connect votes with contestants and states for comprehensive queries.",
+      "Be mindful of data types when filtering or aggregating, especially for phone numbers and timestamps.",
+      "Always validate state abbreviations against the area_code_state table to ensure accuracy."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:35:05.361518",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 4628,
+    "cost_usd": 0.0018893999999999998,
+    "generation_time_ms": 43453,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: area_code_state =====\nRow count: 305\nPrimary key: area_code\n\nColumns:\n  • area_code: bigint [PRIMARY KEY] NOT NULL\n  • state: character varying NOT NULL\n\n(No foreign keys)\n\n===== Table: contestants =====\nRow count: 11\nPrimary key: contestant_number\n\nColumns:\n  • contestant_number: bigint [PRIMARY KEY] NOT NULL\n  • contestant_name: character varying NOT NULL\n\n(No foreign keys)\n\n===== Table: votes =====\nRow count: 4\nPrimary key: vote_id\n\nColumns:\n  • vote_id: bigint [PRIMARY KEY] NOT NULL\n  • phone_number: bigint NOT NULL\n  • state: character varying NOT NULL\n  • contestant_number: bigint NOT NULL\n  • created: text NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → contestant_number REFERENCES contestants.contestant_number\n     JOIN: JOIN contestants ON votes.contestant_number = contestants.contestant_number\n     Source: database\n  → state REFERENCES area_code_state.state\n     JOIN: JOIN area_code_state ON votes.state = area_code_state.state\n     Source: spider_metadata\n\nSAMPLE DATA:\n\nTable: area_code_state\n  Sample rows (10):\n    1. {\"area_code\": 201, \"state\": \"NJ\"}\n    2. {\"area_code\": 202, \"state\": \"DC\"}\n    3. {\"area_code\": 203, \"state\": \"CT\"}\n    4. {\"area_code\": 205, \"state\": \"AL\"}\n    5. {\"area_code\": 206, \"state\": \"WA\"}\n\nTable: contestants\n  Sample rows (10):\n    1. {\"contestant_number\": 1, \"contestant_name\": \"Edwina Burnam\"}\n    2. {\"contestant_number\": 2, \"contestant_name\": \"Tabatha Gehling\"}\n    3. {\"contestant_number\": 3, \"contestant_name\": \"Kelly Clauss\"}\n    4. {\"contestant_number\": 4, \"contestant_name\": \"Jessie Alloway\"}\n    5. {\"contestant_number\": 5, \"contestant_name\": \"Alana Bregman\"}\n\nTable: votes\n  Sample rows (4):\n    1. {\"vote_id\": 1, \"phone_number\": 7182887233, \"state\": \"NY\", \"contestant_number\": 2, \"created\": \"2018-03-09 19:03:21\"}\n    2. {\"vote_id\": 2, \"phone_number\": 7148407040, \"state\": \"NY\", \"contestant_number\": 3, \"created\": \"2018-03-09 19:03:36\"}\n    3. {\"vote_id\": 3, \"phone_number\": 6209222712, \"state\": \"CA\", \"contestant_number\": 3, \"created\": \"2018-03-09 19:03:39\"}\n    4. {\"vote_id\": 5, \"phone_number\": 5112677315, \"state\": \"NJ\\n\", \"contestant_number\": 5, \"created\": \"2018-03-09 19:03:40\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:34:21.907525\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

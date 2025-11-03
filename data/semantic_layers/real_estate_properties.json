@@ -1,0 +1,1015 @@
+{
+  "database": "real_estate_properties",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:41:13.343530",
+    "overview": {
+      "domain": "Real Estate",
+      "purpose": "This database is used to manage and track properties, their features, and types in the real estate market.",
+      "key_entities": [
+        "Properties",
+        "Available Features",
+        "Property Features",
+        "Feature Types",
+        "Property Types"
+      ],
+      "typical_questions": [
+        "What properties are available for sale?",
+        "What features do specific properties have?",
+        "What types of properties are listed?",
+        "How many rooms do the properties have?",
+        "What is the selling price of a specific property?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "other_available_features",
+        "row_count": 3,
+        "business_name": "Available Features",
+        "purpose": "This table lists features that can be associated with properties, such as amenities and security features.",
+        "primary_key": "feature_id",
+        "columns": [
+          {
+            "name": "feature_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Feature ID",
+            "business_meaning": "A unique identifier for each feature.",
+            "synonyms": [
+              "Feature Identifier",
+              "ID",
+              "Feature Number"
+            ],
+            "sample_values": [
+              "2",
+              "3",
+              "4"
+            ],
+            "typical_filters": [
+              "feature_id = ?",
+              "feature_type_code = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "feature_type_code",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Feature Type Code",
+            "business_meaning": "A code representing the type of feature (e.g., Amenity, Security).",
+            "synonyms": [
+              "Type Code",
+              "Feature Category"
+            ],
+            "sample_values": [
+              "Amenity",
+              "Security"
+            ],
+            "typical_filters": [
+              "feature_type_code = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match existing feature type codes."
+          },
+          {
+            "name": "feature_name",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Feature Name",
+            "business_meaning": "The name of the feature (e.g., Air Conditioning).",
+            "synonyms": [
+              "Feature Title",
+              "Name"
+            ],
+            "sample_values": [
+              "AirCon",
+              "Pool",
+              "BurglarAlarm"
+            ],
+            "typical_filters": [
+              "feature_name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "feature_description",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Feature Description",
+            "business_meaning": "A description of the feature.",
+            "synonyms": [
+              "Description",
+              "Feature Details"
+            ],
+            "sample_values": [
+              "Air Conditioning.",
+              "Swimming Pool.",
+              "Burglar Alarm"
+            ],
+            "typical_filters": [
+              "feature_description LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "feature_type_code",
+            "references_table": "ref_feature_types",
+            "references_column": "feature_type_code",
+            "business_meaning": "Links available features to their types, categorizing them.",
+            "cardinality": "one-to-many",
+            "join_pattern": "JOIN ref_feature_types ON other_available_features.feature_type_code = ref_feature_types.feature_type_code",
+            "common_uses": [
+              "To find all features of a specific type.",
+              "To categorize features when querying properties."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What features are available for properties?",
+            "explanation": "Query the available features table to list all features.",
+            "involves_joins": []
+          },
+          {
+            "question": "What types of amenities are offered?",
+            "explanation": "Filter the features by feature_type_code to get amenities.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "other_property_features",
+        "row_count": 15,
+        "business_name": "Property Features",
+        "purpose": "This table associates properties with their specific features and descriptions.",
+        "primary_key": "property_id, feature_id",
+        "columns": [
+          {
+            "name": "property_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Property ID",
+            "business_meaning": "A unique identifier for each property.",
+            "synonyms": [
+              "ID",
+              "Property Identifier"
+            ],
+            "sample_values": [
+              "15",
+              "12",
+              "6"
+            ],
+            "typical_filters": [
+              "property_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match existing property IDs."
+          },
+          {
+            "name": "feature_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Feature ID",
+            "business_meaning": "A unique identifier for each feature associated with a property.",
+            "synonyms": [
+              "ID",
+              "Feature Identifier"
+            ],
+            "sample_values": [
+              "3",
+              "4",
+              "2"
+            ],
+            "typical_filters": [
+              "feature_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match existing feature IDs."
+          },
+          {
+            "name": "property_feature_description",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Property Feature Description",
+            "business_meaning": "A description of how the feature applies to the property.",
+            "synonyms": [
+              "Feature Details",
+              "Description"
+            ],
+            "sample_values": [
+              "dolorem",
+              "earum",
+              "illo"
+            ],
+            "typical_filters": [
+              "property_feature_description LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "feature_id",
+            "references_table": "other_available_features",
+            "references_column": "feature_id",
+            "business_meaning": "Links property features to the available features, detailing what features a property has.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN other_available_features ON other_property_features.feature_id = other_available_features.feature_id",
+            "common_uses": [
+              "To retrieve all features for a specific property.",
+              "To get descriptions of features associated with properties."
+            ]
+          },
+          {
+            "type": "foreign_key",
+            "column": "property_id",
+            "references_table": "properties",
+            "references_column": "property_id",
+            "business_meaning": "Associates property features with specific properties.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN properties ON other_property_features.property_id = properties.property_id",
+            "common_uses": [
+              "To find all features related to a specific property.",
+              "To analyze features across different properties."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What features does a specific property have?",
+            "explanation": "Query the property features table using the property_id to find associated features.",
+            "involves_joins": [
+              "other_available_features",
+              "properties"
+            ]
+          },
+          {
+            "question": "What is the description of a feature for a property?",
+            "explanation": "Filter by property_id and feature_id to get the specific description.",
+            "involves_joins": [
+              "other_available_features"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "properties",
+        "row_count": 15,
+        "business_name": "Properties",
+        "purpose": "This table contains information about properties available in the market.",
+        "primary_key": "property_id",
+        "columns": [
+          {
+            "name": "property_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Property ID",
+            "business_meaning": "A unique identifier for each property.",
+            "synonyms": [
+              "ID",
+              "Property Identifier"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "property_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "property_type_code",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Property Type Code",
+            "business_meaning": "A code representing the type of property (e.g., House, Apartment).",
+            "synonyms": [
+              "Type Code",
+              "Property Category"
+            ],
+            "sample_values": [
+              "House",
+              "Apartment",
+              "Field"
+            ],
+            "typical_filters": [
+              "property_type_code = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match existing property type codes."
+          },
+          {
+            "name": "date_on_market",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Date on Market",
+            "business_meaning": "The date when the property was listed for sale.",
+            "synonyms": [
+              "Listing Date",
+              "Market Date"
+            ],
+            "sample_values": [
+              "1991-06-21 23:52:10",
+              "1990-05-25 23:01:51"
+            ],
+            "typical_filters": [
+              "date_on_market >= ?",
+              "date_on_market <= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "date_sold",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Date Sold",
+            "business_meaning": "The date when the property was sold.",
+            "synonyms": [
+              "Sale Date",
+              "Closing Date"
+            ],
+            "sample_values": [
+              "1979-05-13 16:58:06",
+              "1990-11-14 19:16:38"
+            ],
+            "typical_filters": [
+              "date_sold >= ?",
+              "date_sold <= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "property_name",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Property Name",
+            "business_meaning": "The name or title of the property.",
+            "synonyms": [
+              "Title",
+              "Property Title"
+            ],
+            "sample_values": [
+              "park",
+              "the cole",
+              "prism"
+            ],
+            "typical_filters": [
+              "property_name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "property_address",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Property Address",
+            "business_meaning": "The physical address of the property.",
+            "synonyms": [
+              "Address",
+              "Location"
+            ],
+            "sample_values": [
+              "4745 Emerson Stravenue Suite 829\nSouth Garret, IN ...",
+              "098 Tremaine Highway Suite 569\nSouth Wilford, NJ ..."
+            ],
+            "typical_filters": [
+              "property_address LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "room_count",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Room Count",
+            "business_meaning": "The number of rooms in the property.",
+            "synonyms": [
+              "Number of Rooms",
+              "Room Total"
+            ],
+            "sample_values": [
+              "7",
+              "1",
+              "8"
+            ],
+            "typical_filters": [
+              "room_count >= ?",
+              "room_count <= ?"
+            ],
+            "aggregations": [
+              "COUNT(room_count)",
+              "SUM(room_count)"
+            ],
+            "value_constraints": "Must be a non-negative integer."
+          },
+          {
+            "name": "vendor_requested_price",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Vendor Requested Price",
+            "business_meaning": "The price requested by the vendor for the property.",
+            "synonyms": [
+              "Asking Price",
+              "Listed Price"
+            ],
+            "sample_values": [
+              "372652.2909",
+              "661536468.4429"
+            ],
+            "typical_filters": [
+              "vendor_requested_price >= ?",
+              "vendor_requested_price <= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "buyer_offered_price",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Buyer Offered Price",
+            "business_meaning": "The price offered by a buyer for the property.",
+            "synonyms": [
+              "Offer Price",
+              "Bid Price"
+            ],
+            "sample_values": [
+              "1.68",
+              "8.7122"
+            ],
+            "typical_filters": [
+              "buyer_offered_price >= ?",
+              "buyer_offered_price <= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "agreed_selling_price",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Agreed Selling Price",
+            "business_meaning": "The price agreed upon for the sale of the property.",
+            "synonyms": [
+              "Final Sale Price",
+              "Selling Price"
+            ],
+            "sample_values": [
+              "4201.8",
+              "21769471.8328"
+            ],
+            "typical_filters": [
+              "agreed_selling_price >= ?",
+              "agreed_selling_price <= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "apt_feature_1",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Apartment Feature 1",
+            "business_meaning": "A specific feature of the apartment.",
+            "synonyms": [
+              "Apartment Feature",
+              "Apt Feature"
+            ],
+            "sample_values": [
+              "aut",
+              "est"
+            ],
+            "typical_filters": [
+              "apt_feature_1 LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "apt_feature_2",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Apartment Feature 2",
+            "business_meaning": "Another specific feature of the apartment.",
+            "synonyms": [
+              "Apartment Feature",
+              "Apt Feature"
+            ],
+            "sample_values": [
+              "suscipit",
+              "est"
+            ],
+            "typical_filters": [
+              "apt_feature_2 LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "apt_feature_3",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Apartment Feature 3",
+            "business_meaning": "A third specific feature of the apartment.",
+            "synonyms": [
+              "Apartment Feature",
+              "Apt Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "apt_feature_3 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "fld_feature_1",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Field Feature 1",
+            "business_meaning": "A specific feature of the field.",
+            "synonyms": [
+              "Field Feature",
+              "Fld Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "fld_feature_1 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "fld_feature_2",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Field Feature 2",
+            "business_meaning": "Another specific feature of the field.",
+            "synonyms": [
+              "Field Feature",
+              "Fld Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "fld_feature_2 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "fld_feature_3",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Field Feature 3",
+            "business_meaning": "A third specific feature of the field.",
+            "synonyms": [
+              "Field Feature",
+              "Fld Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "fld_feature_3 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "hse_feature_1",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "House Feature 1",
+            "business_meaning": "A specific feature of the house.",
+            "synonyms": [
+              "House Feature",
+              "Hse Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "hse_feature_1 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "hse_feature_2",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "House Feature 2",
+            "business_meaning": "Another specific feature of the house.",
+            "synonyms": [
+              "House Feature",
+              "Hse Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "hse_feature_2 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "hse_feature_3",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "House Feature 3",
+            "business_meaning": "A third specific feature of the house.",
+            "synonyms": [
+              "House Feature",
+              "Hse Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "hse_feature_3 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "oth_feature_1",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Other Feature 1",
+            "business_meaning": "A specific feature that does not fit other categories.",
+            "synonyms": [
+              "Other Feature",
+              "Oth Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "oth_feature_1 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "oth_feature_2",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Other Feature 2",
+            "business_meaning": "Another specific feature that does not fit other categories.",
+            "synonyms": [
+              "Other Feature",
+              "Oth Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "oth_feature_2 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "oth_feature_3",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Other Feature 3",
+            "business_meaning": "A third specific feature that does not fit other categories.",
+            "synonyms": [
+              "Other Feature",
+              "Oth Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "oth_feature_3 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "shp_feature_1",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Shop Feature 1",
+            "business_meaning": "A specific feature of the shop.",
+            "synonyms": [
+              "Shop Feature",
+              "Shp Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "shp_feature_1 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "shp_feature_2",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Shop Feature 2",
+            "business_meaning": "Another specific feature of the shop.",
+            "synonyms": [
+              "Shop Feature",
+              "Shp Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "shp_feature_2 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "shp_feature_3",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Shop Feature 3",
+            "business_meaning": "A third specific feature of the shop.",
+            "synonyms": [
+              "Shop Feature",
+              "Shp Feature"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "shp_feature_3 IS NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "other_property_details",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Other Property Details",
+            "business_meaning": "Any additional details about the property.",
+            "synonyms": [
+              "Additional Details",
+              "Property Notes"
+            ],
+            "sample_values": [
+              "null"
+            ],
+            "typical_filters": [
+              "other_property_details LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "property_type_code",
+            "references_table": "ref_property_types",
+            "references_column": "property_type_code",
+            "business_meaning": "Links properties to their types, categorizing them.",
+            "cardinality": "one-to-many",
+            "join_pattern": "JOIN ref_property_types ON properties.property_type_code = ref_property_types.property_type_code",
+            "common_uses": [
+              "To find all properties of a specific type.",
+              "To categorize properties when querying."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What properties are available for a specific type?",
+            "explanation": "Filter properties by property_type_code to get a list of properties.",
+            "involves_joins": [
+              "ref_property_types"
+            ]
+          },
+          {
+            "question": "What is the selling price of a property?",
+            "explanation": "Query the properties table to find the agreed_selling_price for a specific property_id.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "ref_feature_types",
+        "row_count": 2,
+        "business_name": "Reference Feature Types",
+        "purpose": "This table defines the types of features available for properties.",
+        "primary_key": "feature_type_code",
+        "columns": [
+          {
+            "name": "feature_type_code",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Feature Type Code",
+            "business_meaning": "A unique code for each feature type.",
+            "synonyms": [
+              "Type Code",
+              "Feature Category"
+            ],
+            "sample_values": [
+              "Amenity",
+              "Security"
+            ],
+            "typical_filters": [
+              "feature_type_code = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique string."
+          },
+          {
+            "name": "feature_type_name",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Feature Type Name",
+            "business_meaning": "The name of the feature type.",
+            "synonyms": [
+              "Type Name",
+              "Category Name"
+            ],
+            "sample_values": [
+              "Amenity, eg Pool.",
+              "Security, eg Burglar Alarm."
+            ],
+            "typical_filters": [
+              "feature_type_name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What types of features are available?",
+            "explanation": "Query the reference feature types table to list all feature types.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "ref_property_types",
+        "row_count": 5,
+        "business_name": "Reference Property Types",
+        "purpose": "This table defines the types of properties available in the market.",
+        "primary_key": "property_type_code",
+        "columns": [
+          {
+            "name": "property_type_code",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Property Type Code",
+            "business_meaning": "A unique code for each property type.",
+            "synonyms": [
+              "Type Code",
+              "Category Code"
+            ],
+            "sample_values": [
+              "House",
+              "Apartment",
+              "Field"
+            ],
+            "typical_filters": [
+              "property_type_code = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique string."
+          },
+          {
+            "name": "property_type_description",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Property Type Description",
+            "business_meaning": "A description of the property type.",
+            "synonyms": [
+              "Type Description",
+              "Category Description"
+            ],
+            "sample_values": [
+              "House, Bungalow, etc.",
+              "Apartment, Flat, Condo, etc."
+            ],
+            "typical_filters": [
+              "property_type_description LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What are the descriptions of property types?",
+            "explanation": "Query the reference property types table to list all descriptions.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Property Feature Analysis",
+        "example_question": "What features are available for houses?",
+        "tables_involved": [
+          "properties",
+          "other_property_features",
+          "other_available_features"
+        ],
+        "typical_structure": "SELECT * FROM properties JOIN other_property_features ON properties.property_id = other_property_features.property_id JOIN other_available_features ON other_property_features.feature_id = other_available_features.feature_id WHERE properties.property_type_code = 'House'",
+        "key_considerations": [
+          "Ensure to filter by property type to get relevant features.",
+          "Consider the possibility of null values in feature descriptions."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Property",
+        "technical_mapping": "properties.property_id",
+        "definition": "A piece of real estate that is available for sale or rent.",
+        "synonyms": [
+          "Real Estate",
+          "Listing"
+        ],
+        "example_usage": "What properties are available in my area?"
+      },
+      {
+        "business_term": "Feature",
+        "technical_mapping": "other_available_features.feature_id",
+        "definition": "An attribute or characteristic of a property, such as amenities or security features.",
+        "synonyms": [
+          "Attribute",
+          "Characteristic"
+        ],
+        "example_usage": "What features does this property have?"
+      },
+      {
+        "business_term": "Property Type",
+        "technical_mapping": "ref_property_types.property_type_code",
+        "definition": "A classification of properties, such as House, Apartment, or Field.",
+        "synonyms": [
+          "Type",
+          "Category"
+        ],
+        "example_usage": "What types of properties are listed?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in property types and features.",
+        "example": "What features does a house have?",
+        "clarification": "Specify the property_id to avoid confusion with other property types.",
+        "affected_elements": [
+          "properties.property_id",
+          "other_property_features.feature_id"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use specific property IDs when querying to avoid ambiguity.",
+      "Join tables appropriately to retrieve related data.",
+      "Be mindful of nullable fields when filtering results."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:43:16.253649",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 9848,
+    "cost_usd": 0.00419745,
+    "generation_time_ms": 122905,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: other_available_features =====\nRow count: 3\nPrimary key: feature_id\n\nColumns:\n  • feature_id: bigint [PRIMARY KEY] NOT NULL\n  • feature_type_code: character varying NOT NULL\n  • feature_name: character varying NULL\n  • feature_description: character varying NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → feature_type_code REFERENCES ref_feature_types.feature_type_code\n     JOIN: JOIN ref_feature_types ON other_available_features.feature_type_code = ref_feature_types.feature_type_code\n     Source: database\n\n===== Table: other_property_features =====\nRow count: 15\nPrimary key: unknown\n\nColumns:\n  • property_id: bigint NOT NULL\n  • feature_id: bigint NOT NULL\n  • property_feature_description: character varying NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → feature_id REFERENCES other_available_features.feature_id\n     JOIN: JOIN other_available_features ON other_property_features.feature_id = other_available_features.feature_id\n     Source: database\n  → property_id REFERENCES properties.property_id\n     JOIN: JOIN properties ON other_property_features.property_id = properties.property_id\n     Source: database\n\n===== Table: properties =====\nRow count: 15\nPrimary key: property_id\n\nColumns:\n  • property_id: bigint [PRIMARY KEY] NOT NULL\n  • property_type_code: character varying NOT NULL\n  • date_on_market: text NULL\n  • date_sold: text NULL\n  • property_name: character varying NULL\n  • property_address: character varying NULL\n  • room_count: bigint NULL\n  • vendor_requested_price: text NULL\n  • buyer_offered_price: text NULL\n  • agreed_selling_price: text NULL\n  • apt_feature_1: character varying NULL\n  • apt_feature_2: character varying NULL\n  • apt_feature_3: character varying NULL\n  • fld_feature_1: character varying NULL\n  • fld_feature_2: character varying NULL\n  • fld_feature_3: character varying NULL\n  • hse_feature_1: character varying NULL\n  • hse_feature_2: character varying NULL\n  • hse_feature_3: character varying NULL\n  • oth_feature_1: character varying NULL\n  • oth_feature_2: character varying NULL\n  • oth_feature_3: character varying NULL\n  • shp_feature_1: character varying NULL\n  • shp_feature_2: character varying NULL\n  • shp_feature_3: character varying NULL\n  • other_property_details: character varying NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → property_type_code REFERENCES ref_property_types.property_type_code\n     JOIN: JOIN ref_property_types ON properties.property_type_code = ref_property_types.property_type_code\n     Source: database\n\n===== Table: ref_feature_types =====\nRow count: 2\nPrimary key: feature_type_code\n\nColumns:\n  • feature_type_code: character varying [PRIMARY KEY] NOT NULL\n  • feature_type_name: character varying NULL\n\n(No foreign keys)\n\n===== Table: ref_property_types =====\nRow count: 5\nPrimary key: property_type_code\n\nColumns:\n  • property_type_code: character varying [PRIMARY KEY] NOT NULL\n  • property_type_description: character varying NULL\n\n(No foreign keys)\n\nSAMPLE DATA:\n\nTable: ref_property_types\n  Sample rows (5):\n    1. {\"property_type_code\": \"House\", \"property_type_description\": \"House, Bungalow, etc.\"}\n    2. {\"property_type_code\": \"Apartment\", \"property_type_description\": \"Apartment, Flat, Condo, etc.\"}\n    3. {\"property_type_code\": \"Field\", \"property_type_description\": \"Field, Meadow.\"}\n    4. {\"property_type_code\": \"Other\", \"property_type_description\": \"Other, to be determined.\"}\n    5. {\"property_type_code\": \"Shop\", \"property_type_description\": \"Shop, Retail Outlet.\"}\n\nTable: other_available_features\n  Sample rows (3):\n    1. {\"feature_id\": 2, \"feature_type_code\": \"Amenity\", \"feature_name\": \"AirCon\", \"feature_description\": \"Air Conditioning.\"}\n    2. {\"feature_id\": 3, \"feature_type_code\": \"Amenity\", \"feature_name\": \"Pool\", \"feature_description\": \"Swimming Pool.\"}\n    3. {\"feature_id\": 4, \"feature_type_code\": \"Security\", \"feature_name\": \"BurglarAlarm\", \"feature_description\": \"Burglar Alarm\"}\n\nTable: properties\n  Sample rows (10):\n    1. {\"property_id\": 1, \"property_type_code\": \"House\", \"date_on_market\": \"1991-06-21 23:52:10\", \"date_sold\": \"1979-05-13 16:58:06\", \"property_name\": \"park\", \"property_address\": \"4745 Emerson Stravenue Suite 829\\nSouth Garret, IN ...\", \"room_count\": 7, \"vendor_requested_price\": \"372652.2909\", \"buyer_offered_price\": \"1.68\", \"agreed_selling_price\": \"4201.8\", \"apt_feature_1\": \"aut\", \"apt_feature_2\": \"suscipit\", \"apt_feature_3\": null, \"fld_feature_1\": null, \"fld_feature_2\": null, \"fld_feature_3\": null, \"hse_feature_1\": null, \"hse_feature_2\": null, \"hse_feature_3\": null, \"oth_feature_1\": null, \"oth_feature_2\": null, \"oth_feature_3\": null, \"shp_feature_1\": null, \"shp_feature_2\": null, \"shp_feature_3\": null, \"other_property_details\": null}\n    2. {\"property_id\": 2, \"property_type_code\": \"House\", \"date_on_market\": \"1990-05-25 23:01:51\", \"date_sold\": \"1990-11-14 19:16:38\", \"property_name\": \"the cole\", \"property_address\": \"098 Tremaine Highway Suite 569\\nSouth Wilford, NJ 4...\", \"room_count\": 1, \"vendor_requested_price\": \"661536468.4429\", \"buyer_offered_price\": \"8.7122\", \"agreed_selling_price\": \"21769471.8328\", \"apt_feature_1\": \"est\", \"apt_feature_2\": \"est\", \"apt_feature_3\": null, \"fld_feature_1\": null, \"fld_feature_2\": null, \"fld_feature_3\": null, \"hse_feature_1\": null, \"hse_feature_2\": null, \"hse_feature_3\": null, \"oth_feature_1\": null, \"oth_feature_2\": null, \"oth_feature_3\": null, \"shp_feature_1\": null, \"shp_feature_2\": null, \"shp_feature_3\": null, \"other_property_details\": null}\n    3. {\"property_id\": 3, \"property_type_code\": \"Other\", \"date_on_market\": \"1986-11-26 04:12:18\", \"date_sold\": \"1981-06-26 21:28:28\", \"property_name\": \"prism\", \"property_address\": \"062 Micaela Court Apt. 707\\nMargretville, WV 51628-...\", \"room_count\": 8, \"vendor_requested_price\": \"1337\", \"buyer_offered_price\": \"11375259.502\", \"agreed_selling_price\": \"5\", \"apt_feature_1\": \"ut\", \"apt_feature_2\": \"et\", \"apt_feature_3\": null, \"fld_feature_1\": null, \"fld_feature_2\": null, \"fld_feature_3\": null, \"hse_feature_1\": null, \"hse_feature_2\": null, \"hse_feature_3\": null, \"oth_feature_1\": null, \"oth_feature_2\": null, \"oth_feature_3\": null, \"shp_feature_1\": null, \"shp_feature_2\": null, \"shp_feature_3\": null, \"other_property_details\": null}\n    4. {\"property_id\": 4, \"property_type_code\": \"Field\", \"date_on_market\": \"2017-09-14 15:49:23\", \"date_sold\": \"2003-02-27 18:17:11\", \"property_name\": \"riverside\", \"property_address\": \"49578 Ayden Mountains\\nNew Russellhaven, UT 46626\", \"room_count\": 6, \"vendor_requested_price\": \"192374065.8\", \"buyer_offered_price\": \"15.17\", \"agreed_selling_price\": \"4514.807\", \"apt_feature_1\": \"nesciunt\", \"apt_feature_2\": \"adipisci\", \"apt_feature_3\": null, \"fld_feature_1\": null, \"fld_feature_2\": null, \"fld_feature_3\": null, \"hse_feature_1\": null, \"hse_feature_2\": null, \"hse_feature_3\": null, \"oth_feature_1\": null, \"oth_feature_2\": null, \"oth_feature_3\": null, \"shp_feature_1\": null, \"shp_feature_2\": null, \"shp_feature_3\": null, \"other_property_details\": null}\n    5. {\"property_id\": 5, \"property_type_code\": \"Apartment\", \"date_on_market\": \"2016-05-06 16:53:39\", \"date_sold\": \"2012-08-19 07:36:57\", \"property_name\": \"parc east\", \"property_address\": \"2765 Schulist Stream\\nLindmouth, UT 03391-3817\", \"room_count\": 5, \"vendor_requested_price\": \"983.8596\", \"buyer_offered_price\": \"10.1067\", \"agreed_selling_price\": \"1.0012\", \"apt_feature_1\": \"quo\", \"apt_feature_2\": \"sequi\", \"apt_feature_3\": null, \"fld_feature_1\": null, \"fld_feature_2\": null, \"fld_feature_3\": null, \"hse_feature_1\": null, \"hse_feature_2\": null, \"hse_feature_3\": null, \"oth_feature_1\": null, \"oth_feature_2\": null, \"oth_feature_3\": null, \"shp_feature_1\": null, \"shp_feature_2\": null, \"shp_feature_3\": null, \"other_property_details\": null}\n\nTable: other_property_features\n  Sample rows (10):\n    1. {\"property_id\": 15, \"feature_id\": 3, \"property_feature_description\": \"dolorem\"}\n    2. {\"property_id\": 12, \"feature_id\": 4, \"property_feature_description\": \"earum\"}\n    3. {\"property_id\": 6, \"feature_id\": 2, \"property_feature_description\": \"illo\"}\n    4. {\"property_id\": 7, \"feature_id\": 2, \"property_feature_description\": \"hic\"}\n    5. {\"property_id\": 6, \"feature_id\": 3, \"property_feature_description\": \"et\"}\n\nTable: ref_feature_types\n  Sample rows (2):\n    1. {\"feature_type_code\": \"Amenity\", \"feature_type_name\": \"Amenity, eg Pool.\"}\n    2. {\"feature_type_code\": \"Security\", \"feature_type_name\": \"Securiyt, eg Burglar Alarm.\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:41:13.343530\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

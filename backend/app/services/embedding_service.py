@@ -17,6 +17,16 @@ from pinecone import Pinecone, ServerlessSpec
 class EmbeddingService:
     """Service for generating and managing embeddings of semantic layers."""
 
+    # Chunk type weights for re-ranking search results
+    # Higher weight = more relevant, will rank higher in results
+    CHUNK_TYPE_WEIGHTS = {
+        'table': 1.2,              # BOOST: Table-specific docs are most valuable
+        'cross_table_patterns': 1.1,  # BOOST: Multi-table patterns are helpful
+        'overview': 0.7,           # PENALIZE: Generic overviews less specific
+        'ambiguities': 0.6,        # PENALIZE: Ambiguities add noise
+        'guidelines': 0.8,         # PENALIZE: Generic guidelines less specific
+    }
+
     def __init__(
         self,
         openai_api_key: str,
@@ -280,7 +290,7 @@ Typical Questions:
                 "values": embedding,
                 "metadata": {
                     **chunk['metadata'],
-                    "text": chunk['text'][:1000]  # Store first 1000 chars in metadata
+                    "text": chunk['text'][:2000]  # Store first 2000 chars in metadata
                 }
             })
 
@@ -322,18 +332,23 @@ Typical Questions:
         self,
         query: str,
         database_name: str,
-        top_k: int = 5
+        top_k: int = 10
     ) -> List[Dict[str, Any]]:
         """
-        Search for relevant semantic context for a query.
+        Search for relevant semantic context for a query with chunk type weighting.
+
+        Uses a two-stage approach:
+        1. Retrieve 2x top_k candidates from vector search
+        2. Re-rank by applying chunk type weights to boost/penalize certain types
+        3. Return top_k after re-ranking
 
         Args:
             query: Natural language query
             database_name: Database to search within
-            top_k: Number of results to return
+            top_k: Number of results to return after re-ranking
 
         Returns:
-            List of relevant chunks with scores
+            List of relevant chunks with scores (sorted by weighted score)
         """
         # Embed the query
         query_embedding = self.embed_text(query)
@@ -342,25 +357,37 @@ Typical Questions:
         # (vectors are indexed with lowercase database names from semantic_layers table)
         normalized_db_name = database_name.lower()
 
-        # Search Pinecone
+        # Search Pinecone - get 2x candidates to allow for effective re-ranking
+        candidate_count = min(top_k * 2, 50)  # Cap at 50 to avoid excessive retrieval
         results = self.index.query(
             vector=query_embedding,
             filter={"database": {"$eq": normalized_db_name}},
-            top_k=top_k,
+            top_k=candidate_count,
             include_metadata=True
         )
 
-        # Format results
-        context_chunks = []
+        # Re-rank results with chunk type weights
+        weighted_results = []
         for match in results['matches']:
-            context_chunks.append({
-                "chunk_type": match['metadata'].get('chunk_type', 'unknown'),
+            chunk_type = match['metadata'].get('chunk_type', 'unknown')
+            original_score = match['score']
+
+            # Apply weight based on chunk type
+            weight = self.CHUNK_TYPE_WEIGHTS.get(chunk_type, 1.0)
+            weighted_score = original_score * weight
+
+            weighted_results.append({
+                "chunk_type": chunk_type,
                 "table_name": match['metadata'].get('table_name'),
                 "text": match['metadata'].get('text', 'N/A'),
-                "score": match['score']
+                "score": weighted_score,  # Weighted score
+                "original_score": original_score,  # Keep original for debugging
+                "weight": weight  # Keep weight for debugging
             })
 
-        return context_chunks
+        # Sort by weighted score (descending) and take top_k
+        weighted_results.sort(key=lambda x: x['score'], reverse=True)
+        return weighted_results[:top_k]
 
     def get_index_stats(self) -> Dict[str, Any]:
         """Get statistics about the Pinecone index."""

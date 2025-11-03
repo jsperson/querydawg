@@ -1,0 +1,740 @@
+{
+  "database": "tvshow",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:32:24.694299",
+    "overview": {
+      "domain": "Media and Entertainment",
+      "purpose": "This database is used to track various television series and cartoons, including their details and broadcasting channels.",
+      "key_entities": [
+        "Cartoons",
+        "TV Channels",
+        "TV Series"
+      ],
+      "typical_questions": [
+        "What cartoons were aired on a specific channel?",
+        "Which TV series had the highest viewer ratings?",
+        "What is the original air date of a specific cartoon?",
+        "Who directed a particular cartoon?",
+        "What are the details of episodes aired on a specific date?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "cartoon",
+        "row_count": 12,
+        "business_name": "Cartoons",
+        "purpose": "This table represents animated television shows, detailing their titles, directors, writers, and air dates.",
+        "primary_key": "id",
+        "columns": [
+          {
+            "name": "id",
+            "type": "double precision",
+            "nullable": false,
+            "business_name": "Cartoon ID",
+            "business_meaning": "A unique identifier for each cartoon.",
+            "synonyms": [
+              "cartoon identifier",
+              "cartoon number"
+            ],
+            "sample_values": [
+              "1.0",
+              "2.0",
+              "3.0"
+            ],
+            "typical_filters": [
+              "id = 1.0",
+              "id IN (1.0, 2.0)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique and not null."
+          },
+          {
+            "name": "title",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Title",
+            "business_meaning": "The name of the cartoon.",
+            "synonyms": [
+              "cartoon name",
+              "show title"
+            ],
+            "sample_values": [
+              "The Rise of the Blue Beetle!",
+              "Terror on Dinosaur Island!"
+            ],
+            "typical_filters": [
+              "title LIKE '%Beetle%'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "directed_by",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Directed By",
+            "business_meaning": "The name of the director of the cartoon.",
+            "synonyms": [
+              "director",
+              "show director"
+            ],
+            "sample_values": [
+              "Ben Jones",
+              "Brandon Vietti"
+            ],
+            "typical_filters": [
+              "directed_by = 'Ben Jones'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "written_by",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Written By",
+            "business_meaning": "The name of the writer of the cartoon.",
+            "synonyms": [
+              "writer",
+              "scriptwriter"
+            ],
+            "sample_values": [
+              "Michael Jelenic",
+              "Steven Melching"
+            ],
+            "typical_filters": [
+              "written_by = 'Michael Jelenic'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "original_air_date",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Original Air Date",
+            "business_meaning": "The date when the cartoon first aired.",
+            "synonyms": [
+              "air date",
+              "premiere date"
+            ],
+            "sample_values": [
+              "November14,2008",
+              "November21,2008"
+            ],
+            "typical_filters": [
+              "original_air_date = 'November14,2008'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "production_code",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Production Code",
+            "business_meaning": "A code representing the production sequence of the cartoon.",
+            "synonyms": [
+              "prod code",
+              "production identifier"
+            ],
+            "sample_values": [
+              "101.0",
+              "102.0"
+            ],
+            "typical_filters": [
+              "production_code = 101.0"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "channel",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Channel ID",
+            "business_meaning": "The ID of the channel on which the cartoon was aired.",
+            "synonyms": [
+              "broadcast channel",
+              "airing channel"
+            ],
+            "sample_values": [
+              "700",
+              "701"
+            ],
+            "typical_filters": [
+              "channel = '700'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "channel",
+            "references_table": "tv_channel",
+            "references_column": "id",
+            "business_meaning": "This relationship links cartoons to the channels they are aired on.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN tv_channel ON cartoon.channel = tv_channel.id",
+            "common_uses": [
+              "To find out which channel aired a specific cartoon.",
+              "To get details about the channel for a given cartoon."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What cartoons were directed by Ben Jones?",
+            "explanation": "Query the cartoon table filtering by the directed_by column.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which cartoons aired on channel 700?",
+            "explanation": "Query the cartoon table filtering by the channel column.",
+            "involves_joins": [
+              "tv_channel"
+            ]
+          },
+          {
+            "question": "What is the original air date of 'The Rise of the Blue Beetle!'?",
+            "explanation": "Query the cartoon table filtering by the title column.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "tv_channel",
+        "row_count": 15,
+        "business_name": "TV Channels",
+        "purpose": "This table represents television channels, detailing their names, countries, languages, and content types.",
+        "primary_key": "id",
+        "columns": [
+          {
+            "name": "id",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Channel ID",
+            "business_meaning": "A unique identifier for each TV channel.",
+            "synonyms": [
+              "channel identifier",
+              "channel number"
+            ],
+            "sample_values": [
+              "700",
+              "701"
+            ],
+            "typical_filters": [
+              "id = '700'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique and not null."
+          },
+          {
+            "name": "series_name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Series Name",
+            "business_meaning": "The name of the series associated with the channel.",
+            "synonyms": [
+              "show name",
+              "program name"
+            ],
+            "sample_values": [
+              "Sky Radio",
+              "MTV Hits"
+            ],
+            "typical_filters": [
+              "series_name LIKE '%MTV%'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "country",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Country",
+            "business_meaning": "The country where the channel is based.",
+            "synonyms": [
+              "nation",
+              "country of origin"
+            ],
+            "sample_values": [
+              "Italy"
+            ],
+            "typical_filters": [
+              "country = 'Italy'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "language",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Language",
+            "business_meaning": "The primary language of the channel's content.",
+            "synonyms": [
+              "content language",
+              "broadcast language"
+            ],
+            "sample_values": [
+              "Italian"
+            ],
+            "typical_filters": [
+              "language = 'Italian'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "content",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Content Type",
+            "business_meaning": "The type of content broadcasted by the channel.",
+            "synonyms": [
+              "program type",
+              "content genre"
+            ],
+            "sample_values": [
+              "music"
+            ],
+            "typical_filters": [
+              "content = 'music'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "pixel_aspect_ratio_par",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Pixel Aspect Ratio",
+            "business_meaning": "The pixel aspect ratio for the channel's broadcasts.",
+            "synonyms": [
+              "aspect ratio",
+              "video format"
+            ],
+            "sample_values": [
+              "4:3",
+              "16:9"
+            ],
+            "typical_filters": [
+              "pixel_aspect_ratio_par = '16:9'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "hight_definition_tv",
+            "type": "text",
+            "nullable": true,
+            "business_name": "High Definition TV",
+            "business_meaning": "Indicates if the channel broadcasts in high definition.",
+            "synonyms": [
+              "HD broadcast",
+              "HD content"
+            ],
+            "sample_values": [
+              "no"
+            ],
+            "typical_filters": [
+              "hight_definition_tv = 'yes'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "pay_per_view_ppv",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Pay Per View",
+            "business_meaning": "Indicates if the channel offers pay-per-view content.",
+            "synonyms": [
+              "PPV",
+              "pay-per-view service"
+            ],
+            "sample_values": [
+              "no"
+            ],
+            "typical_filters": [
+              "pay_per_view_ppv = 'yes'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "package_option",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Package Option",
+            "business_meaning": "The package options available for the channel.",
+            "synonyms": [
+              "subscription package",
+              "channel package"
+            ],
+            "sample_values": [
+              "Sky Famiglia"
+            ],
+            "typical_filters": [
+              "package_option = 'Sky Famiglia'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What channels are available in Italy?",
+            "explanation": "Query the tv_channel table filtering by the country column.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which channels offer pay-per-view services?",
+            "explanation": "Query the tv_channel table filtering by the pay_per_view_ppv column.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the content type of channel 700?",
+            "explanation": "Query the tv_channel table filtering by the id column.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "tv_series",
+        "row_count": 12,
+        "business_name": "TV Series",
+        "purpose": "This table represents television series, detailing their episodes, air dates, ratings, and viewer statistics.",
+        "primary_key": "id",
+        "columns": [
+          {
+            "name": "id",
+            "type": "double precision",
+            "nullable": false,
+            "business_name": "Series ID",
+            "business_meaning": "A unique identifier for each TV series episode.",
+            "synonyms": [
+              "episode identifier",
+              "episode number"
+            ],
+            "sample_values": [
+              "1.0",
+              "2.0"
+            ],
+            "typical_filters": [
+              "id = 1.0"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique and not null."
+          },
+          {
+            "name": "episode",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Episode Title",
+            "business_meaning": "The title of the episode.",
+            "synonyms": [
+              "episode name",
+              "show episode"
+            ],
+            "sample_values": [
+              "A Love of a Lifetime",
+              "Friendly Skies"
+            ],
+            "typical_filters": [
+              "episode LIKE '%Love%'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "air_date",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Air Date",
+            "business_meaning": "The date when the episode aired.",
+            "synonyms": [
+              "broadcast date",
+              "episode air date"
+            ],
+            "sample_values": [
+              "September 24, 2007",
+              "October 1, 2007"
+            ],
+            "typical_filters": [
+              "air_date = 'September 24, 2007'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "rating",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Rating",
+            "business_meaning": "The rating given to the episode.",
+            "synonyms": [
+              "episode rating",
+              "show rating"
+            ],
+            "sample_values": [
+              "5.8",
+              "5.3"
+            ],
+            "typical_filters": [
+              "rating >= '5.0'"
+            ],
+            "aggregations": [
+              "AVG(rating)",
+              "MAX(rating)"
+            ],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "share",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Share",
+            "business_meaning": "The share percentage of viewers watching the episode.",
+            "synonyms": [
+              "viewership share",
+              "audience share"
+            ],
+            "sample_values": [
+              "9.0",
+              "7.0"
+            ],
+            "typical_filters": [
+              "share > 8.0"
+            ],
+            "aggregations": [
+              "AVG(share)",
+              "SUM(share)"
+            ],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "18_49_Rating_Share",
+            "type": "text",
+            "nullable": true,
+            "business_name": "18-49 Rating Share",
+            "business_meaning": "The rating share for viewers aged 18 to 49.",
+            "synonyms": [
+              "demographic rating",
+              "18-49 viewership"
+            ],
+            "sample_values": [
+              "3.5/9",
+              "3.2/8"
+            ],
+            "typical_filters": [
+              "18_49_Rating_Share LIKE '3.5%'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "viewers_m",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Viewers (in millions)",
+            "business_meaning": "The number of viewers in millions for the episode.",
+            "synonyms": [
+              "viewership",
+              "audience size"
+            ],
+            "sample_values": [
+              "9.16",
+              "8.23"
+            ],
+            "typical_filters": [
+              "viewers_m > '8.0'"
+            ],
+            "aggregations": [
+              "SUM(viewers_m)",
+              "AVG(viewers_m)"
+            ],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "weekly_rank",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Weekly Rank",
+            "business_meaning": "The rank of the episode for the week based on viewership.",
+            "synonyms": [
+              "episode ranking",
+              "weekly viewership rank"
+            ],
+            "sample_values": [
+              "43.0",
+              "50.0"
+            ],
+            "typical_filters": [
+              "weekly_rank <= 50.0"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "channel",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Channel ID",
+            "business_meaning": "The ID of the channel on which the episode was aired.",
+            "synonyms": [
+              "broadcast channel",
+              "airing channel"
+            ],
+            "sample_values": [
+              "700",
+              "701"
+            ],
+            "typical_filters": [
+              "channel = '700'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "channel",
+            "references_table": "tv_channel",
+            "references_column": "id",
+            "business_meaning": "This relationship links TV series episodes to the channels they are aired on.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN tv_channel ON tv_series.channel = tv_channel.id",
+            "common_uses": [
+              "To find out which channel aired a specific episode.",
+              "To get details about the channel for a given series episode."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What is the rating of 'A Love of a Lifetime'?",
+            "explanation": "Query the tv_series table filtering by the episode column.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which episodes aired on channel 700?",
+            "explanation": "Query the tv_series table filtering by the channel column.",
+            "involves_joins": [
+              "tv_channel"
+            ]
+          },
+          {
+            "question": "What was the weekly rank of the episode aired on September 24, 2007?",
+            "explanation": "Query the tv_series table filtering by the air_date column.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Channel Viewership Analysis",
+        "example_question": "What are the average ratings for cartoons aired on channel 700?",
+        "tables_involved": [
+          "cartoon",
+          "tv_channel"
+        ],
+        "typical_structure": "SELECT AVG(tv_series.rating) FROM tv_series JOIN tv_channel ON tv_series.channel = tv_channel.id WHERE tv_channel.id = '700'",
+        "key_considerations": [
+          "Ensure to join on the correct channel ID."
+        ]
+      },
+      {
+        "pattern_type": "Episode Performance Comparison",
+        "example_question": "Which episodes had the highest viewership on MTV Hits?",
+        "tables_involved": [
+          "tv_series",
+          "tv_channel"
+        ],
+        "typical_structure": "SELECT tv_series.episode, tv_series.viewers_m FROM tv_series JOIN tv_channel ON tv_series.channel = tv_channel.id WHERE tv_channel.series_name = 'MTV Hits' ORDER BY tv_series.viewers_m DESC",
+        "key_considerations": [
+          "Filter by series_name to get specific channel data."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Cartoon",
+        "technical_mapping": "cartoon.title",
+        "definition": "An animated television show.",
+        "synonyms": [
+          "animated series",
+          "animated show"
+        ],
+        "example_usage": "What cartoons are available on channel 700?"
+      },
+      {
+        "business_term": "TV Channel",
+        "technical_mapping": "tv_channel.series_name",
+        "definition": "A broadcasting service that airs television programs.",
+        "synonyms": [
+          "broadcast channel",
+          "television network"
+        ],
+        "example_usage": "Which TV channels broadcast in Italian?"
+      },
+      {
+        "business_term": "Episode",
+        "technical_mapping": "tv_series.episode",
+        "definition": "A single installment of a television series.",
+        "synonyms": [
+          "show episode",
+          "series episode"
+        ],
+        "example_usage": "What is the title of the episode aired on October 1, 2007?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in channel names and IDs.",
+        "example": "What cartoons aired on MTV?",
+        "clarification": "Specify whether the user means the channel name or the channel ID.",
+        "affected_elements": [
+          "cartoon.channel",
+          "tv_channel.series_name"
+        ]
+      },
+      {
+        "issue": "Confusion between ratings and viewership numbers.",
+        "example": "Which episodes had the best ratings?",
+        "clarification": "Clarify if the user is asking for ratings or the number of viewers.",
+        "affected_elements": [
+          "tv_series.rating",
+          "tv_series.viewers_m"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use specific channel IDs when querying to avoid ambiguity.",
+      "Always check for null values in optional fields.",
+      "Consider joining tables when looking for related information across cartoons and TV series."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:33:40.079254",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 7387,
+    "cost_usd": 0.00313485,
+    "generation_time_ms": 75367,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: cartoon =====\nRow count: 12\nPrimary key: id\n\nColumns:\n  • id: double precision [PRIMARY KEY] NOT NULL\n  • title: text NULL\n  • directed_by: text NULL\n  • written_by: text NULL\n  • original_air_date: text NULL\n  • production_code: double precision NULL\n  • channel: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → channel REFERENCES tv_channel.id\n     JOIN: JOIN tv_channel ON cartoon.channel = tv_channel.id\n     Source: database\n\n===== Table: tv_channel =====\nRow count: 15\nPrimary key: id\n\nColumns:\n  • id: text [PRIMARY KEY] NOT NULL\n  • series_name: text NULL\n  • country: text NULL\n  • language: text NULL\n  • content: text NULL\n  • pixel_aspect_ratio_par: text NULL\n  • hight_definition_tv: text NULL\n  • pay_per_view_ppv: text NULL\n  • package_option: text NULL\n\n(No foreign keys)\n\n===== Table: tv_series =====\nRow count: 12\nPrimary key: id\n\nColumns:\n  • id: double precision [PRIMARY KEY] NOT NULL\n  • episode: text NULL\n  • air_date: text NULL\n  • rating: text NULL\n  • share: double precision NULL\n  • 18_49_Rating_Share: text NULL\n  • viewers_m: text NULL\n  • weekly_rank: double precision NULL\n  • channel: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → channel REFERENCES tv_channel.id\n     JOIN: JOIN tv_channel ON tv_series.channel = tv_channel.id\n     Source: database\n\nSAMPLE DATA:\n\nTable: tv_channel\n  Sample rows (10):\n    1. {\"id\": \"700\", \"series_name\": \"Sky Radio\", \"country\": \"Italy\", \"language\": \"Italian\", \"content\": \"music\", \"pixel_aspect_ratio_par\": \"4:3\", \"hight_definition_tv\": \"no\", \"pay_per_view_ppv\": \"no\", \"package_option\": \"Sky Famiglia\"}\n    2. {\"id\": \"701\", \"series_name\": \"Sky Music\", \"country\": \"Italy\", \"language\": \"Italian\", \"content\": \"music\", \"pixel_aspect_ratio_par\": \"4:3\", \"hight_definition_tv\": \"no\", \"pay_per_view_ppv\": \"no\", \"package_option\": \"Sky Famiglia\"}\n    3. {\"id\": \"703\", \"series_name\": \"Music Box Italia\", \"country\": \"Italy\", \"language\": \"Italian\", \"content\": \"music\", \"pixel_aspect_ratio_par\": \"4:3 / 16:9\", \"hight_definition_tv\": \"no\", \"pay_per_view_ppv\": \"no\", \"package_option\": \"Sky Famiglia\"}\n    4. {\"id\": \"704\", \"series_name\": \"MTV Hits\", \"country\": \"Italy\", \"language\": \"Italian\", \"content\": \"music\", \"pixel_aspect_ratio_par\": \"16:9\", \"hight_definition_tv\": \"no\", \"pay_per_view_ppv\": \"no\", \"package_option\": \"Sky Famiglia\"}\n    5. {\"id\": \"705\", \"series_name\": \"MTV Classic\", \"country\": \"Italy\", \"language\": \"Italian\", \"content\": \"music\", \"pixel_aspect_ratio_par\": \"4:3\", \"hight_definition_tv\": \"no\", \"pay_per_view_ppv\": \"no\", \"package_option\": \"Sky Famiglia\"}\n\nTable: tv_series\n  Sample rows (10):\n    1. {\"id\": 1.0, \"episode\": \"A Love of a Lifetime\", \"air_date\": \"September 24, 2007\", \"rating\": \"5.8\", \"share\": 9.0, \"18_49_Rating_Share\": \"3.5/9\", \"viewers_m\": \"9.16\", \"weekly_rank\": 43.0, \"channel\": \"700\"}\n    2. {\"id\": 2.0, \"episode\": \"Friendly Skies\", \"air_date\": \"October 1, 2007\", \"rating\": \"5.3\", \"share\": 9.0, \"18_49_Rating_Share\": \"3.2/8\", \"viewers_m\": \"8.23\", \"weekly_rank\": 50.0, \"channel\": \"701\"}\n    3. {\"id\": 3.0, \"episode\": \"Game Three\", \"air_date\": \"October 8, 2007\", \"rating\": \"4.4\", \"share\": 7.0, \"18_49_Rating_Share\": \"2.9/7\", \"viewers_m\": \"6.94\", \"weekly_rank\": 61.0, \"channel\": \"707\"}\n    4. {\"id\": 4.0, \"episode\": \"The Year of the Rabbit\", \"air_date\": \"October 15, 2007\", \"rating\": \"4.3\", \"share\": 7.0, \"18_49_Rating_Share\": \"2.7/7\", \"viewers_m\": \"6.75\", \"weekly_rank\": 67.0, \"channel\": \"713\"}\n    5. {\"id\": 5.0, \"episode\": \"The Legend of Dylan McCleen\", \"air_date\": \"October 22, 2007\", \"rating\": \"3.8\", \"share\": 6.0, \"18_49_Rating_Share\": \"2.4/6\", \"viewers_m\": \"6.06\", \"weekly_rank\": 72.0, \"channel\": \"714\"}\n\nTable: cartoon\n  Sample rows (10):\n    1. {\"id\": 1.0, \"title\": \"The Rise of the Blue Beetle!\", \"directed_by\": \"Ben Jones\", \"written_by\": \"Michael Jelenic\", \"original_air_date\": \"November14,2008\", \"production_code\": 101.0, \"channel\": \"700\"}\n    2. {\"id\": 2.0, \"title\": \"Terror on Dinosaur Island!\", \"directed_by\": \"Brandon Vietti\", \"written_by\": \"Steven Melching\", \"original_air_date\": \"November21,2008\", \"production_code\": 102.0, \"channel\": \"701\"}\n    3. {\"id\": 3.0, \"title\": \"Evil Under the Sea!\", \"directed_by\": \"Michael Chang\", \"written_by\": \"Joseph Kuhr\", \"original_air_date\": \"December5,2008\", \"production_code\": 103.0, \"channel\": \"703\"}\n    4. {\"id\": 4.0, \"title\": \"Day of the Dark Knight!\", \"directed_by\": \"Ben Jones\", \"written_by\": \"J. M. DeMatteis\", \"original_air_date\": \"January2,2009\", \"production_code\": 104.0, \"channel\": \"704\"}\n    5. {\"id\": 5.0, \"title\": \"Invasion of the Secret Santas!\", \"directed_by\": \"Brandon Vietti\", \"written_by\": \"Adam Beechen\", \"original_air_date\": \"December12,2008\", \"production_code\": 105.0, \"channel\": \"705\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:32:24.694299\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

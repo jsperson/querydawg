@@ -26,7 +26,7 @@ class EnhancedSQLGenerator:
         database_name: str,
         connection_name: str = "Supabase",
         use_vector_search: bool = True,
-        top_k_chunks: int = 5
+        top_k_chunks: int = 10
     ):
         """
         Initialize enhanced SQL generator

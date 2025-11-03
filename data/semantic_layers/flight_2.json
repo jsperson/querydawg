@@ -1,0 +1,472 @@
+{
+  "database": "flight_2",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:24:25.577921",
+    "overview": {
+      "domain": "Aviation and Travel",
+      "purpose": "This database is used to track airlines, airports, and flight information.",
+      "key_entities": [
+        "Airlines",
+        "Airports",
+        "Flights"
+      ],
+      "typical_questions": [
+        "What airlines operate flights from a specific airport?",
+        "What are the destinations served by a particular airline?",
+        "How many flights are there from one airport to another?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "airlines",
+        "row_count": 12,
+        "business_name": "Airlines",
+        "purpose": "This table contains information about various airlines.",
+        "primary_key": "uid",
+        "columns": [
+          {
+            "name": "uid",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Airline ID",
+            "business_meaning": "A unique identifier for each airline.",
+            "synonyms": [
+              "Airline Identifier",
+              "Airline Key"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "uid = 1",
+              "uid IN (1, 2)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "airline",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Airline Name",
+            "business_meaning": "The name of the airline.",
+            "synonyms": [
+              "Carrier Name",
+              "Airline Title"
+            ],
+            "sample_values": [
+              "United Airlines",
+              "Delta Airlines",
+              "American Airlines"
+            ],
+            "typical_filters": [
+              "airline = 'United Airlines'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          },
+          {
+            "name": "abbreviation",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Airline Abbreviation",
+            "business_meaning": "The short code used to identify the airline.",
+            "synonyms": [
+              "Airline Code",
+              "IATA Code"
+            ],
+            "sample_values": [
+              "UAL",
+              "Delta",
+              "American"
+            ],
+            "typical_filters": [
+              "abbreviation = 'UAL'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          },
+          {
+            "name": "country",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Country of Origin",
+            "business_meaning": "The country where the airline is based.",
+            "synonyms": [
+              "Country",
+              "Nation"
+            ],
+            "sample_values": [
+              "USA",
+              "Canada"
+            ],
+            "typical_filters": [
+              "country = 'USA'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "Which airlines are based in the USA?",
+            "explanation": "Query the airlines table filtering by country.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the abbreviation for Delta Airlines?",
+            "explanation": "Query the airlines table filtering by airline name.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "airports",
+        "row_count": 100,
+        "business_name": "Airports",
+        "purpose": "This table contains information about various airports.",
+        "primary_key": "airportcode",
+        "columns": [
+          {
+            "name": "city",
+            "type": "text",
+            "nullable": true,
+            "business_name": "City",
+            "business_meaning": "The city where the airport is located.",
+            "synonyms": [
+              "Location",
+              "City Name"
+            ],
+            "sample_values": [
+              "Aberdeen",
+              "Abilene"
+            ],
+            "typical_filters": [
+              "city = 'Aberdeen'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          },
+          {
+            "name": "airportcode",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Airport Code",
+            "business_meaning": "A unique code identifying the airport.",
+            "synonyms": [
+              "IATA Code",
+              "Airport Identifier"
+            ],
+            "sample_values": [
+              "APG",
+              "ABR"
+            ],
+            "typical_filters": [
+              "airportcode = 'APG'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique."
+          },
+          {
+            "name": "airportname",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Airport Name",
+            "business_meaning": "The full name of the airport.",
+            "synonyms": [
+              "Airport Title",
+              "Airport Designation"
+            ],
+            "sample_values": [
+              "Phillips AAF",
+              "Municipal"
+            ],
+            "typical_filters": [
+              "airportname = 'Municipal'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          },
+          {
+            "name": "country",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Country",
+            "business_meaning": "The country where the airport is located.",
+            "synonyms": [
+              "Nation",
+              "Country of Location"
+            ],
+            "sample_values": [
+              "United States"
+            ],
+            "typical_filters": [
+              "country = 'United States'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          },
+          {
+            "name": "countryabbrev",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Country Abbreviation",
+            "business_meaning": "The abbreviation for the country.",
+            "synonyms": [
+              "Country Code",
+              "Nation Abbreviation"
+            ],
+            "sample_values": [
+              "US"
+            ],
+            "typical_filters": [
+              "countryabbrev = 'US'"
+            ],
+            "aggregations": [],
+            "value_constraints": "No specific constraints."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What airports are located in the United States?",
+            "explanation": "Query the airports table filtering by country.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the airport code for Phillips AAF?",
+            "explanation": "Query the airports table filtering by airport name.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "flights",
+        "row_count": 1200,
+        "business_name": "Flights",
+        "purpose": "This table contains information about flights operated by airlines.",
+        "primary_key": "airline, flightno",
+        "columns": [
+          {
+            "name": "airline",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Airline ID",
+            "business_meaning": "The ID of the airline operating the flight.",
+            "synonyms": [
+              "Carrier ID",
+              "Airline Identifier"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "airline = 1"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must correspond to a valid airline uid."
+          },
+          {
+            "name": "flightno",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Flight Number",
+            "business_meaning": "The unique number assigned to the flight.",
+            "synonyms": [
+              "Flight ID",
+              "Flight Code"
+            ],
+            "sample_values": [
+              "28",
+              "29",
+              "44"
+            ],
+            "typical_filters": [
+              "flightno = 28"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "sourceairport",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Source Airport Code",
+            "business_meaning": "The airport code from which the flight departs.",
+            "synonyms": [
+              "Departure Airport",
+              "Origin Airport"
+            ],
+            "sample_values": [
+              "APG",
+              "ASY"
+            ],
+            "typical_filters": [
+              "sourceairport = 'APG'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must correspond to a valid airport code."
+          },
+          {
+            "name": "destairport",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Destination Airport Code",
+            "business_meaning": "The airport code where the flight arrives.",
+            "synonyms": [
+              "Arrival Airport",
+              "Destination"
+            ],
+            "sample_values": [
+              "ASY",
+              "APG"
+            ],
+            "typical_filters": [
+              "destairport = 'ASY'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must correspond to a valid airport code."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "destairport",
+            "references_table": "airports",
+            "references_column": "airportcode",
+            "business_meaning": "This relationship links flights to their destination airports.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN airports ON flights.destairport = airports.airportcode",
+            "common_uses": [
+              "To find details about the destination airport for a flight.",
+              "To get the city or country of the destination airport."
+            ]
+          },
+          {
+            "type": "foreign_key",
+            "column": "sourceairport",
+            "references_table": "airports",
+            "references_column": "airportcode",
+            "business_meaning": "This relationship links flights to their source airports.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN airports ON flights.sourceairport = airports.airportcode",
+            "common_uses": [
+              "To find details about the source airport for a flight.",
+              "To get the city or country of the source airport."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What flights are available from a specific airport?",
+            "explanation": "Query the flights table filtering by sourceairport and join with airports for details.",
+            "involves_joins": [
+              "airports"
+            ]
+          },
+          {
+            "question": "Which flights are operated by United Airlines?",
+            "explanation": "Query the flights table filtering by airline ID.",
+            "involves_joins": []
+          },
+          {
+            "question": "What are the destination airports for flights from APG?",
+            "explanation": "Query the flights table filtering by sourceairport and join with airports for destination details.",
+            "involves_joins": [
+              "airports"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Flight Route Analysis",
+        "example_question": "What are the most common destination airports for flights from United Airlines?",
+        "tables_involved": [
+          "flights",
+          "airports"
+        ],
+        "typical_structure": "SELECT airports.city, COUNT(*) FROM flights JOIN airports ON flights.destairport = airports.airportcode WHERE flights.airline = ? GROUP BY airports.city",
+        "key_considerations": [
+          "Ensure to filter by the correct airline ID and aggregate results properly."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Flight",
+        "technical_mapping": "flights.airline, flights.flightno",
+        "definition": "A scheduled journey made by an airline from one airport to another.",
+        "synonyms": [
+          "Air Travel",
+          "Flight Route"
+        ],
+        "example_usage": "What flights are available from APG?"
+      },
+      {
+        "business_term": "Airport",
+        "technical_mapping": "airports.airportcode",
+        "definition": "A location where aircraft can take off and land, equipped with facilities for passengers.",
+        "synonyms": [
+          "Air Terminal",
+          "Aviation Hub"
+        ],
+        "example_usage": "What is the airport code for the Municipal airport?"
+      },
+      {
+        "business_term": "Airline",
+        "technical_mapping": "airlines.uid",
+        "definition": "A company that provides air transport services for traveling passengers and freight.",
+        "synonyms": [
+          "Carrier",
+          "Air Transport Company"
+        ],
+        "example_usage": "Which airlines operate flights from APG?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in airport codes due to similar names.",
+        "example": "What flights are available from ABR?",
+        "clarification": "Specify the city or full airport name to avoid confusion.",
+        "affected_elements": [
+          "airports.airportcode"
+        ]
+      },
+      {
+        "issue": "Multiple airlines may have similar names.",
+        "example": "What flights does Delta operate?",
+        "clarification": "Use the airline abbreviation or ID for specificity.",
+        "affected_elements": [
+          "flights.airline"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Always use the correct foreign key relationships when querying across tables.",
+      "Be specific with filters to avoid ambiguous results.",
+      "Consider performance implications when joining large tables."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:25:11.403333",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 4950,
+    "cost_usd": 0.0020133,
+    "generation_time_ms": 45824,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: airlines =====\nRow count: 12\nPrimary key: uid\n\nColumns:\n  • uid: bigint [PRIMARY KEY] NOT NULL\n  • airline: text NULL\n  • abbreviation: text NULL\n  • country: text NULL\n\n(No foreign keys)\n\n===== Table: airports =====\nRow count: 100\nPrimary key: airportcode\n\nColumns:\n  • city: text NULL\n  • airportcode: text [PRIMARY KEY] NOT NULL\n  • airportname: text NULL\n  • country: text NULL\n  • countryabbrev: text NULL\n\n(No foreign keys)\n\n===== Table: flights =====\nRow count: 1200\nPrimary key: airline, flightno\n\nColumns:\n  • airline: bigint [PRIMARY KEY] NOT NULL\n  • flightno: bigint [PRIMARY KEY] NOT NULL\n  • sourceairport: text NULL\n  • destairport: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → destairport REFERENCES airports.airportcode\n     JOIN: JOIN airports ON flights.destairport = airports.airportcode\n     Source: spider_metadata\n  → sourceairport REFERENCES airports.airportcode\n     JOIN: JOIN airports ON flights.sourceairport = airports.airportcode\n     Source: spider_metadata\n\nSAMPLE DATA:\n\nTable: airlines\n  Sample rows (10):\n    1. {\"uid\": 1, \"airline\": \"United Airlines\", \"abbreviation\": \"UAL\", \"country\": \"USA\"}\n    2. {\"uid\": 2, \"airline\": \"US Airways\", \"abbreviation\": \"USAir\", \"country\": \"USA\"}\n    3. {\"uid\": 3, \"airline\": \"Delta Airlines\", \"abbreviation\": \"Delta\", \"country\": \"USA\"}\n    4. {\"uid\": 4, \"airline\": \"Southwest Airlines\", \"abbreviation\": \"Southwest\", \"country\": \"USA\"}\n    5. {\"uid\": 5, \"airline\": \"American Airlines\", \"abbreviation\": \"American\", \"country\": \"USA\"}\n\nTable: airports\n  Sample rows (10):\n    1. {\"city\": \"Aberdeen \", \"airportcode\": \"APG\", \"airportname\": \"Phillips AAF \", \"country\": \"United States \", \"countryabbrev\": \"US \"}\n    2. {\"city\": \"Aberdeen \", \"airportcode\": \"ABR\", \"airportname\": \"Municipal \", \"country\": \"United States \", \"countryabbrev\": \"US\"}\n    3. {\"city\": \"Abilene \", \"airportcode\": \"DYS\", \"airportname\": \"Dyess AFB \", \"country\": \"United States \", \"countryabbrev\": \"US\"}\n    4. {\"city\": \"Abilene \", \"airportcode\": \"ABI\", \"airportname\": \"Municipal \", \"country\": \"United States \", \"countryabbrev\": \"US\"}\n    5. {\"city\": \"Abingdon \", \"airportcode\": \"VJI\", \"airportname\": \"Virginia Highlands \", \"country\": \"United States \", \"countryabbrev\": \"US\"}\n\nTable: flights\n  Sample rows (10):\n    1. {\"airline\": 1, \"flightno\": 28, \"sourceairport\": \" APG\", \"destairport\": \" ASY\"}\n    2. {\"airline\": 1, \"flightno\": 29, \"sourceairport\": \" ASY\", \"destairport\": \" APG\"}\n    3. {\"airline\": 1, \"flightno\": 44, \"sourceairport\": \" CVO\", \"destairport\": \" ACV\"}\n    4. {\"airline\": 1, \"flightno\": 45, \"sourceairport\": \" ACV\", \"destairport\": \" CVO\"}\n    5. {\"airline\": 1, \"flightno\": 54, \"sourceairport\": \" AHD\", \"destairport\": \" AHT\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:24:25.577921\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

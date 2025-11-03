@@ -19,6 +19,7 @@ python-dotenv==1.0.1
 
 # API Clients
 openai>=1.10.0
+requests>=2.31.0  # For Turso HTTP API
 
 # Vector Database (Week 3)
 pinecone>=5.0.0

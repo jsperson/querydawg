@@ -104,4 +104,21 @@
 
 ---
 
-_Last Updated: 2025-10-31_
+## Future Semantic Layer Strategies
+
+### Multi-Agent Schema Refinement
+- Leverage agentic pipelines (planner/critic/verifier) to automatically propose, critique, and verify SQL views that encapsulate meaningful business concepts.
+- Persist verified views as the semantic layer backbone; cluster them via embeddings and GraphRAG to derive an executable ER map.
+- Use verification failures as feedback to iteratively improve prompts and view proposals.
+
+### Ontology-Backed Virtualization
+- Introduce a lightweight ontology or rule-based transformation layer to harmonize terminology across outputs (prompts, docs, metrics) with auditable conversions.
+- Support multiple “semantic projections” (prompt snippets, API responses, data catalog entries) generated on demand from the same canonical ontology.
+- Consider semantic data virtualization patterns (raw schema → RDF/source semantics → harmonized domain model → application-specific views) to keep artifacts consistent.
+
+### Metric-Centric Semantic Hub
+- Curate a central catalog of business metrics, canonical KPIs, and join patterns (e.g., a logical “Inbound Query” table) that LLMs target instead of raw schema.
+- Map hub queries back to warehouse SQL through deterministic translation, ensuring consistent metric definitions and shielding the model from brittle joins.
+- Gate new metadata assets with execution-based checks before exposing them to retrieval or prompt pipelines, guaranteeing each chunk improves downstream accuracy.
+
+_Last Updated: 2025-11-03_

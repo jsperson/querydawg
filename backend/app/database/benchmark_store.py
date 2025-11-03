@@ -38,6 +38,7 @@ class BenchmarkStore(SupabaseClient):
         data = {
             "name": config.name,
             "run_type": config.run_type,
+            "data_source": config.data_source,
             "question_count": config.question_count,
             "databases": config.databases,
             "status": "pending",
@@ -297,6 +298,7 @@ class BenchmarkStore(SupabaseClient):
             run_id=run["id"],
             name=run["name"],
             run_type=run["run_type"],
+            data_source=run.get("data_source", "supabase"),
             status=run["status"],
             status_reason=run.get("status_reason"),
             total_questions=run["question_count"],
@@ -451,6 +453,7 @@ class BenchmarkStore(SupabaseClient):
                 run_id=r["id"],
                 name=r["name"],
                 run_type=r["run_type"],
+                data_source=r.get("data_source", "supabase"),
                 status=r["status"],
                 status_reason=r.get("status_reason"),
                 total_questions=r["question_count"],

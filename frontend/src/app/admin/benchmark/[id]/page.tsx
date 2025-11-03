@@ -12,6 +12,7 @@ interface BenchmarkSummary {
   run_id: string;
   name: string;
   run_type: string;
+  data_source: string;
   status: string;
   status_reason: string | null;
   total_questions: number;
@@ -237,6 +238,7 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
           baseline_sql: result.baseline_sql || '',
           enhanced_sql: result.enhanced_sql || '',
           database: result.database,
+          data_source: summary?.data_source || 'supabase',
         }),
       });
 
@@ -495,42 +497,6 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
               </Card>
             )}
 
-            {/* Comparison - Only if both run */}
-            {summary.run_type === 'both' &&
-             summary.baseline_exact_match_rate !== null &&
-             summary.enhanced_exact_match_rate !== null && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Improvement Analysis</CardTitle>
-                  <CardDescription>Enhanced vs Baseline</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Accuracy Improvement</p>
-                      <p className="text-3xl font-bold text-green-600">
-                        +{((summary.enhanced_exact_match_rate - summary.baseline_exact_match_rate) * 100).toFixed(1)}%
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        ({(summary.baseline_exact_match_rate * 100).toFixed(1)}% → {(summary.enhanced_exact_match_rate * 100).toFixed(1)}%)
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Cost Difference</p>
-                      <p className="text-3xl font-bold">
-                        {summary.enhanced_total_cost && summary.baseline_total_cost
-                          ? `+$${(summary.enhanced_total_cost - summary.baseline_total_cost).toFixed(4)}`
-                          : '-'}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Additional cost for semantic layer
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Metadata */}
             <Card>
               <CardHeader>
@@ -540,6 +506,10 @@ export default function BenchmarkResultsPage({ params }: { params: { id: string 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Run ID:</span>
                   <span className="font-mono">{summary.run_id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Database Source:</span>
+                  <span className="font-semibold uppercase">{summary.data_source}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Created:</span>

@@ -19,6 +19,7 @@ from ..models.responses import (
     QueryExecutionResult
 )
 from ..database.benchmark_store import get_benchmark_store, BenchmarkStore
+from ..database.query_executor import QueryExecutorFactory
 from ..services.benchmark_runner import BenchmarkRunner, BudgetExceededError
 from ..services.executor import SQLExecutor, SQLExecutionError
 from ..dependencies import verify_api_key
@@ -330,13 +331,15 @@ async def execute_compare(
     Returns results for all three queries, with errors captured individually
     """
     try:
-        database_url = os.getenv("DATABASE_URL")
-        if not database_url:
-            raise HTTPException(status_code=500, detail="Server configuration error")
-
         # Validate request
         if not request.database or not request.database.strip():
             raise HTTPException(status_code=400, detail="Database name cannot be empty")
+
+        # Get appropriate executor based on data_source
+        database_url = os.getenv("DATABASE_URL") if request.data_source == "supabase" else None
+
+        if request.data_source == "supabase" and not database_url:
+            raise HTTPException(status_code=500, detail="PostgreSQL configuration missing")
 
         # Helper function to execute a single query
         def execute_query(sql: str) -> QueryExecutionResult:
@@ -348,28 +351,53 @@ async def execute_compare(
                 )
 
             try:
-                executor = SQLExecutor(
-                    database_url=database_url,
-                    schema_name=request.database,
-                    max_rows=100,  # Limit for comparison view
-                    timeout_seconds=10
+                # Use QueryExecutorFactory for correct database platform
+                import time
+                start_time = time.time()
+
+                executor = QueryExecutorFactory.create(
+                    source=request.data_source,
+                    connection_string=database_url
                 )
 
-                result = executor.execute(sql)
+                # Execute query
+                results, error = executor.execute_query(sql, request.database)
+                execution_time_ms = int((time.time() - start_time) * 1000)
 
-                return QueryExecutionResult(
-                    success=True,
-                    results=result["results"],
-                    columns=result["columns"],
-                    row_count=result["row_count"],
-                    execution_time_ms=result["execution_time_ms"]
-                )
+                if error:
+                    return QueryExecutionResult(
+                        success=False,
+                        error=error
+                    )
 
-            except SQLExecutionError as e:
-                return QueryExecutionResult(
-                    success=False,
-                    error=str(e)
-                )
+                # Convert tuple results to dict format for frontend
+                if results:
+                    # Get column count from first row
+                    num_cols = len(results[0]) if results else 0
+                    columns = [f"col{i}" for i in range(num_cols)]  # Generic column names
+
+                    # Convert tuples to dicts
+                    dict_results = [
+                        {columns[i]: val for i, val in enumerate(row)}
+                        for row in results[:100]  # Limit to 100 rows for UI
+                    ]
+
+                    return QueryExecutionResult(
+                        success=True,
+                        results=dict_results,
+                        columns=columns,
+                        row_count=len(results),
+                        execution_time_ms=execution_time_ms
+                    )
+                else:
+                    return QueryExecutionResult(
+                        success=True,
+                        results=[],
+                        columns=[],
+                        row_count=0,
+                        execution_time_ms=execution_time_ms
+                    )
+
             except Exception as e:
                 return QueryExecutionResult(
                     success=False,

@@ -26,23 +26,26 @@ class EnhancedSQLGenerator:
         database_name: str,
         connection_name: str = "Supabase",
         use_vector_search: bool = True,
-        top_k_chunks: int = 10
+        top_k_chunks: int = 10,
+        db_type: str = 'postgresql'
     ):
         """
         Initialize enhanced SQL generator
 
         Args:
-            database_url: PostgreSQL connection string
-            database_name: Schema name in Supabase
+            database_url: Database connection string
+            database_name: Schema/database name
             connection_name: Connection name for semantic layer lookup
             use_vector_search: If True, use vector search for semantic context retrieval
             top_k_chunks: Number of semantic chunks to retrieve (if using vector search)
+            db_type: Database type ('postgresql' or 'sqlite')
         """
         self.database_url = database_url
         self.database_name = database_name
         self.connection_name = connection_name
         self.use_vector_search = use_vector_search
         self.top_k_chunks = top_k_chunks
+        self.db_type = db_type.lower()
         self._schema_cache: Optional[Dict[str, Any]] = None
         self._semantic_layer_cache: Optional[Dict[str, Any]] = None
         self._embedding_service: Optional[EmbeddingService] = None
@@ -61,7 +64,7 @@ class EnhancedSQLGenerator:
         """
         if self._schema_cache is None:
             extractor = SchemaExtractorFactory.create(
-                db_type='postgresql',
+                db_type=self.db_type,
                 connection_string=self.database_url,
                 schema_name=self.database_name
             )
@@ -213,10 +216,10 @@ class EnhancedSQLGenerator:
         llm = LLMConfig.get_provider_for_task("enhanced_sql")
         config = LLMConfig.get_task_config("enhanced_sql")
 
-        # Generate SQL with semantic context
-        system_prompt = PromptTemplates.enhanced_sql_system()
+        # Generate SQL with semantic context and database type
+        system_prompt = PromptTemplates.enhanced_sql_system(db_type=self.db_type)
         user_prompt = PromptTemplates.enhanced_sql_user_with_context(
-            question, schema, semantic_context
+            question, schema, semantic_context, db_type=self.db_type
         )
 
         response = llm.generate(

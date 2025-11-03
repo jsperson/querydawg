@@ -433,18 +433,26 @@ class BenchmarkRunner:
     def _get_baseline_generator(self, database: str) -> BaselineSQLGenerator:
         """Get or create baseline generator for database"""
         if database not in self._baseline_generators:
+            # Map data source to database type
+            db_type = 'sqlite' if self.data_source == 'turso' else 'postgresql'
+
             self._baseline_generators[database] = BaselineSQLGenerator(
                 database_url=self.connection_string,
-                database_name=database
+                database_name=database,
+                db_type=db_type
             )
         return self._baseline_generators[database]
 
     def _get_enhanced_generator(self, database: str) -> EnhancedSQLGenerator:
         """Get or create enhanced generator for database"""
         if database not in self._enhanced_generators:
+            # Map data source to database type
+            db_type = 'sqlite' if self.data_source == 'turso' else 'postgresql'
+
             self._enhanced_generators[database] = EnhancedSQLGenerator(
                 database_url=self.connection_string,
-                database_name=database
+                database_name=database,
+                db_type=db_type
             )
         return self._enhanced_generators[database]
 

@@ -47,13 +47,48 @@ class PromptTemplates:
     """Collection of prompt templates for different tasks"""
 
     @staticmethod
-    def baseline_sql_system() -> str:
-        """System prompt for baseline SQL generation"""
-        return """You are an expert PostgreSQL database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema and natural language questions.
+    def _get_db_specific_instructions(db_type: str = 'postgresql') -> Dict[str, str]:
+        """
+        Get database-specific instructions for SQL generation
+
+        Args:
+            db_type: Database type ('postgresql' or 'sqlite')
+
+        Returns:
+            Dictionary with db_name, syntax_instruction, and table_qualification
+        """
+        if db_type.lower() == 'sqlite':
+            return {
+                'db_name': 'SQLite',
+                'syntax_instruction': 'Generate ONLY valid SQLite syntax',
+                'table_qualification': 'Reference tables directly by name (e.g., table_name)',
+                'qualification_example': 'table_name',
+                'qualification_note': 'SQLite does not require schema qualification for table names.'
+            }
+        else:  # postgresql (default)
+            return {
+                'db_name': 'PostgreSQL',
+                'syntax_instruction': 'Generate ONLY valid PostgreSQL syntax',
+                'table_qualification': 'ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)',
+                'qualification_example': '{database_name}.table_name',
+                'qualification_note': 'All table references in your SQL query MUST be qualified with the schema name.'
+            }
+
+    @staticmethod
+    def baseline_sql_system(db_type: str = 'postgresql') -> str:
+        """
+        System prompt for baseline SQL generation
+
+        Args:
+            db_type: Database type ('postgresql' or 'sqlite')
+        """
+        db_info = PromptTemplates._get_db_specific_instructions(db_type)
+
+        return f"""You are an expert {db_info['db_name']} database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema and natural language questions.
 
 Guidelines:
-1. Generate ONLY valid PostgreSQL syntax
-2. ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)
+1. {db_info['syntax_instruction']}
+2. {db_info['table_qualification']}
 3. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
 4. Include proper WHERE clauses for filtering
 5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
@@ -72,29 +107,36 @@ Examples:
   - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
 
     @staticmethod
-    def baseline_sql_user(question: str, schema: Dict[str, Any]) -> str:
+    def baseline_sql_user(question: str, schema: Dict[str, Any], db_type: str = 'postgresql') -> str:
         """
         User prompt for baseline SQL generation
 
         Args:
             question: Natural language question
             schema: Database schema from SchemaExtractor
+            db_type: Database type ('postgresql' or 'sqlite')
 
         Returns:
             Formatted user prompt
         """
         formatted_schema = format_schema_for_prompt(schema)
-
+        db_info = PromptTemplates._get_db_specific_instructions(db_type)
         database_name = schema.get('database', 'unknown')
+
+        # Build table qualification instruction
+        if db_type.lower() == 'sqlite':
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nReference tables directly (e.g., table_name)."
+        else:
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nFor example, use \"{database_name}.table_name\" NOT just \"table_name\"."
+
         return f"""DATABASE SCHEMA:
 {formatted_schema}
 
-IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
-For example, use "{database_name}.table_name" NOT just "table_name".
+{qualification_section}
 
 QUESTION: {question}
 
-Generate a PostgreSQL query to answer this question. Return only the SQL query."""
+Generate a {db_info['db_name']} query to answer this question. Return only the SQL query."""
 
     @staticmethod
     def sql_explanation_system() -> str:
@@ -194,9 +236,16 @@ Provide a brief summary of this database schema, including:
 3. Key insights about the data structure"""
 
     @staticmethod
-    def enhanced_sql_system() -> str:
-        """System prompt for enhanced SQL generation with semantic layer"""
-        return """You are an expert PostgreSQL database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema, semantic documentation, and natural language questions.
+    def enhanced_sql_system(db_type: str = 'postgresql') -> str:
+        """
+        System prompt for enhanced SQL generation with semantic layer
+
+        Args:
+            db_type: Database type ('postgresql' or 'sqlite')
+        """
+        db_info = PromptTemplates._get_db_specific_instructions(db_type)
+
+        return f"""You are an expert {db_info['db_name']} database assistant. Your task is to generate accurate, efficient SQL queries based on the provided database schema, semantic documentation, and natural language questions.
 
 SEMANTIC LAYER CONTEXT:
 The semantic layer provides important business context to help you generate more accurate queries:
@@ -213,8 +262,8 @@ Use this semantic information to:
 - Map business terminology in questions to technical names
 
 Guidelines:
-1. Generate ONLY valid PostgreSQL syntax
-2. ALWAYS qualify table names with the schema name (e.g., schema_name.table_name)
+1. {db_info['syntax_instruction']}
+2. {db_info['table_qualification']}
 3. Use appropriate JOIN types (INNER, LEFT, etc.) based on the question
 4. Include proper WHERE clauses for filtering
 5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
@@ -233,7 +282,7 @@ Examples:
   - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
 
     @staticmethod
-    def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]]) -> str:
+    def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]], db_type: str = 'postgresql') -> str:
         """
         User prompt for enhanced SQL generation
 
@@ -241,11 +290,14 @@ Examples:
             question: Natural language question
             schema: Database schema from SchemaExtractor
             semantic_layer: Semantic layer documentation (may be None)
+            db_type: Database type ('postgresql' or 'sqlite')
 
         Returns:
             Formatted user prompt
         """
         formatted_schema = format_schema_for_prompt(schema)
+        db_info = PromptTemplates._get_db_specific_instructions(db_type)
+        database_name = schema.get('database', 'unknown')
 
         # Build semantic layer section if available
         semantic_section = ""
@@ -307,22 +359,27 @@ Examples:
                             rel_meaning = rel.get('business_meaning', 'N/A')
                             semantic_section += f"      {col} → {ref_table}: {rel_meaning}\n"
 
-        database_name = schema.get('database', 'unknown')
+        # Build table qualification instruction
+        if db_type.lower() == 'sqlite':
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nReference tables directly (e.g., table_name)."
+        else:
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nFor example, use \"{database_name}.table_name\" NOT just \"table_name\"."
+
         return f"""DATABASE SCHEMA:
 {formatted_schema}{semantic_section}
 
-IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
-For example, use "{database_name}.table_name" NOT just "table_name".
+{qualification_section}
 
 QUESTION: {question}
 
-Generate a PostgreSQL query to answer this question. Use the semantic layer documentation to understand the business context and choose the right tables and columns. Return only the SQL query."""
+Generate a {db_info['db_name']} query to answer this question. Use the semantic layer documentation to understand the business context and choose the right tables and columns. Return only the SQL query."""
 
     @staticmethod
     def enhanced_sql_user_with_context(
         question: str,
         schema: Dict[str, Any],
-        semantic_context: Optional[str]
+        semantic_context: Optional[str],
+        db_type: str = 'postgresql'
     ) -> str:
         """
         User prompt for enhanced SQL generation with text-based semantic context.
@@ -334,24 +391,31 @@ Generate a PostgreSQL query to answer this question. Use the semantic layer docu
             question: Natural language question
             schema: Database schema from SchemaExtractor
             semantic_context: Pre-formatted semantic context string (may be None)
+            db_type: Database type ('postgresql' or 'sqlite')
 
         Returns:
             Formatted user prompt
         """
         formatted_schema = format_schema_for_prompt(schema)
+        db_info = PromptTemplates._get_db_specific_instructions(db_type)
+        database_name = schema.get('database', 'unknown')
 
         # Build semantic context section if available
         context_section = ""
         if semantic_context:
             context_section = f"\n\nSEMANTIC CONTEXT:\n{semantic_context}\n"
 
-        database_name = schema.get('database', 'unknown')
+        # Build table qualification instruction
+        if db_type.lower() == 'sqlite':
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nReference tables directly (e.g., table_name)."
+        else:
+            qualification_section = f"IMPORTANT: {db_info['qualification_note']}\nFor example, use \"{database_name}.table_name\" NOT just \"table_name\"."
+
         return f"""DATABASE SCHEMA:
 {formatted_schema}{context_section}
 
-IMPORTANT: All table references in your SQL query MUST be qualified with the schema name.
-For example, use "{database_name}.table_name" NOT just "table_name".
+{qualification_section}
 
 QUESTION: {question}
 
-Generate a PostgreSQL query to answer this question. Use the semantic context to understand the business meaning and choose the right tables and columns. Return only the SQL query."""
+Generate a {db_info['db_name']} query to answer this question. Use the semantic context to understand the business meaning and choose the right tables and columns. Return only the SQL query."""

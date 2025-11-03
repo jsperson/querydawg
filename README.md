@@ -5,6 +5,8 @@ A cloud-native text-to-SQL system that uses automatically generated natural lang
 **📊 Current Status:** Week 3 Complete - Benchmark System Operational
 
 **Recent Updates:**
+- ✅ **Dual database support**: Turso (native SQLite) + Supabase (PostgreSQL)
+- ✅ **Database-specific prompts**: LLM prompts automatically adapt to SQL dialect
 - ✅ Full Spider 1.0 benchmark system (1,034 questions across 20 databases)
 - ✅ Baseline vs Enhanced comparison with real-time metrics
 - ✅ SQL execution comparison viewer with filtering
@@ -12,7 +14,7 @@ A cloud-native text-to-SQL system that uses automatically generated natural lang
 - ✅ Column-order-independent result matching
 - ✅ Vector search for semantic layer RAG (Pinecone integration)
 - ✅ Semantic layer generation with LLM-powered documentation
-- ✅ 20 Spider databases migrated to Supabase PostgreSQL
+- ✅ 20 Spider databases available in both Turso (SQLite) and Supabase (PostgreSQL)
 
 **Note:** Production deployment available on Vercel (frontend) and Railway (backend).
 
@@ -24,6 +26,8 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
 
 ## Key Features
 
+- **🗄️ Dual Database Support**: Choose between Turso (native SQLite) or Supabase (PostgreSQL) per benchmark run
+- **🎯 Database-Specific Prompts**: LLM prompts automatically adapt to SQL dialect (SQLite vs PostgreSQL)
 - **🤖 Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
 - **📊 Spider 1.0 Benchmark System**: Full evaluation suite with 1,034 questions across 20 databases
 - **🔍 Advanced SQL Comparison**: Execute and compare gold/baseline/enhanced SQL side-by-side
@@ -88,13 +92,16 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
   - Run management (cancel, delete, view history)
 
 **Infrastructure:**
-- 20 Spider databases migrated to Supabase PostgreSQL
+- **Dual Database Sources:**
+  - Turso (SQLite): 20 Spider databases in native SQLite format (zero conversion errors)
+  - Supabase (PostgreSQL): 20 Spider databases with automatic SQLite→PostgreSQL conversion
 - Semantic layers and benchmark results in Supabase
 - Pinecone vector database for semantic embeddings
 - RESTful API with OpenAPI documentation (/docs)
 - Environment-based configuration
 - Production deployment on Vercel (frontend) + Railway (backend)
 - Background task processing for benchmark runs
+- **Database-Specific LLM Prompts:** Automatic SQL dialect adaptation (SQLite vs PostgreSQL)
 
 ## Expected Results
 

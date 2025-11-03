@@ -82,25 +82,25 @@ Examples:
 2. **Missing key pattern** - Doesn't distinguish "which X has min/max Y" from "what is the min/max Y"
 3. **Insufficient examples** - Only 2 examples, neither covering MIN/MAX misuse
 
-**Benchmark evidence** (8+ failures in car_1 alone):
+**Benchmark evidence** (30 cases / 88% of failures):
 
 ```sql
--- Question: "Which model has minimum horsepower?"
+-- Pattern: "Which X has minimum/maximum Y?"
 
--- Gold SQL (CORRECT):
-SELECT T1.Model FROM CAR_NAMES AS T1
-JOIN CARS_DATA AS T2 ON T1.MakeId = T2.Id
-ORDER BY T2.horsepower ASC LIMIT 1
+-- CORRECT approach:
+SELECT item_name FROM items
+JOIN properties ON items.id = properties.item_id
+ORDER BY properties.value ASC LIMIT 1
 
--- Enhanced SQL (WRONG):
-SELECT model_names.model, MIN(cars_data.horsepower)
-FROM car_names AS model_names
-JOIN cars_data ON model_names.MakeId = cars_data.Id
-GROUP BY model_names.model
-ORDER BY MIN(cars_data.horsepower) ASC LIMIT 1
+-- WRONG approach (what the LLM is doing):
+SELECT item_name, MIN(properties.value)
+FROM items
+JOIN properties ON items.id = properties.item_id
+GROUP BY item_name
+ORDER BY MIN(properties.value) ASC LIMIT 1
 ```
 
-**The problem:** Enhanced sees "minimum" and incorrectly adds `MIN()` + `GROUP BY` when the question asks for the **identifier** (which model), not the **value** (what is the minimum).
+**The problem:** LLM sees "minimum/maximum" and incorrectly adds `MIN()/MAX()` + `GROUP BY` when the question asks for the **identifier** (which item), not the **value** (what is the minimum).
 
 ---
 
@@ -108,27 +108,31 @@ ORDER BY MIN(cars_data.horsepower) ASC LIMIT 1
 
 **Current state:** No guideline addresses case sensitivity
 
-**Benchmark evidence** (3 failures):
+**Benchmark evidence** (3 cases / 9% of failures):
 
 ```sql
--- Question: "Names and locations of stadiums with concerts in 2014 and 2015"
+-- Pattern: Using lowercase when schema has mixed case
 
--- Baseline SQL (CORRECT):
-SELECT DISTINCT s.Name, s.Location
-FROM stadium s
-JOIN concert c ON s.Stadium_ID = c.Stadium_ID
-WHERE c.Year IN ('2014', '2015')
+-- Schema definition:
+--   venues(Venue_ID, Name, Location)
+--   events(Event_ID, Venue_ID, Year)
 
--- Enhanced SQL (WRONG):
-SELECT DISTINCT s.name, st.location  -- lowercase 'name'
-FROM concert c
-JOIN stadium st ON c.stadium_id = st.stadium_id
-WHERE c.year IN ('2014', '2015')
+-- CORRECT approach (matches schema case):
+SELECT DISTINCT v.Name, v.Location
+FROM venues v
+JOIN events e ON v.Venue_ID = e.Venue_ID
+WHERE e.Year IN ('2020', '2021')
 
--- Error: no such column: s.name
+-- WRONG approach (lowercase names):
+SELECT DISTINCT v.name, v.location
+FROM venues v
+JOIN events e ON v.venue_id = e.venue_id
+WHERE e.year IN ('2020', '2021')
+
+-- Error: no such column: v.name
 ```
 
-**The problem:** SQLite is case-sensitive for identifiers. Schema has `Name` but enhanced uses `name`.
+**The problem:** SQLite is case-sensitive for identifiers. Schema has `Name` but LLM uses `name`.
 
 ---
 
@@ -136,27 +140,32 @@ WHERE c.year IN ('2014', '2015')
 
 **Current guideline #8:** "Ensure column references are unambiguous" - too vague
 
-**Benchmark evidence** (1 failure):
+**Benchmark evidence** (1 case / 3% of failures):
 
 ```sql
--- Question: "Which airline has most number of flights?"
+-- Pattern: Column name exists in multiple joined tables
 
--- Baseline SQL (CORRECT - no JOIN needed):
-SELECT Airline FROM flights
-GROUP BY Airline
+-- Schema definition:
+--   transactions(id, vendor_code, amount)
+--   vendors(id, vendor_code, name)
+
+-- CORRECT approach (qualified column name):
+SELECT transactions.vendor_code
+FROM transactions
+GROUP BY transactions.vendor_code
 ORDER BY COUNT(*) DESC LIMIT 1
 
--- Enhanced SQL (WRONG - ambiguous column):
-SELECT airline, COUNT(*) AS flight_count
-FROM flights
-JOIN airlines ON flights.airline = airlines.uid
-GROUP BY airline  -- ERROR: which table's 'airline'?
-ORDER BY flight_count DESC LIMIT 1
+-- WRONG approach (ambiguous column):
+SELECT vendor_code, COUNT(*) AS tx_count
+FROM transactions
+JOIN vendors ON transactions.vendor_code = vendors.id
+GROUP BY vendor_code  -- ERROR: which table's 'vendor_code'?
+ORDER BY tx_count DESC LIMIT 1
 
--- Error: ambiguous column name: airline
+-- Error: ambiguous column name: vendor_code
 ```
 
-**The problem:** Column `airline` exists in both `flights` and `airlines` tables. When joined, must use `flights.airline` or `airlines.airline`.
+**The problem:** Column `vendor_code` exists in both tables. When joined, must use `transactions.vendor_code` or `vendors.vendor_code`.
 
 ---
 
@@ -177,15 +186,15 @@ ORDER BY flight_count DESC LIMIT 1
    - **DO NOT use MIN/MAX/SUM/AVG when questions ask "which/what/who X has the min/max/most/least Y"**
      - These questions want the IDENTIFIER (X), not the aggregated value
      - Use ORDER BY + LIMIT instead
-     - Example: "Which car has minimum horsepower?" → ORDER BY horsepower ASC LIMIT 1 (NOT MIN(horsepower))
+     - Example: "Which product has minimum price?" → ORDER BY price ASC LIMIT 1 (NOT MIN(price))
    - **DO use aggregations when questions explicitly ask for quantities:**
      - "How many..." → COUNT(*)
      - "What is the total..." → SUM(column)
      - "What is the average..." → AVG(column)
      - "What is the maximum..." (asking for the value, not the identifier) → MAX(column)
    - **Key distinction:**
-     - "Which model has minimum horsepower?" → wants model name (ORDER BY + LIMIT)
-     - "What is the minimum horsepower?" → wants the value (SELECT MIN)
+     - "Which product has minimum price?" → wants product name (ORDER BY + LIMIT)
+     - "What is the minimum price?" → wants the value (SELECT MIN)
 ```
 
 ---
@@ -199,7 +208,7 @@ ORDER BY flight_count DESC LIMIT 1
 11. **CASE SENSITIVITY (SQLite CRITICAL):**
     - SQLite is CASE-SENSITIVE for all table and column identifiers
     - You MUST use the EXACT case shown in the schema
-    - Example: If schema shows "Stadium_ID", use "Stadium_ID" NOT "stadium_id" or "StadiumID"
+    - Example: If schema shows "Customer_ID", use "Customer_ID" NOT "customer_id" or "CustomerID"
     - Always verify your SQL uses exact case from the schema before responding
     - **This does not apply to PostgreSQL** (case-insensitive), but doesn't hurt to be precise
 ```
@@ -220,7 +229,7 @@ ORDER BY flight_count DESC LIMIT 1
 8. **Ensure column references are unambiguous:**
    - When a column name exists in multiple tables in a JOIN, ALWAYS qualify it
    - Use table.column or alias.column syntax
-   - Example: If both `flights` and `airlines` have an `airline` column, use `flights.airline`
+   - Example: If both `orders` and `customers` have a `status` column, use `orders.status`
    - Check the schema carefully for duplicate column names across tables
 ```
 
@@ -246,20 +255,20 @@ Examples:
 Examples:
 
 AGGREGATION PATTERNS:
-1. Question: "What city has the most customers?"
-   - WRONG: SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-   - CORRECT: SELECT city FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-   - Why: Question asks for "what city" (identifier), not "how many customers" (quantity)
+1. Question: "What region has the most stores?"
+   - WRONG: SELECT region, COUNT(*) FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - CORRECT: SELECT region FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Question asks for "what region" (identifier), not "how many stores" (quantity)
 
-2. Question: "Which model has the minimum horsepower?"
-   - WRONG: SELECT model, MIN(horsepower) FROM cars GROUP BY model ORDER BY MIN(horsepower) LIMIT 1
-   - CORRECT: SELECT model FROM cars ORDER BY horsepower ASC LIMIT 1
-   - Why: Question asks for "which model" (identifier), not "what is the minimum" (value)
+2. Question: "Which product has the minimum price?"
+   - WRONG: SELECT product_name, MIN(price) FROM products GROUP BY product_name ORDER BY MIN(price) LIMIT 1
+   - CORRECT: SELECT product_name FROM products ORDER BY price ASC LIMIT 1
+   - Why: Question asks for "which product" (identifier), not "what is the minimum" (value)
 
-3. Question: "What is the maximum horsepower?"
-   - WRONG: SELECT model FROM cars ORDER BY horsepower DESC LIMIT 1
-   - CORRECT: SELECT MAX(horsepower) FROM cars
-   - Why: Question asks for the value itself, not which car has it
+3. Question: "What is the maximum salary?"
+   - WRONG: SELECT employee_name FROM employees ORDER BY salary DESC LIMIT 1
+   - CORRECT: SELECT MAX(salary) FROM employees
+   - Why: Question asks for the value itself, not which employee has it
 
 4. Question: "How many orders were placed each month?"
    - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
@@ -267,17 +276,17 @@ AGGREGATION PATTERNS:
    - Why: "How many" explicitly asks for the count
 
 CASE SENSITIVITY (SQLite):
-5. Given schema: Stadium(Stadium_ID, Name, Location)
-   - WRONG: SELECT name FROM stadium WHERE stadium_id = 1
-   - CORRECT: SELECT Name FROM stadium WHERE Stadium_ID = 1
+5. Given schema: Customers(Customer_ID, First_Name, Last_Name)
+   - WRONG: SELECT first_name FROM customers WHERE customer_id = 1
+   - CORRECT: SELECT First_Name FROM Customers WHERE Customer_ID = 1
    - Why: SQLite is case-sensitive; must match exact schema case
 
 COLUMN DISAMBIGUATION:
-6. Given: flights(airline, ...) and airlines(uid, airline, ...)
-   Question: "Which airline has most flights?"
-   - WRONG: SELECT airline FROM flights JOIN airlines ON flights.airline = airlines.uid GROUP BY airline ORDER BY COUNT(*) DESC
-   - CORRECT: SELECT flights.airline FROM flights GROUP BY flights.airline ORDER BY COUNT(*) DESC LIMIT 1
-   - Why: Column 'airline' exists in both tables; must qualify or avoid JOIN if not needed
+6. Given: orders(status, ...) and customers(status, ...)
+   Question: "Which customer status has most orders?"
+   - WRONG: SELECT status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY status ORDER BY COUNT(*) DESC
+   - CORRECT: SELECT customers.status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY customers.status ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Column 'status' exists in both tables; must qualify to avoid ambiguity
 ```
 
 ---
@@ -303,10 +312,10 @@ Identifying characteristics:
 
 When documenting relationships, identify which tables are bridges and explain the complete join path.
 
-Example: If model_list bridges car_makers to car_names:
-- Relationship: car_makers → model_list → car_names → cars_data
-- Purpose: Enables queries connecting car makers to actual car specifications
-- Common mistake: Trying to join car_makers directly to car_names (will fail or give wrong results)
+Example: If order_items bridges orders to products:
+- Relationship: orders → order_items → products
+- Purpose: Enables queries connecting orders to product details (many-to-many relationship)
+- Common mistake: Trying to join orders directly to products (will fail or give wrong results)
 ```
 
 **Location**: In relationships output schema (modify lines 280-286)
@@ -365,10 +374,10 @@ When documenting columns:
 **Example:**
 ```json
 {
-  "name": "airline",
-  "business_meaning": "Airline identifier code",
-  "appears_in_other_tables": ["airlines"],
-  "disambiguation_note": "Use flights.airline when filtering/grouping by airline code. Use airlines.airline when you need the full airline name for display (requires JOIN)."
+  "name": "status",
+  "business_meaning": "Current status code",
+  "appears_in_other_tables": ["customers"],
+  "disambiguation_note": "Use orders.status when filtering by order status (pending, shipped, etc.). Use customers.status when filtering by customer account status (active, inactive, etc.)."
 }
 ```
 
@@ -393,9 +402,10 @@ When documenting columns:
 - `enhanced_sql_system()` (lines 239-282)
 
 **Testing:**
-- Run benchmark on car_1 database (most aggregation failures)
-- Run benchmark on concert_singer (case sensitivity failures)
-- Run benchmark on flight_2 (disambiguation failure)
+- Run benchmark focusing on databases with aggregation pattern failures
+- Run benchmark focusing on databases with case sensitivity issues (SQLite)
+- Run benchmark focusing on databases with column disambiguation issues
+- Compare results before and after changes
 
 ---
 
@@ -412,10 +422,10 @@ When documenting columns:
 4. Add column schema fields for disambiguation
 
 **Testing:**
-- Regenerate semantic layers for car_1, student_transcripts_tracking
-- Verify bridge tables are identified
-- Verify duplicate column names are documented
-- Run full benchmark
+- Regenerate semantic layers for databases with many-to-many relationships
+- Verify bridge tables are identified with complete join paths
+- Verify duplicate column names are documented with disambiguation notes
+- Run full benchmark and compare with Phase 1 results
 
 ---
 

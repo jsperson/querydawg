@@ -20,6 +20,7 @@ class BenchmarkRunCreate(BaseModel):
     """Data needed to create a benchmark_runs record"""
     name: str
     run_type: str
+    data_source: Literal['supabase', 'turso'] = 'supabase'
     question_count: int
     databases: Optional[List[str]]
     created_by: Optional[str] = None
@@ -53,6 +54,7 @@ class BenchmarkSummary(BaseModel):
     run_id: str
     name: str
     run_type: str
+    data_source: Literal['supabase', 'turso'] = 'supabase'
     status: str
     status_reason: Optional[str] = None
 

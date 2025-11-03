@@ -21,6 +21,7 @@ interface BenchmarkRun {
   run_id: string;
   name: string;
   run_type: string;
+  data_source: string;
   status: string;
   total_questions: number;
   completed: number;
@@ -347,6 +348,7 @@ export default function BenchmarkControlPanel() {
                         <TableHead>Name</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Type</TableHead>
+                        <TableHead>Source</TableHead>
                         <TableHead>Progress</TableHead>
                         <TableHead>Baseline Accuracy</TableHead>
                         <TableHead>Enhanced Accuracy</TableHead>
@@ -364,6 +366,7 @@ export default function BenchmarkControlPanel() {
                           <TableCell className="font-medium">{run.name}</TableCell>
                           <TableCell>{getStatusBadge(run.status)}</TableCell>
                           <TableCell className="capitalize">{run.run_type}</TableCell>
+                          <TableCell className="font-semibold uppercase text-xs">{run.data_source}</TableCell>
                           <TableCell>
                             {run.completed}/{run.total_questions}
                             {run.failed > 0 && <span className="text-red-600 ml-1">({run.failed} failed)</span>}

@@ -107,6 +107,7 @@ class CompareExecuteRequest(BaseModel):
     baseline_sql: str
     enhanced_sql: str
     database: str
+    data_source: str = "supabase"  # Database platform: "supabase" or "turso"
 
 
 class QueryExecutionResult(BaseModel):

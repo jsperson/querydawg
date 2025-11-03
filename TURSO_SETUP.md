@@ -204,6 +204,34 @@ Expected outcome:
 3. **Accuracy**: Eliminates 84 known SQL dialect conversion failures
 4. **Edge Distribution**: Global low-latency access
 5. **Cost**: Generous free tier for benchmarking
+6. **Native SQL Generation**: LLM prompts automatically use SQLite syntax (no schema qualification needed)
+
+## Database-Specific Prompt System
+
+QueryDawg now automatically adjusts LLM prompts based on the database source:
+
+### PostgreSQL (Supabase)
+- Prompts specify "PostgreSQL syntax"
+- Requires schema qualification: `schema_name.table_name`
+- Example: `SELECT * FROM concert_singer.singer`
+
+### SQLite (Turso)
+- Prompts specify "SQLite syntax"
+- Direct table references: `table_name`
+- Example: `SELECT * FROM singer`
+- **No schema qualification needed** - this eliminates a major source of errors!
+
+### Implementation
+
+The system automatically detects database type from `data_source`:
+- `turso` → SQLite prompts
+- `supabase` → PostgreSQL prompts
+
+Changed files:
+- `backend/app/services/llm/prompts.py` - Database-specific prompt templates
+- `backend/app/services/text_to_sql/baseline.py` - Baseline generator with db_type
+- `backend/app/services/text_to_sql/enhanced.py` - Enhanced generator with db_type
+- `backend/app/services/benchmark_runner.py` - Auto-detects and passes db_type
 
 ## Official Spider Databases (20 total)
 

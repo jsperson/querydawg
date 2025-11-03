@@ -15,16 +15,18 @@ class BaselineSQLGenerator:
     This is the "baseline" approach without RAG, few-shot examples, or query history.
     """
 
-    def __init__(self, database_url: str, database_name: str):
+    def __init__(self, database_url: str, database_name: str, db_type: str = 'postgresql'):
         """
         Initialize baseline SQL generator
 
         Args:
-            database_url: PostgreSQL connection string
-            database_name: Schema name in Supabase
+            database_url: Database connection string
+            database_name: Schema/database name
+            db_type: Database type ('postgresql' or 'sqlite')
         """
         self.database_url = database_url
         self.database_name = database_name
+        self.db_type = db_type.lower()
         self._schema_cache: Optional[Dict[str, Any]] = None
 
     def _get_schema(self) -> Dict[str, Any]:
@@ -36,7 +38,7 @@ class BaselineSQLGenerator:
         """
         if self._schema_cache is None:
             extractor = SchemaExtractorFactory.create(
-                db_type='postgresql',
+                db_type=self.db_type,
                 connection_string=self.database_url,
                 schema_name=self.database_name
             )
@@ -64,9 +66,9 @@ class BaselineSQLGenerator:
         llm = LLMConfig.get_provider_for_task("baseline_sql")
         config = LLMConfig.get_task_config("baseline_sql")
 
-        # Generate SQL
-        system_prompt = PromptTemplates.baseline_sql_system()
-        user_prompt = PromptTemplates.baseline_sql_user(question, schema)
+        # Generate SQL with database type
+        system_prompt = PromptTemplates.baseline_sql_system(db_type=self.db_type)
+        user_prompt = PromptTemplates.baseline_sql_user(question, schema, db_type=self.db_type)
 
         response = llm.generate(
             system_prompt=system_prompt,

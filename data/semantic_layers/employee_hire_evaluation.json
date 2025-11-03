@@ -1,0 +1,653 @@
+{
+  "database": "employee_hire_evaluation",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:25:13.562075",
+    "overview": {
+      "domain": "Human Resources",
+      "purpose": "This database is used to manage employee information, evaluations, hiring details, and shop information.",
+      "key_entities": [
+        "Employee",
+        "Evaluation",
+        "Hiring",
+        "Shop"
+      ],
+      "typical_questions": [
+        "What are the evaluation bonuses awarded to employees?",
+        "Which employees work at a specific shop?",
+        "What is the hiring status of employees?",
+        "How many products does each shop have?",
+        "What is the average age of employees?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "employee",
+        "row_count": 10,
+        "business_name": "Employee",
+        "purpose": "This table contains information about employees including their personal details.",
+        "primary_key": "employee_id",
+        "columns": [
+          {
+            "name": "employee_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Employee ID",
+            "business_meaning": "A unique identifier for each employee.",
+            "synonyms": [
+              "ID",
+              "Employee Number",
+              "Staff ID"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "employee_id = ?",
+              "employee_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique for each employee."
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Employee Name",
+            "business_meaning": "The full name of the employee.",
+            "synonyms": [
+              "Full Name",
+              "Employee's Name",
+              "Staff Name"
+            ],
+            "sample_values": [
+              "George Chuter",
+              "Lee Mears",
+              "Mark Regan"
+            ],
+            "typical_filters": [
+              "name LIKE ?",
+              "name = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "age",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Employee Age",
+            "business_meaning": "The age of the employee.",
+            "synonyms": [
+              "Years",
+              "Employee Age",
+              "Staff Age"
+            ],
+            "sample_values": [
+              "23",
+              "29",
+              "43"
+            ],
+            "typical_filters": [
+              "age > ?",
+              "age < ?"
+            ],
+            "aggregations": [
+              "AVG(age)",
+              "MAX(age)",
+              "MIN(age)"
+            ],
+            "value_constraints": "Must be a positive integer."
+          },
+          {
+            "name": "city",
+            "type": "text",
+            "nullable": true,
+            "business_name": "City of Residence",
+            "business_meaning": "The city where the employee resides.",
+            "synonyms": [
+              "Residence City",
+              "Location",
+              "Home City"
+            ],
+            "sample_values": [
+              "Bristol",
+              "Bath",
+              "Wasps"
+            ],
+            "typical_filters": [
+              "city = ?",
+              "city IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What is the average age of employees?",
+            "explanation": "To find the average age, you would use the AVG function on the age column.",
+            "involves_joins": []
+          },
+          {
+            "question": "List all employees living in Bristol.",
+            "explanation": "You would filter the city column for 'Bristol'.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "evaluation",
+        "row_count": 6,
+        "business_name": "Employee Evaluation",
+        "purpose": "This table tracks evaluations and bonuses awarded to employees over the years.",
+        "primary_key": "employee_id, year_awarded",
+        "columns": [
+          {
+            "name": "employee_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Employee ID",
+            "business_meaning": "A unique identifier for each employee, linking to the employee table.",
+            "synonyms": [
+              "ID",
+              "Employee Number",
+              "Staff ID"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "4"
+            ],
+            "typical_filters": [
+              "employee_id = ?",
+              "employee_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match an existing employee_id in the employee table."
+          },
+          {
+            "name": "year_awarded",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Year Awarded",
+            "business_meaning": "The year in which the evaluation was awarded.",
+            "synonyms": [
+              "Award Year",
+              "Year",
+              "Evaluation Year"
+            ],
+            "sample_values": [
+              "2011",
+              "2015",
+              "2016"
+            ],
+            "typical_filters": [
+              "year_awarded = ?",
+              "year_awarded IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid year format."
+          },
+          {
+            "name": "bonus",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Bonus Amount",
+            "business_meaning": "The bonus awarded to the employee for that year.",
+            "synonyms": [
+              "Bonus",
+              "Award Amount",
+              "Incentive"
+            ],
+            "sample_values": [
+              "3000.0",
+              "3200.0"
+            ],
+            "typical_filters": [
+              "bonus > ?",
+              "bonus < ?"
+            ],
+            "aggregations": [
+              "SUM(bonus)",
+              "AVG(bonus)"
+            ],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "employee_id",
+            "references_table": "employee",
+            "references_column": "employee_id",
+            "business_meaning": "Links each evaluation to a specific employee.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN employee ON evaluation.employee_id = employee.employee_id",
+            "common_uses": [
+              "To find the evaluations and bonuses for a specific employee.",
+              "To aggregate bonuses by employee."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What bonuses were awarded to employee 1?",
+            "explanation": "You would filter the evaluation table by employee_id = 1.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the total bonus awarded in 2016?",
+            "explanation": "You would sum the bonus column where year_awarded = '2016'.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "hiring",
+        "row_count": 7,
+        "business_name": "Employee Hiring",
+        "purpose": "This table records the hiring details of employees, including their employment status and the shop they work at.",
+        "primary_key": "employee_id",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Shop ID",
+            "business_meaning": "A unique identifier for the shop where the employee works.",
+            "synonyms": [
+              "Store ID",
+              "Location ID",
+              "Shop Number"
+            ],
+            "sample_values": [
+              "1",
+              "4",
+              "5"
+            ],
+            "typical_filters": [
+              "shop_id = ?",
+              "shop_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "employee_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Employee ID",
+            "business_meaning": "A unique identifier for each employee, linking to the employee table.",
+            "synonyms": [
+              "ID",
+              "Employee Number",
+              "Staff ID"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "employee_id = ?",
+              "employee_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match an existing employee_id in the employee table."
+          },
+          {
+            "name": "start_from",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Start Date",
+            "business_meaning": "The date when the employee started working.",
+            "synonyms": [
+              "Start Date",
+              "Employment Start",
+              "Joining Date"
+            ],
+            "sample_values": [
+              "2009",
+              "2003",
+              "2011"
+            ],
+            "typical_filters": [
+              "start_from = ?",
+              "start_from >= ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "is_full_time",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Employment Type",
+            "business_meaning": "Indicates whether the employee is full-time or part-time.",
+            "synonyms": [
+              "Employment Status",
+              "Work Type",
+              "Job Type"
+            ],
+            "sample_values": [
+              "T",
+              "F"
+            ],
+            "typical_filters": [
+              "is_full_time = 'T'",
+              "is_full_time = 'F'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "employee_id",
+            "references_table": "employee",
+            "references_column": "employee_id",
+            "business_meaning": "Links each hiring record to a specific employee.",
+            "cardinality": "one-to-one",
+            "join_pattern": "JOIN employee ON hiring.employee_id = employee.employee_id",
+            "common_uses": [
+              "To find the hiring details of a specific employee.",
+              "To check the employment status of employees."
+            ]
+          },
+          {
+            "type": "foreign_key",
+            "column": "shop_id",
+            "references_table": "shop",
+            "references_column": "shop_id",
+            "business_meaning": "Links each hiring record to the specific shop where the employee works.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN shop ON hiring.shop_id = shop.shop_id",
+            "common_uses": [
+              "To find all employees working at a specific shop.",
+              "To aggregate hiring data by shop."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which employees work at shop 1?",
+            "explanation": "You would filter the hiring table by shop_id = 1.",
+            "involves_joins": []
+          },
+          {
+            "question": "How many full-time employees are there?",
+            "explanation": "You would count the number of records where is_full_time = 'T'.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "shop",
+        "row_count": 9,
+        "business_name": "Shop",
+        "purpose": "This table contains information about shops, including their location and management.",
+        "primary_key": "shop_id",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Shop ID",
+            "business_meaning": "A unique identifier for each shop.",
+            "synonyms": [
+              "Store ID",
+              "Location ID",
+              "Shop Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "shop_id = ?",
+              "shop_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be unique for each shop."
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Shop Name",
+            "business_meaning": "The name of the shop.",
+            "synonyms": [
+              "Store Name",
+              "Business Name",
+              "Outlet Name"
+            ],
+            "sample_values": [
+              "FC Haka",
+              "HJK",
+              "FC Honka"
+            ],
+            "typical_filters": [
+              "name LIKE ?",
+              "name = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "location",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Location",
+            "business_meaning": "The geographical location of the shop.",
+            "synonyms": [
+              "Address",
+              "Shop Address",
+              "Store Location"
+            ],
+            "sample_values": [
+              "Valkeakoski",
+              "Helsinki",
+              "Espoo"
+            ],
+            "typical_filters": [
+              "location = ?",
+              "location LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "district",
+            "type": "text",
+            "nullable": true,
+            "business_name": "District",
+            "business_meaning": "The district where the shop is located.",
+            "synonyms": [
+              "Area",
+              "Region",
+              "Neighborhood"
+            ],
+            "sample_values": [
+              "Tehtaan kenttä",
+              "Finnair Stadium",
+              "Tapiolan Urheilupuisto"
+            ],
+            "typical_filters": [
+              "district = ?",
+              "district LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "number_products",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Number of Products",
+            "business_meaning": "The total number of products available in the shop.",
+            "synonyms": [
+              "Product Count",
+              "Inventory Size",
+              "Stock Quantity"
+            ],
+            "sample_values": [
+              "3516",
+              "10770",
+              "6000"
+            ],
+            "typical_filters": [
+              "number_products > ?",
+              "number_products < ?"
+            ],
+            "aggregations": [
+              "SUM(number_products)",
+              "AVG(number_products)"
+            ],
+            "value_constraints": "Can be null."
+          },
+          {
+            "name": "manager_name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Manager Name",
+            "business_meaning": "The name of the shop manager.",
+            "synonyms": [
+              "Store Manager",
+              "Manager",
+              "Shop Supervisor"
+            ],
+            "sample_values": [
+              "Olli Huttunen",
+              "Antti Muurinen",
+              "Mika Lehkosuo"
+            ],
+            "typical_filters": [
+              "manager_name = ?",
+              "manager_name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Can be null."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What is the total number of products across all shops?",
+            "explanation": "You would sum the number_products column.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which shops are located in Helsinki?",
+            "explanation": "You would filter the location column for 'Helsinki'.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "employee evaluation summary",
+        "example_question": "What bonuses did employees receive in 2016?",
+        "tables_involved": [
+          "evaluation",
+          "employee"
+        ],
+        "typical_structure": "SELECT employee.name, evaluation.bonus FROM evaluation JOIN employee ON evaluation.employee_id = employee.employee_id WHERE evaluation.year_awarded = '2016'",
+        "key_considerations": [
+          "Ensure to join on employee_id to get employee names with their bonuses."
+        ]
+      },
+      {
+        "pattern_type": "hiring details by shop",
+        "example_question": "Which employees work at shop 1?",
+        "tables_involved": [
+          "hiring",
+          "employee",
+          "shop"
+        ],
+        "typical_structure": "SELECT employee.name FROM hiring JOIN employee ON hiring.employee_id = employee.employee_id WHERE hiring.shop_id = 1",
+        "key_considerations": [
+          "Join hiring with employee to get names, and filter by shop_id."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Employee Bonus",
+        "technical_mapping": "evaluation.bonus",
+        "definition": "A monetary reward given to employees based on their performance.",
+        "synonyms": [
+          "Incentive",
+          "Award",
+          "Performance Bonus"
+        ],
+        "example_usage": "What was the bonus for employee 1?"
+      },
+      {
+        "business_term": "Shop Location",
+        "technical_mapping": "shop.location",
+        "definition": "The geographical area where a shop is situated.",
+        "synonyms": [
+          "Address",
+          "Store Location",
+          "Geographical Location"
+        ],
+        "example_usage": "Where is shop 2 located?"
+      },
+      {
+        "business_term": "Full-Time Employment",
+        "technical_mapping": "hiring.is_full_time",
+        "definition": "Indicates whether an employee works full-time or part-time.",
+        "synonyms": [
+          "Employment Status",
+          "Job Type",
+          "Work Type"
+        ],
+        "example_usage": "How many full-time employees are there?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in year format for evaluations.",
+        "example": "What bonuses were awarded in 2016?",
+        "clarification": "Ensure the year is treated as a string in the evaluation table.",
+        "affected_elements": [
+          "evaluation.year_awarded"
+        ]
+      },
+      {
+        "issue": "Confusion between full-time and part-time employment.",
+        "example": "How many employees are part-time?",
+        "clarification": "Clarify that part-time employees are indicated by 'F' in the is_full_time column.",
+        "affected_elements": [
+          "hiring.is_full_time"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use explicit JOINs to connect related tables based on foreign keys.",
+      "Be mindful of NULL values when filtering or aggregating data.",
+      "Always check for the correct data type when filtering or joining on columns."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:26:09.863427",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 6293,
+    "cost_usd": 0.0026755499999999996,
+    "generation_time_ms": 56300,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: employee =====\nRow count: 10\nPrimary key: employee_id\n\nColumns:\n  • employee_id: bigint [PRIMARY KEY] NOT NULL\n  • name: text NULL\n  • age: bigint NULL\n  • city: text NULL\n\n(No foreign keys)\n\n===== Table: evaluation =====\nRow count: 6\nPrimary key: employee_id, year_awarded\n\nColumns:\n  • employee_id: bigint [PRIMARY KEY] NOT NULL\n  • year_awarded: text [PRIMARY KEY] NOT NULL\n  • bonus: double precision NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → employee_id REFERENCES employee.employee_id\n     JOIN: JOIN employee ON evaluation.employee_id = employee.employee_id\n     Source: spider_metadata\n\n===== Table: hiring =====\nRow count: 7\nPrimary key: employee_id\n\nColumns:\n  • shop_id: bigint NULL\n  • employee_id: bigint [PRIMARY KEY] NOT NULL\n  • start_from: text NULL\n  • is_full_time: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → employee_id REFERENCES employee.employee_id\n     JOIN: JOIN employee ON hiring.employee_id = employee.employee_id\n     Source: database\n  → shop_id REFERENCES shop.shop_id\n     JOIN: JOIN shop ON hiring.shop_id = shop.shop_id\n     Source: database\n\n===== Table: shop =====\nRow count: 9\nPrimary key: shop_id\n\nColumns:\n  • shop_id: bigint [PRIMARY KEY] NOT NULL\n  • name: text NULL\n  • location: text NULL\n  • district: text NULL\n  • number_products: bigint NULL\n  • manager_name: text NULL\n\n(No foreign keys)\n\nSAMPLE DATA:\n\nTable: evaluation\n  Sample rows (6):\n    1. {\"employee_id\": 1, \"year_awarded\": \"2011\", \"bonus\": 3000.0}\n    2. {\"employee_id\": 2, \"year_awarded\": \"2015\", \"bonus\": 3200.0}\n    3. {\"employee_id\": 1, \"year_awarded\": \"2016\", \"bonus\": 2900.0}\n    4. {\"employee_id\": 4, \"year_awarded\": \"2017\", \"bonus\": 3200.0}\n    5. {\"employee_id\": 7, \"year_awarded\": \"2018\", \"bonus\": 3200.0}\n\nTable: employee\n  Sample rows (10):\n    1. {\"employee_id\": 1, \"name\": \"George Chuter\", \"age\": 23, \"city\": \"Bristol\"}\n    2. {\"employee_id\": 2, \"name\": \"Lee Mears\", \"age\": 29, \"city\": \"Bath\"}\n    3. {\"employee_id\": 3, \"name\": \"Mark Regan\", \"age\": 43, \"city\": \"Bristol\"}\n    4. {\"employee_id\": 4, \"name\": \"Jason Hobson\", \"age\": 30, \"city\": \"Bristol\"}\n    5. {\"employee_id\": 5, \"name\": \"Tim Payne\", \"age\": 29, \"city\": \"Wasps\"}\n\nTable: shop\n  Sample rows (9):\n    1. {\"shop_id\": 1, \"name\": \"FC Haka\", \"location\": \"Valkeakoski\", \"district\": \"Tehtaan kenttä\", \"number_products\": 3516, \"manager_name\": \"Olli Huttunen\"}\n    2. {\"shop_id\": 2, \"name\": \"HJK\", \"location\": \"Helsinki\", \"district\": \"Finnair Stadium\", \"number_products\": 10770, \"manager_name\": \"Antti Muurinen\"}\n    3. {\"shop_id\": 3, \"name\": \"FC Honka\", \"location\": \"Espoo\", \"district\": \"Tapiolan Urheilupuisto\", \"number_products\": 6000, \"manager_name\": \"Mika Lehkosuo\"}\n    4. {\"shop_id\": 4, \"name\": \"FC Inter\", \"location\": \"Turku\", \"district\": \"Veritas Stadion\", \"number_products\": 10000, \"manager_name\": \"Job Dragtsma\"}\n    5. {\"shop_id\": 5, \"name\": \"FF Jaro\", \"location\": \"Jakobstad\", \"district\": \"Jakobstads Centralplan\", \"number_products\": 5000, \"manager_name\": \"Mika Laurikainen\"}\n\nTable: hiring\n  Sample rows (7):\n    1. {\"shop_id\": 1, \"employee_id\": 1, \"start_from\": \"2009\", \"is_full_time\": \"T\"}\n    2. {\"shop_id\": 1, \"employee_id\": 2, \"start_from\": \"2003\", \"is_full_time\": \"T\"}\n    3. {\"shop_id\": 8, \"employee_id\": 3, \"start_from\": \"2011\", \"is_full_time\": \"F\"}\n    4. {\"shop_id\": 4, \"employee_id\": 4, \"start_from\": \"2012\", \"is_full_time\": \"T\"}\n    5. {\"shop_id\": 5, \"employee_id\": 5, \"start_from\": \"2013\", \"is_full_time\": \"T\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:25:13.562075\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

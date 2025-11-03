@@ -1,0 +1,788 @@
+{
+  "database": "orchestra",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:36:22.430946",
+    "overview": {
+      "domain": "Music and Performance",
+      "purpose": "This database tracks conductors, orchestras, performances, and shows, providing insights into the music industry.",
+      "key_entities": [
+        "Conductor",
+        "Orchestra",
+        "Performance",
+        "Show"
+      ],
+      "typical_questions": [
+        "Who are the conductors and what orchestras do they lead?",
+        "What performances are associated with a specific orchestra?",
+        "What shows were held for a particular performance?",
+        "What is the attendance for each show?",
+        "Which orchestra has the highest official ratings?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "conductor",
+        "row_count": 12,
+        "business_name": "Conductor",
+        "purpose": "This table represents the conductors who lead orchestras.",
+        "primary_key": "conductor_id",
+        "columns": [
+          {
+            "name": "conductor_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Conductor ID",
+            "business_meaning": "A unique identifier for each conductor.",
+            "synonyms": [
+              "ID",
+              "Conductor Identifier",
+              "Conductor Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE conductor_id = ?",
+              "WHERE age > ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Name",
+            "business_meaning": "The name of the conductor.",
+            "synonyms": [
+              "Conductor Name",
+              "Full Name",
+              "Conductor's Name"
+            ],
+            "sample_values": [
+              "Antal Doráti",
+              "Igor Stravinsky",
+              "Colin Davis"
+            ],
+            "typical_filters": [
+              "WHERE name LIKE ?",
+              "WHERE name = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "age",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Age",
+            "business_meaning": "The age of the conductor.",
+            "synonyms": [
+              "Conductor Age",
+              "Years",
+              "Age in Years"
+            ],
+            "sample_values": [
+              "40",
+              "41",
+              "42"
+            ],
+            "typical_filters": [
+              "WHERE age > ?",
+              "WHERE age < ?"
+            ],
+            "aggregations": [
+              "AVG(age)",
+              "MAX(age)",
+              "MIN(age)"
+            ],
+            "value_constraints": "Must be a positive integer."
+          },
+          {
+            "name": "nationality",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Nationality",
+            "business_meaning": "The nationality of the conductor.",
+            "synonyms": [
+              "Country",
+              "National Origin",
+              "Conductor's Nationality"
+            ],
+            "sample_values": [
+              "USA",
+              "UK"
+            ],
+            "typical_filters": [
+              "WHERE nationality = ?",
+              "WHERE nationality LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "year_of_work",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Years of Work",
+            "business_meaning": "The number of years the conductor has worked.",
+            "synonyms": [
+              "Experience",
+              "Years Active",
+              "Work Duration"
+            ],
+            "sample_values": [
+              "10",
+              "11",
+              "6"
+            ],
+            "typical_filters": [
+              "WHERE year_of_work > ?",
+              "WHERE year_of_work < ?"
+            ],
+            "aggregations": [
+              "SUM(year_of_work)",
+              "AVG(year_of_work)"
+            ],
+            "value_constraints": "Must be a non-negative integer."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What are the names of all conductors?",
+            "explanation": "Query the 'name' column to retrieve all conductor names.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which conductors are older than 40?",
+            "explanation": "Filter the 'age' column for values greater than 40.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "orchestra",
+        "row_count": 12,
+        "business_name": "Orchestra",
+        "purpose": "This table represents orchestras and their associated conductors.",
+        "primary_key": "orchestra_id",
+        "columns": [
+          {
+            "name": "orchestra_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Orchestra ID",
+            "business_meaning": "A unique identifier for each orchestra.",
+            "synonyms": [
+              "ID",
+              "Orchestra Identifier",
+              "Orchestra Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE orchestra_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "orchestra",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Orchestra Name",
+            "business_meaning": "The name of the orchestra.",
+            "synonyms": [
+              "Name",
+              "Orchestra Title",
+              "Full Orchestra Name"
+            ],
+            "sample_values": [
+              "London Symphony Orchestra",
+              "Columbia Symphony Orchestra"
+            ],
+            "typical_filters": [
+              "WHERE orchestra LIKE ?",
+              "WHERE orchestra = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "conductor_id",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Conductor ID",
+            "business_meaning": "The ID of the conductor leading the orchestra.",
+            "synonyms": [
+              "Conductor Reference",
+              "Conductor Identifier",
+              "Conductor Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE conductor_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must reference a valid conductor_id."
+          },
+          {
+            "name": "record_company",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Record Company",
+            "business_meaning": "The record company associated with the orchestra.",
+            "synonyms": [
+              "Label",
+              "Music Label",
+              "Record Label"
+            ],
+            "sample_values": [
+              "Mercury Records",
+              "Columbia Masterworks"
+            ],
+            "typical_filters": [
+              "WHERE record_company LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "year_of_founded",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Year Founded",
+            "business_meaning": "The year the orchestra was founded.",
+            "synonyms": [
+              "Foundation Year",
+              "Established Year",
+              "Year of Establishment"
+            ],
+            "sample_values": [
+              "2003",
+              "2009"
+            ],
+            "typical_filters": [
+              "WHERE year_of_founded > ?",
+              "WHERE year_of_founded < ?"
+            ],
+            "aggregations": [
+              "AVG(year_of_founded)",
+              "MAX(year_of_founded)"
+            ],
+            "value_constraints": "Must be a valid year."
+          },
+          {
+            "name": "major_record_format",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Major Record Format",
+            "business_meaning": "The primary format in which the orchestra's music is recorded.",
+            "synonyms": [
+              "Record Format",
+              "Format Type",
+              "Music Format"
+            ],
+            "sample_values": [
+              "CD",
+              "CD / LP"
+            ],
+            "typical_filters": [
+              "WHERE major_record_format LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "conductor_id",
+            "references_table": "conductor",
+            "references_column": "conductor_id",
+            "business_meaning": "This relationship links each orchestra to its conductor.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN conductor ON orchestra.conductor_id = conductor.conductor_id",
+            "common_uses": [
+              "To find the conductor for a specific orchestra.",
+              "To list all orchestras conducted by a specific conductor."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which orchestras are associated with a specific conductor?",
+            "explanation": "Join the orchestra table with the conductor table using conductor_id.",
+            "involves_joins": [
+              "conductor"
+            ]
+          },
+          {
+            "question": "What is the record company for the London Symphony Orchestra?",
+            "explanation": "Filter the orchestra table by the name of the orchestra.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "performance",
+        "row_count": 11,
+        "business_name": "Performance",
+        "purpose": "This table represents performances given by orchestras.",
+        "primary_key": "performance_id",
+        "columns": [
+          {
+            "name": "performance_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Performance ID",
+            "business_meaning": "A unique identifier for each performance.",
+            "synonyms": [
+              "ID",
+              "Performance Identifier",
+              "Performance Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE performance_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "orchestra_id",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Orchestra ID",
+            "business_meaning": "The ID of the orchestra performing.",
+            "synonyms": [
+              "Orchestra Reference",
+              "Orchestra Identifier",
+              "Orchestra Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE orchestra_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must reference a valid orchestra_id."
+          },
+          {
+            "name": "type",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Performance Type",
+            "business_meaning": "The type of performance (e.g., auditions, concerts).",
+            "synonyms": [
+              "Performance Category",
+              "Type of Show",
+              "Event Type"
+            ],
+            "sample_values": [
+              "Auditions 1",
+              "Auditions 2"
+            ],
+            "typical_filters": [
+              "WHERE type LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "date",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Performance Date",
+            "business_meaning": "The date of the performance.",
+            "synonyms": [
+              "Event Date",
+              "Show Date",
+              "Date of Performance"
+            ],
+            "sample_values": [
+              "9 June",
+              "10 June"
+            ],
+            "typical_filters": [
+              "WHERE date = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "Official_ratings_(millions)",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Official Ratings (Millions)",
+            "business_meaning": "The official ratings of the performance in millions.",
+            "synonyms": [
+              "Ratings",
+              "Viewership",
+              "Audience Ratings"
+            ],
+            "sample_values": [
+              "5.2",
+              "6.73"
+            ],
+            "typical_filters": [
+              "WHERE Official_ratings_(millions) > ?"
+            ],
+            "aggregations": [
+              "AVG(Official_ratings_(millions))",
+              "MAX(Official_ratings_(millions))"
+            ],
+            "value_constraints": "Must be a non-negative number."
+          },
+          {
+            "name": "weekly_rank",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Weekly Rank",
+            "business_meaning": "The rank of the performance for the week.",
+            "synonyms": [
+              "Ranking",
+              "Weekly Position",
+              "Performance Rank"
+            ],
+            "sample_values": [
+              "12",
+              "8"
+            ],
+            "typical_filters": [
+              "WHERE weekly_rank = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "share",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Share",
+            "business_meaning": "The share percentage of the performance.",
+            "synonyms": [
+              "Market Share",
+              "Audience Share",
+              "Performance Share"
+            ],
+            "sample_values": [
+              "22.7%",
+              "28.0%"
+            ],
+            "typical_filters": [
+              "WHERE share = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "orchestra_id",
+            "references_table": "orchestra",
+            "references_column": "orchestra_id",
+            "business_meaning": "This relationship links each performance to the orchestra that performed it.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN orchestra ON performance.orchestra_id = orchestra.orchestra_id",
+            "common_uses": [
+              "To find all performances by a specific orchestra.",
+              "To get details about the orchestra for a specific performance."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What performances did the London Symphony Orchestra give?",
+            "explanation": "Join the performance table with the orchestra table using orchestra_id.",
+            "involves_joins": [
+              "orchestra"
+            ]
+          },
+          {
+            "question": "What is the average rating of performances?",
+            "explanation": "Aggregate the 'Official_ratings_(millions)' column.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "show",
+        "row_count": 5,
+        "business_name": "Show",
+        "purpose": "This table represents individual shows that are part of performances.",
+        "primary_key": "show_id",
+        "columns": [
+          {
+            "name": "show_id",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Show ID",
+            "business_meaning": "A unique identifier for each show.",
+            "synonyms": [
+              "ID",
+              "Show Identifier",
+              "Show Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE show_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "performance_id",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Performance ID",
+            "business_meaning": "The ID of the performance associated with the show.",
+            "synonyms": [
+              "Performance Reference",
+              "Performance Identifier",
+              "Performance Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE performance_id = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must reference a valid performance_id."
+          },
+          {
+            "name": "if_first_show",
+            "type": "text",
+            "nullable": true,
+            "business_name": "First Show Location",
+            "business_meaning": "The location of the first show.",
+            "synonyms": [
+              "Location",
+              "Venue",
+              "Show Venue"
+            ],
+            "sample_values": [
+              "Glebe Park",
+              "Fir Park"
+            ],
+            "typical_filters": [
+              "WHERE if_first_show LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "result",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Result",
+            "business_meaning": "The result of the show (e.g., T for True, F for False).",
+            "synonyms": [
+              "Outcome",
+              "Show Outcome",
+              "Show Result"
+            ],
+            "sample_values": [
+              "T",
+              "F"
+            ],
+            "typical_filters": [
+              "WHERE result = ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Text value."
+          },
+          {
+            "name": "attendance",
+            "type": "double precision",
+            "nullable": true,
+            "business_name": "Attendance",
+            "business_meaning": "The number of attendees at the show.",
+            "synonyms": [
+              "Audience Size",
+              "Number of Attendees",
+              "Show Attendance"
+            ],
+            "sample_values": [
+              "1026.0",
+              "695.0"
+            ],
+            "typical_filters": [
+              "WHERE attendance > ?"
+            ],
+            "aggregations": [
+              "SUM(attendance)",
+              "AVG(attendance)"
+            ],
+            "value_constraints": "Must be a non-negative number."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "performance_id",
+            "references_table": "performance",
+            "references_column": "performance_id",
+            "business_meaning": "This relationship links each show to the performance it is part of.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN performance ON show.performance_id = performance.performance_id",
+            "common_uses": [
+              "To find all shows for a specific performance.",
+              "To get details about the performance for a specific show."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What shows were part of the first performance?",
+            "explanation": "Join the show table with the performance table using performance_id.",
+            "involves_joins": [
+              "performance"
+            ]
+          },
+          {
+            "question": "What was the attendance for each show?",
+            "explanation": "Query the 'attendance' column to retrieve attendance numbers.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "performance attendance analysis",
+        "example_question": "What is the total attendance for all shows in a specific performance?",
+        "tables_involved": [
+          "show",
+          "performance"
+        ],
+        "typical_structure": "SELECT SUM(attendance) FROM show JOIN performance ON show.performance_id = performance.performance_id WHERE performance.performance_id = ?",
+        "key_considerations": [
+          "Ensure the performance_id is valid and exists in the performance table."
+        ]
+      },
+      {
+        "pattern_type": "orchestra performance ratings",
+        "example_question": "Which orchestras have performances with ratings above a certain threshold?",
+        "tables_involved": [
+          "orchestra",
+          "performance"
+        ],
+        "typical_structure": "SELECT orchestra.orchestra FROM orchestra JOIN performance ON orchestra.orchestra_id = performance.orchestra_id WHERE performance.Official_ratings_(millions) > ?",
+        "key_considerations": [
+          "Check that the ratings are numeric and within expected ranges."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Conductor",
+        "technical_mapping": "conductor.conductor_id",
+        "definition": "A person who leads an orchestra.",
+        "synonyms": [
+          "Music Director",
+          "Orchestra Leader",
+          "Conductor"
+        ],
+        "example_usage": "Who is the conductor of the London Symphony Orchestra?"
+      },
+      {
+        "business_term": "Orchestra",
+        "technical_mapping": "orchestra.orchestra_id",
+        "definition": "A group of musicians playing together, typically led by a conductor.",
+        "synonyms": [
+          "Symphony",
+          "Musical Ensemble",
+          "Orchestral Group"
+        ],
+        "example_usage": "What orchestras are conducted by Igor Stravinsky?"
+      },
+      {
+        "business_term": "Performance",
+        "technical_mapping": "performance.performance_id",
+        "definition": "An event where an orchestra plays music.",
+        "synonyms": [
+          "Concert",
+          "Show",
+          "Musical Event"
+        ],
+        "example_usage": "What performances did the Royal Concertgebouw Orchestra give?"
+      },
+      {
+        "business_term": "Show",
+        "technical_mapping": "show.show_id",
+        "definition": "An individual event that is part of a performance.",
+        "synonyms": [
+          "Event",
+          "Showcase",
+          "Presentation"
+        ],
+        "example_usage": "How many attendees were at the show in Glebe Park?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in performance types.",
+        "example": "What types of performances are there?",
+        "clarification": "Specify if the user is asking for types of performances by a specific orchestra or all performances.",
+        "affected_elements": [
+          "performance.type"
+        ]
+      },
+      {
+        "issue": "Confusion between attendance and ratings.",
+        "example": "Which performance had the highest attendance?",
+        "clarification": "Clarify if the user means the highest attendance for a specific show or overall performance.",
+        "affected_elements": [
+          "show.attendance",
+          "performance.Official_ratings_(millions)"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use specific IDs when querying to improve performance and accuracy.",
+      "Be cautious with NULL values; ensure to handle them in your queries.",
+      "When joining tables, always check the foreign key relationships to avoid missing data."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:37:35.555411",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 7387,
+    "cost_usd": 0.0031776,
+    "generation_time_ms": 73121,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: conductor =====\nRow count: 12\nPrimary key: conductor_id\n\nColumns:\n  • conductor_id: bigint [PRIMARY KEY] NOT NULL\n  • name: text NULL\n  • age: bigint NULL\n  • nationality: text NULL\n  • year_of_work: bigint NULL\n\n(No foreign keys)\n\n===== Table: orchestra =====\nRow count: 12\nPrimary key: orchestra_id\n\nColumns:\n  • orchestra_id: bigint [PRIMARY KEY] NOT NULL\n  • orchestra: text NULL\n  • conductor_id: bigint NULL\n  • record_company: text NULL\n  • year_of_founded: double precision NULL\n  • major_record_format: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → conductor_id REFERENCES conductor.conductor_id\n     JOIN: JOIN conductor ON orchestra.conductor_id = conductor.conductor_id\n     Source: database\n\n===== Table: performance =====\nRow count: 11\nPrimary key: performance_id\n\nColumns:\n  • performance_id: bigint [PRIMARY KEY] NOT NULL\n  • orchestra_id: bigint NULL\n  • type: text NULL\n  • date: text NULL\n  • Official_ratings_(millions): double precision NULL\n  • weekly_rank: text NULL\n  • share: text NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → orchestra_id REFERENCES orchestra.orchestra_id\n     JOIN: JOIN orchestra ON performance.orchestra_id = orchestra.orchestra_id\n     Source: database\n\n===== Table: show =====\nRow count: 5\nPrimary key: unknown\n\nColumns:\n  • show_id: bigint NULL\n  • performance_id: bigint NULL\n  • if_first_show: text NULL\n  • result: text NULL\n  • attendance: double precision NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → performance_id REFERENCES performance.performance_id\n     JOIN: JOIN performance ON show.performance_id = performance.performance_id\n     Source: database\n\nSAMPLE DATA:\n\nTable: show\n  Sample rows (5):\n    1. {\"show_id\": 1, \"performance_id\": 1, \"if_first_show\": \"Glebe Park\", \"result\": \"T\", \"attendance\": 1026.0}\n    2. {\"show_id\": 2, \"performance_id\": 2, \"if_first_show\": \"Fir Park\", \"result\": \"T\", \"attendance\": 695.0}\n    3. {\"show_id\": 3, \"performance_id\": 3, \"if_first_show\": \"St. Mirren Park\", \"result\": \"F\", \"attendance\": 555.0}\n    4. {\"show_id\": 4, \"performance_id\": 4, \"if_first_show\": \"St. Mirren Park\", \"result\": \"F\", \"attendance\": 1925.0}\n    5. {\"show_id\": 5, \"performance_id\": 5, \"if_first_show\": \"Hampden Park\", \"result\": \"T\", \"attendance\": 2431.0}\n\nTable: conductor\n  Sample rows (10):\n    1. {\"conductor_id\": 1, \"name\": \"Antal Doráti\", \"age\": 40, \"nationality\": \"USA\", \"year_of_work\": 10}\n    2. {\"conductor_id\": 2, \"name\": \"Igor Stravinsky\", \"age\": 41, \"nationality\": \"UK\", \"year_of_work\": 11}\n    3. {\"conductor_id\": 3, \"name\": \"Colin Davis\", \"age\": 42, \"nationality\": \"USA\", \"year_of_work\": 6}\n    4. {\"conductor_id\": 4, \"name\": \"Paul Jorgensen\", \"age\": 43, \"nationality\": \"UK\", \"year_of_work\": 11}\n    5. {\"conductor_id\": 5, \"name\": \"Antal Brown\", \"age\": 43, \"nationality\": \"USA\", \"year_of_work\": 20}\n\nTable: orchestra\n  Sample rows (10):\n    1. {\"orchestra_id\": 1, \"orchestra\": \"London Symphony Orchestra\", \"conductor_id\": 1, \"record_company\": \"Mercury Records\", \"year_of_founded\": 2003.0, \"major_record_format\": \"CD\"}\n    2. {\"orchestra_id\": 2, \"orchestra\": \"Columbia Symphony Orchestra\", \"conductor_id\": 2, \"record_company\": \"Columbia Masterworks\", \"year_of_founded\": 2009.0, \"major_record_format\": \"CD / LP\"}\n    3. {\"orchestra_id\": 3, \"orchestra\": \"Royal Concertgebouw Orchestra\", \"conductor_id\": 3, \"record_company\": \"Philips\", \"year_of_founded\": 2008.0, \"major_record_format\": \"CD\"}\n    4. {\"orchestra_id\": 4, \"orchestra\": \"Royal Danish Orchestra\", \"conductor_id\": 4, \"record_company\": \"Kultur\", \"year_of_founded\": 2002.0, \"major_record_format\": \"DVD\"}\n    5. {\"orchestra_id\": 5, \"orchestra\": \"Detroit Symphony Orchestra\", \"conductor_id\": 5, \"record_company\": \"Decca Records\", \"year_of_founded\": 2002.0, \"major_record_format\": \"CD\"}\n\nTable: performance\n  Sample rows (10):\n    1. {\"performance_id\": 1, \"orchestra_id\": 1, \"type\": \"Auditions 1\", \"date\": \"9 June\", \"Official_ratings_(millions)\": 5.2, \"weekly_rank\": \"12\", \"share\": \"22.7%\"}\n    2. {\"performance_id\": 2, \"orchestra_id\": 2, \"type\": \"Auditions 2\", \"date\": \"10 June\", \"Official_ratings_(millions)\": 6.73, \"weekly_rank\": \"8\", \"share\": \"28.0%\"}\n    3. {\"performance_id\": 3, \"orchestra_id\": 3, \"type\": \"Auditions 3\", \"date\": \"11 June\", \"Official_ratings_(millions)\": 7.28, \"weekly_rank\": \"15\", \"share\": \"29.4%\"}\n    4. {\"performance_id\": 4, \"orchestra_id\": 4, \"type\": \"Auditions 4\", \"date\": \"12 June\", \"Official_ratings_(millions)\": 7.39, \"weekly_rank\": \"13\", \"share\": \"29.3%\"}\n    5. {\"performance_id\": 5, \"orchestra_id\": 5, \"type\": \"Auditions 5\", \"date\": \"13 June\", \"Official_ratings_(millions)\": 7.51, \"weekly_rank\": \"11\", \"share\": \"29.2%\"}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:36:22.430946\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

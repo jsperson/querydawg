@@ -1,0 +1,444 @@
+{
+  "database": "course_teach",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:27:14.421905",
+    "overview": {
+      "domain": "Education",
+      "purpose": "This database is used to manage courses, teachers, and their arrangements in an educational institution.",
+      "key_entities": [
+        "Course",
+        "Teacher",
+        "Course Arrangement"
+      ],
+      "typical_questions": [
+        "What courses are offered?",
+        "Who teaches a specific course?",
+        "What grades are assigned to each course by teachers?",
+        "When does a particular course start?",
+        "What is the age of a specific teacher?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "course",
+        "row_count": 10,
+        "business_name": "Courses",
+        "purpose": "This table represents the courses offered by the institution.",
+        "primary_key": "course_id",
+        "columns": [
+          {
+            "name": "course_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Course ID",
+            "business_meaning": "A unique identifier for each course.",
+            "synonyms": [
+              "Course Identifier",
+              "Course Number",
+              "Course Key"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE course_id = ?",
+              "WHERE course_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "staring_date",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Starting Date",
+            "business_meaning": "The date when the course begins.",
+            "synonyms": [
+              "Start Date",
+              "Course Start Date",
+              "Beginning Date"
+            ],
+            "sample_values": [
+              "5 May",
+              "6 May",
+              "7 May"
+            ],
+            "typical_filters": [
+              "WHERE staring_date = ?",
+              "WHERE staring_date > ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Date format should be consistent."
+          },
+          {
+            "name": "course",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Course Name",
+            "business_meaning": "The name of the course.",
+            "synonyms": [
+              "Course Title",
+              "Subject",
+              "Course Description"
+            ],
+            "sample_values": [
+              "Language Arts",
+              "Math",
+              "Science"
+            ],
+            "typical_filters": [
+              "WHERE course = ?",
+              "WHERE course LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What courses are available?",
+            "explanation": "Query the course table to list all courses.",
+            "involves_joins": []
+          },
+          {
+            "question": "When does the Math course start?",
+            "explanation": "Filter the course table by course name to find the starting date.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "teacher",
+        "row_count": 7,
+        "business_name": "Teachers",
+        "purpose": "This table contains information about the teachers in the institution.",
+        "primary_key": "teacher_id",
+        "columns": [
+          {
+            "name": "teacher_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Teacher ID",
+            "business_meaning": "A unique identifier for each teacher.",
+            "synonyms": [
+              "Instructor ID",
+              "Educator ID",
+              "Teacher Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "WHERE teacher_id = ?",
+              "WHERE teacher_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Teacher Name",
+            "business_meaning": "The full name of the teacher.",
+            "synonyms": [
+              "Instructor Name",
+              "Educator Name",
+              "Teacher Full Name"
+            ],
+            "sample_values": [
+              "Joseph Huts",
+              "Gustaaf Deloor",
+              "Vicente Carretero"
+            ],
+            "typical_filters": [
+              "WHERE name = ?",
+              "WHERE name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "age",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Teacher Age",
+            "business_meaning": "The age of the teacher.",
+            "synonyms": [
+              "Instructor Age",
+              "Educator Age",
+              "Teacher Years"
+            ],
+            "sample_values": [
+              "32",
+              "29",
+              "26"
+            ],
+            "typical_filters": [
+              "WHERE age = ?",
+              "WHERE age > ?"
+            ],
+            "aggregations": [
+              "AVG(age)",
+              "COUNT(*)"
+            ],
+            "value_constraints": "Must be a positive integer."
+          },
+          {
+            "name": "hometown",
+            "type": "text",
+            "nullable": true,
+            "business_name": "Hometown",
+            "business_meaning": "The hometown of the teacher.",
+            "synonyms": [
+              "Teacher's Hometown",
+              "Instructor's Hometown",
+              "Educator's Origin"
+            ],
+            "sample_values": [
+              "Blackrod Urban District",
+              "Bolton County Borough",
+              "Farnworth Municipal Borough"
+            ],
+            "typical_filters": [
+              "WHERE hometown = ?",
+              "WHERE hometown LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "Who are the teachers?",
+            "explanation": "Query the teacher table to list all teachers.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the age of Joseph Huts?",
+            "explanation": "Filter the teacher table by name to find the age.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "course_arrange",
+        "row_count": 6,
+        "business_name": "Course Arrangements",
+        "purpose": "This table tracks the arrangement of courses with teachers and their assigned grades.",
+        "primary_key": "course_id, teacher_id, grade",
+        "columns": [
+          {
+            "name": "course_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Course ID",
+            "business_meaning": "The unique identifier for the course being arranged.",
+            "synonyms": [
+              "Course Identifier",
+              "Course Number",
+              "Course Key"
+            ],
+            "sample_values": [
+              "2",
+              "3",
+              "4"
+            ],
+            "typical_filters": [
+              "WHERE course_id = ?",
+              "WHERE course_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match an existing course_id in the course table."
+          },
+          {
+            "name": "teacher_id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Teacher ID",
+            "business_meaning": "The unique identifier for the teacher assigned to the course.",
+            "synonyms": [
+              "Instructor ID",
+              "Educator ID",
+              "Teacher Number"
+            ],
+            "sample_values": [
+              "5",
+              "3",
+              "2"
+            ],
+            "typical_filters": [
+              "WHERE teacher_id = ?",
+              "WHERE teacher_id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match an existing teacher_id in the teacher table."
+          },
+          {
+            "name": "grade",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Grade",
+            "business_meaning": "The grade level assigned to the course by the teacher.",
+            "synonyms": [
+              "Course Grade",
+              "Assigned Grade",
+              "Grade Level"
+            ],
+            "sample_values": [
+              "1",
+              "3",
+              "5"
+            ],
+            "typical_filters": [
+              "WHERE grade = ?",
+              "WHERE grade > ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a positive integer."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "course_id",
+            "references_table": "course",
+            "references_column": "course_id",
+            "business_meaning": "This relationship links the course arrangement to the specific course being taught.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN course ON course_arrange.course_id = course.course_id",
+            "common_uses": [
+              "To find out which courses are taught by which teachers.",
+              "To retrieve course details along with their arrangements."
+            ]
+          },
+          {
+            "type": "foreign_key",
+            "column": "teacher_id",
+            "references_table": "teacher",
+            "references_column": "teacher_id",
+            "business_meaning": "This relationship links the course arrangement to the specific teacher assigned to the course.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN teacher ON course_arrange.teacher_id = teacher.teacher_id",
+            "common_uses": [
+              "To find out which teachers are assigned to which courses.",
+              "To retrieve teacher details along with their course arrangements."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which teachers are teaching the Math course?",
+            "explanation": "Join the course_arrange table with the course table to filter by course name.",
+            "involves_joins": [
+              "course"
+            ]
+          },
+          {
+            "question": "What grades are assigned to the Science course?",
+            "explanation": "Join the course_arrange table with the course table to filter by course name and retrieve grades.",
+            "involves_joins": [
+              "course"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Teacher Course Assignments",
+        "example_question": "Who teaches each course and what grades do they assign?",
+        "tables_involved": [
+          "course",
+          "teacher",
+          "course_arrange"
+        ],
+        "typical_structure": "SELECT course.course, teacher.name, course_arrange.grade FROM course_arrange JOIN course ON course_arrange.course_id = course.course_id JOIN teacher ON course_arrange.teacher_id = teacher.teacher_id",
+        "key_considerations": [
+          "Ensure to join all relevant tables to get complete information.",
+          "Be aware of the many-to-one relationships when filtering."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "Course",
+        "technical_mapping": "course.course",
+        "definition": "A subject offered for study.",
+        "synonyms": [
+          "Subject",
+          "Class",
+          "Curriculum"
+        ],
+        "example_usage": "What courses are available this semester?"
+      },
+      {
+        "business_term": "Teacher",
+        "technical_mapping": "teacher.name",
+        "definition": "An individual who teaches students.",
+        "synonyms": [
+          "Instructor",
+          "Educator",
+          "Professor"
+        ],
+        "example_usage": "Who is the teacher for the Science course?"
+      },
+      {
+        "business_term": "Grade",
+        "technical_mapping": "course_arrange.grade",
+        "definition": "The level or score assigned to a course by a teacher.",
+        "synonyms": [
+          "Grade Level",
+          "Course Grade",
+          "Assigned Grade"
+        ],
+        "example_usage": "What grades are assigned to the Math course?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Confusion between course names and teacher names.",
+        "example": "Who teaches Language Arts?",
+        "clarification": "Specify if the user is asking for the teacher's name or details about the course.",
+        "affected_elements": [
+          "course.course",
+          "teacher.name"
+        ]
+      },
+      {
+        "issue": "Ambiguity in the term 'grade'.",
+        "example": "What is the grade for the Math course?",
+        "clarification": "Clarify if the user is asking for the grade level or the score assigned.",
+        "affected_elements": [
+          "course_arrange.grade"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use specific course names or teacher names to filter results effectively.",
+      "Be mindful of the relationships between tables when constructing queries.",
+      "Avoid ambiguous terms that could lead to confusion in results."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:27:57.490634",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 4657,
+    "cost_usd": 0.0018924,
+    "generation_time_ms": 43066,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: course =====\nRow count: 10\nPrimary key: course_id\n\nColumns:\n  • course_id: bigint [PRIMARY KEY] NOT NULL\n  • staring_date: text NULL\n  • course: text NULL\n\n(No foreign keys)\n\n===== Table: course_arrange =====\nRow count: 6\nPrimary key: course_id, teacher_id, grade\n\nColumns:\n  • course_id: bigint [PRIMARY KEY] NOT NULL\n  • teacher_id: bigint [PRIMARY KEY] NOT NULL\n  • grade: bigint [PRIMARY KEY] NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → course_id REFERENCES course.course_id\n     JOIN: JOIN course ON course_arrange.course_id = course.course_id\n     Source: database\n  → teacher_id REFERENCES teacher.teacher_id\n     JOIN: JOIN teacher ON course_arrange.teacher_id = teacher.teacher_id\n     Source: database\n\n===== Table: teacher =====\nRow count: 7\nPrimary key: teacher_id\n\nColumns:\n  • teacher_id: bigint [PRIMARY KEY] NOT NULL\n  • name: text NULL\n  • age: text NULL\n  • hometown: text NULL\n\n(No foreign keys)\n\nSAMPLE DATA:\n\nTable: course\n  Sample rows (10):\n    1. {\"course_id\": 1, \"staring_date\": \"5 May\", \"course\": \"Language Arts\"}\n    2. {\"course_id\": 2, \"staring_date\": \"6 May\", \"course\": \"Math\"}\n    3. {\"course_id\": 3, \"staring_date\": \"7 May\", \"course\": \"Science\"}\n    4. {\"course_id\": 4, \"staring_date\": \"9 May\", \"course\": \"History\"}\n    5. {\"course_id\": 5, \"staring_date\": \"10 May\", \"course\": \"Bible\"}\n\nTable: teacher\n  Sample rows (7):\n    1. {\"teacher_id\": 1, \"name\": \"Joseph Huts\", \"age\": \"32\", \"hometown\": \"Blackrod Urban District\"}\n    2. {\"teacher_id\": 2, \"name\": \"Gustaaf Deloor\", \"age\": \"29\", \"hometown\": \"Bolton County Borough\"}\n    3. {\"teacher_id\": 3, \"name\": \"Vicente Carretero\", \"age\": \"26\", \"hometown\": \"Farnworth Municipal Borough\"}\n    4. {\"teacher_id\": 4, \"name\": \"John Deloor\", \"age\": \"33\", \"hometown\": \"Horwich Urban District\"}\n    5. {\"teacher_id\": 5, \"name\": \"Kearsley Brown\", \"age\": \"45\", \"hometown\": \"Kearsley Urban District\"}\n\nTable: course_arrange\n  Sample rows (6):\n    1. {\"course_id\": 2, \"teacher_id\": 5, \"grade\": 1}\n    2. {\"course_id\": 2, \"teacher_id\": 3, \"grade\": 3}\n    3. {\"course_id\": 3, \"teacher_id\": 2, \"grade\": 5}\n    4. {\"course_id\": 4, \"teacher_id\": 6, \"grade\": 7}\n    5. {\"course_id\": 5, \"teacher_id\": 6, \"grade\": 1}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:27:14.421905\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

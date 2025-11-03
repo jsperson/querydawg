@@ -1,0 +1,670 @@
+{
+  "database": "world_1",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-02T03:35:07.129991",
+    "overview": {
+      "domain": "Geography and Demographics",
+      "purpose": "This database is used to store information about cities, countries, and the languages spoken in those countries.",
+      "key_entities": [
+        "City",
+        "Country",
+        "Country Language"
+      ],
+      "typical_questions": [
+        "What are the cities in a specific country?",
+        "What is the population of a particular city?",
+        "Which languages are spoken in a specific country?",
+        "What is the capital of a country?",
+        "What is the total population of all cities in a country?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "city",
+        "row_count": 3085,
+        "business_name": "City",
+        "purpose": "This table represents cities along with their associated country and demographic information.",
+        "primary_key": "id",
+        "columns": [
+          {
+            "name": "id",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "City ID",
+            "business_meaning": "A unique identifier for each city.",
+            "synonyms": [
+              "City Identifier",
+              "City Number"
+            ],
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "typical_filters": [
+              "id = ?",
+              "id IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a unique positive integer."
+          },
+          {
+            "name": "name",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "City Name",
+            "business_meaning": "The name of the city.",
+            "synonyms": [
+              "City Title",
+              "City Label"
+            ],
+            "sample_values": [
+              "Kabul",
+              "Qandahar",
+              "Herat"
+            ],
+            "typical_filters": [
+              "name = ?",
+              "name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "countrycode",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Country Code",
+            "business_meaning": "The code representing the country the city is located in.",
+            "synonyms": [
+              "Country Identifier",
+              "Nation Code"
+            ],
+            "sample_values": [
+              "AFG",
+              "NLD"
+            ],
+            "typical_filters": [
+              "countrycode = ?",
+              "countrycode IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match a valid country code."
+          },
+          {
+            "name": "district",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "District",
+            "business_meaning": "The district within which the city is located.",
+            "synonyms": [
+              "Region",
+              "Area"
+            ],
+            "sample_values": [
+              "Kabol",
+              "Qandahar",
+              "Herat"
+            ],
+            "typical_filters": [
+              "district = ?",
+              "district LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "population",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Population",
+            "business_meaning": "The total number of people living in the city.",
+            "synonyms": [
+              "City Inhabitants",
+              "City Demographics"
+            ],
+            "sample_values": [
+              "1780000",
+              "237500",
+              "186800"
+            ],
+            "typical_filters": [
+              "population > ?",
+              "population < ?"
+            ],
+            "aggregations": [
+              "SUM(population)",
+              "AVG(population)"
+            ],
+            "value_constraints": "Must be a non-negative integer."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "countrycode",
+            "references_table": "country",
+            "references_column": "code",
+            "business_meaning": "This relationship links each city to its corresponding country, allowing for queries that involve country-specific data.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN country ON city.countrycode = country.code",
+            "common_uses": [
+              "To find all cities in a specific country.",
+              "To retrieve country details for a given city."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What cities are in Afghanistan?",
+            "explanation": "Query the city table filtering by countrycode = 'AFG'.",
+            "involves_joins": []
+          },
+          {
+            "question": "What is the population of Kabul?",
+            "explanation": "Select population from city where name = 'Kabul'.",
+            "involves_joins": []
+          },
+          {
+            "question": "List all cities with a population greater than 1 million.",
+            "explanation": "Select name from city where population > 1000000.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which country does the city of Amsterdam belong to?",
+            "explanation": "Join city and country tables on countrycode to find the country name.",
+            "involves_joins": [
+              "country"
+            ]
+          },
+          {
+            "question": "What is the total population of cities in the Netherlands?",
+            "explanation": "Sum the population from city where countrycode = 'NLD'.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "country",
+        "row_count": 0,
+        "business_name": "Country",
+        "purpose": "This table represents countries and their associated demographic and geographic information.",
+        "primary_key": "code",
+        "columns": [
+          {
+            "name": "code",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Country Code",
+            "business_meaning": "A unique identifier for each country.",
+            "synonyms": [
+              "Country Identifier",
+              "Nation Code"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "code = ?",
+              "code IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "name",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Country Name",
+            "business_meaning": "The name of the country.",
+            "synonyms": [
+              "Nation Name",
+              "Country Title"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "name = ?",
+              "name LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "continent",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Continent",
+            "business_meaning": "The continent where the country is located.",
+            "synonyms": [
+              "Geographical Region",
+              "Landmass"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "continent = ?",
+              "continent IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "region",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Region",
+            "business_meaning": "The specific region within the continent.",
+            "synonyms": [
+              "Subcontinent",
+              "Area"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "region = ?",
+              "region LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "surfacearea",
+            "type": "numeric",
+            "nullable": false,
+            "business_name": "Surface Area",
+            "business_meaning": "The total land area of the country.",
+            "synonyms": [
+              "Land Area",
+              "Geographical Size"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "surfacearea > ?",
+              "surfacearea < ?"
+            ],
+            "aggregations": [
+              "SUM(surfacearea)",
+              "AVG(surfacearea)"
+            ],
+            "value_constraints": "Must be a positive number."
+          },
+          {
+            "name": "indepyear",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Independence Year",
+            "business_meaning": "The year the country gained independence.",
+            "synonyms": [
+              "Year of Independence",
+              "Independence Date"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "indepyear = ?",
+              "indepyear > ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid year or NULL."
+          },
+          {
+            "name": "population",
+            "type": "bigint",
+            "nullable": false,
+            "business_name": "Population",
+            "business_meaning": "The total population of the country.",
+            "synonyms": [
+              "Country Inhabitants",
+              "National Demographics"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "population > ?",
+              "population < ?"
+            ],
+            "aggregations": [
+              "SUM(population)",
+              "AVG(population)"
+            ],
+            "value_constraints": "Must be a non-negative integer."
+          },
+          {
+            "name": "lifeexpectancy",
+            "type": "numeric",
+            "nullable": true,
+            "business_name": "Life Expectancy",
+            "business_meaning": "The average life expectancy of citizens in the country.",
+            "synonyms": [
+              "Average Lifespan",
+              "Life Span"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "lifeexpectancy > ?",
+              "lifeexpectancy < ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a positive number or NULL."
+          },
+          {
+            "name": "gnp",
+            "type": "numeric",
+            "nullable": true,
+            "business_name": "Gross National Product",
+            "business_meaning": "The total economic output of the country.",
+            "synonyms": [
+              "National Income",
+              "Economic Output"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "gnp > ?",
+              "gnp < ?"
+            ],
+            "aggregations": [
+              "SUM(gnp)",
+              "AVG(gnp)"
+            ],
+            "value_constraints": "Must be a positive number or NULL."
+          },
+          {
+            "name": "gnpold",
+            "type": "numeric",
+            "nullable": true,
+            "business_name": "Old Gross National Product",
+            "business_meaning": "The previous measure of the country's economic output.",
+            "synonyms": [
+              "Previous National Income",
+              "Old Economic Output"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "gnpold > ?",
+              "gnpold < ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a positive number or NULL."
+          },
+          {
+            "name": "localname",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Local Name",
+            "business_meaning": "The name of the country in its local language.",
+            "synonyms": [
+              "Native Name",
+              "Local Title"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "localname = ?",
+              "localname LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "governmentform",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Government Form",
+            "business_meaning": "The type of government in the country.",
+            "synonyms": [
+              "Political System",
+              "Government Type"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "governmentform = ?",
+              "governmentform LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "headofstate",
+            "type": "character varying",
+            "nullable": true,
+            "business_name": "Head of State",
+            "business_meaning": "The current leader of the country.",
+            "synonyms": [
+              "Country Leader",
+              "Political Leader"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "headofstate = ?",
+              "headofstate LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string or NULL."
+          },
+          {
+            "name": "capital",
+            "type": "bigint",
+            "nullable": true,
+            "business_name": "Capital City ID",
+            "business_meaning": "The ID of the capital city of the country.",
+            "synonyms": [
+              "Capital Identifier",
+              "Capital City Number"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "capital = ?",
+              "capital IS NOT NULL"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a valid city ID or NULL."
+          },
+          {
+            "name": "code2",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "2-letter Country Code",
+            "business_meaning": "A two-letter code representing the country.",
+            "synonyms": [
+              "ISO Code",
+              "Short Code"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "code2 = ?",
+              "code2 IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          }
+        ],
+        "relationships": []
+      },
+      {
+        "name": "countrylanguage",
+        "row_count": 0,
+        "business_name": "Country Language",
+        "purpose": "This table represents the languages spoken in each country and their official status.",
+        "primary_key": "countrycode, language",
+        "columns": [
+          {
+            "name": "countrycode",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Country Code",
+            "business_meaning": "The code representing the country where the language is spoken.",
+            "synonyms": [
+              "Country Identifier",
+              "Nation Code"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "countrycode = ?",
+              "countrycode IN (?, ?)"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must match a valid country code."
+          },
+          {
+            "name": "language",
+            "type": "character varying",
+            "nullable": false,
+            "business_name": "Language",
+            "business_meaning": "The name of the language spoken in the country.",
+            "synonyms": [
+              "Spoken Language",
+              "Language Name"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "language = ?",
+              "language LIKE ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be a non-empty string."
+          },
+          {
+            "name": "isofficial",
+            "type": "text",
+            "nullable": false,
+            "business_name": "Official Status",
+            "business_meaning": "Indicates whether the language is an official language of the country.",
+            "synonyms": [
+              "Language Status",
+              "Official Language Indicator"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "isofficial = 'T'",
+              "isofficial = 'F'"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be 'T' (true) or 'F' (false)."
+          },
+          {
+            "name": "percentage",
+            "type": "numeric",
+            "nullable": false,
+            "business_name": "Percentage of Speakers",
+            "business_meaning": "The percentage of the population that speaks this language.",
+            "synonyms": [
+              "Language Proportion",
+              "Speaker Percentage"
+            ],
+            "sample_values": [],
+            "typical_filters": [
+              "percentage > ?",
+              "percentage < ?"
+            ],
+            "aggregations": [],
+            "value_constraints": "Must be between 0 and 100."
+          }
+        ],
+        "relationships": [
+          {
+            "type": "foreign_key",
+            "column": "countrycode",
+            "references_table": "country",
+            "references_column": "code",
+            "business_meaning": "This relationship links each language to its corresponding country, allowing for queries that involve country-specific language data.",
+            "cardinality": "many-to-one",
+            "join_pattern": "JOIN country ON countrylanguage.countrycode = country.code",
+            "common_uses": [
+              "To find all languages spoken in a specific country.",
+              "To check if a language is official in a country."
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "country demographics",
+        "example_question": "What is the total population of cities in Afghanistan and their official languages?",
+        "tables_involved": [
+          "city",
+          "country",
+          "countrylanguage"
+        ],
+        "typical_structure": "SELECT SUM(city.population), countrylanguage.language FROM city JOIN country ON city.countrycode = country.code JOIN countrylanguage ON country.code = countrylanguage.countrycode WHERE country.name = 'Afghanistan' GROUP BY countrylanguage.language",
+        "key_considerations": [
+          "Ensure to join all relevant tables to get accurate demographic data."
+        ]
+      }
+    ],
+    "domain_glossary": [
+      {
+        "business_term": "City",
+        "technical_mapping": "city.name",
+        "definition": "A populated area that is smaller than a country but larger than a town.",
+        "synonyms": [
+          "Urban Area",
+          "Municipality"
+        ],
+        "example_usage": "What cities are in the Netherlands?"
+      },
+      {
+        "business_term": "Country",
+        "technical_mapping": "country.name",
+        "definition": "A distinct territorial body or political entity that is recognized as an independent nation.",
+        "synonyms": [
+          "Nation",
+          "State"
+        ],
+        "example_usage": "What is the capital of Afghanistan?"
+      },
+      {
+        "business_term": "Language",
+        "technical_mapping": "countrylanguage.language",
+        "definition": "A system of communication used by a particular community or country.",
+        "synonyms": [
+          "Dialect",
+          "Tongue"
+        ],
+        "example_usage": "What languages are spoken in Afghanistan?"
+      },
+      {
+        "business_term": "Population",
+        "technical_mapping": "city.population",
+        "definition": "The total number of inhabitants in a specific area.",
+        "synonyms": [
+          "Inhabitants",
+          "Demographics"
+        ],
+        "example_usage": "What is the population of Kabul?"
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Ambiguity in country names that may have similar spellings.",
+        "example": "What is the capital of the Netherlands?",
+        "clarification": "Ensure to specify the country code or full name to avoid confusion with similarly named countries.",
+        "affected_elements": [
+          "country.name"
+        ]
+      },
+      {
+        "issue": "Confusion between official and unofficial languages.",
+        "example": "What languages are spoken in Spain?",
+        "clarification": "Clarify whether the user is asking for official languages or all spoken languages.",
+        "affected_elements": [
+          "countrylanguage.isofficial",
+          "countrylanguage.language"
+        ]
+      }
+    ],
+    "query_guidelines": [
+      "Use specific country codes when querying to avoid ambiguity.",
+      "Always check for NULL values in optional fields like life expectancy and independence year.",
+      "When aggregating data, ensure to group by relevant fields to avoid errors."
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-02T03:36:19.478184",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 6011,
+    "cost_usd": 0.00275115,
+    "generation_time_ms": 72331,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Document the EXACT join pattern for each FK\n3. Explain WHEN this join is needed (what questions require it)\n4. Do NOT invent relationships not shown in the schema\n5. Each FK MUST appear in your \"relationships\" array with complete join_pattern\n\n**Missing a documented foreign key will cause query failures!**\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. Column semantics: What business concept does each column represent?\n5. Query patterns: What questions would users typically ask?\n6. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: city =====\nRow count: 3085\nPrimary key: id\n\nColumns:\n  • id: bigint [PRIMARY KEY] NOT NULL\n  • name: character varying NOT NULL\n  • countrycode: character varying NOT NULL\n  • district: character varying NOT NULL\n  • population: bigint NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → countrycode REFERENCES country.code\n     JOIN: JOIN country ON city.countrycode = country.code\n     Source: spider_metadata\n\n===== Table: country =====\nRow count: 0\nPrimary key: code\n\nColumns:\n  • code: character varying [PRIMARY KEY] NOT NULL\n  • name: character varying NOT NULL\n  • continent: text NOT NULL\n  • region: character varying NOT NULL\n  • surfacearea: numeric NOT NULL\n  • indepyear: bigint NULL\n  • population: bigint NOT NULL\n  • lifeexpectancy: numeric NULL\n  • gnp: numeric NULL\n  • gnpold: numeric NULL\n  • localname: character varying NOT NULL\n  • governmentform: character varying NOT NULL\n  • headofstate: character varying NULL\n  • capital: bigint NULL\n  • code2: character varying NOT NULL\n\n(No foreign keys)\n\n===== Table: countrylanguage =====\nRow count: 0\nPrimary key: countrycode, language\n\nColumns:\n  • countrycode: character varying [PRIMARY KEY] NOT NULL\n  • language: character varying [PRIMARY KEY] NOT NULL\n  • isofficial: text NOT NULL\n  • percentage: numeric NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → countrycode REFERENCES country.code\n     JOIN: JOIN country ON countrylanguage.countrycode = country.code\n     Source: spider_metadata\n\nSAMPLE DATA:\n\nTable: city\n  Sample rows (10):\n    1. {\"id\": 1, \"name\": \"Kabul\", \"countrycode\": \"AFG\", \"district\": \"Kabol\", \"population\": 1780000}\n    2. {\"id\": 2, \"name\": \"Qandahar\", \"countrycode\": \"AFG\", \"district\": \"Qandahar\", \"population\": 237500}\n    3. {\"id\": 3, \"name\": \"Herat\", \"countrycode\": \"AFG\", \"district\": \"Herat\", \"population\": 186800}\n    4. {\"id\": 4, \"name\": \"Mazar-e-Sharif\", \"countrycode\": \"AFG\", \"district\": \"Balkh\", \"population\": 127800}\n    5. {\"id\": 5, \"name\": \"Amsterdam\", \"countrycode\": \"NLD\", \"district\": \"Noord-Holland\", \"population\": 731200}\n\nTable: country\n  (no data)\n\nTable: countrylanguage\n  (no data)\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-02T03:35:07.129991\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"row_count\": number,\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n      \"primary_key\": \"string - primary key column(s)\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"type\": \"string - SQL data type\",\n          \"nullable\": boolean,\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"sample_values\": [\"values from sample data provided\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date\"],\n          \"value_constraints\": \"string - any known constraints or ranges\"\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"type\": \"foreign_key\",\n          \"column\": \"string\",\n          \"references_table\": \"string\",\n          \"references_column\": \"string\",\n          \"business_meaning\": \"string - what this relationship represents\",\n          \"cardinality\": \"string - one-to-many, many-to-one, etc.\",\n          \"join_pattern\": \"string - typical SQL join syntax\",\n          \"common_uses\": [\"string - when users would query across these tables\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"domain_glossary\": [\n    {\n      \"business_term\": \"string - term users would use\",\n      \"technical_mapping\": \"string - which table.column represents this\",\n      \"definition\": \"string - clear definition\",\n      \"synonyms\": [\"string - alternate phrasings\"],\n      \"example_usage\": \"string - how users would reference this in questions\"\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ],\n\n  \"query_guidelines\": [\n    \"string - best practices for querying this database\",\n    \"string - common pitfalls to avoid\",\n    \"string - performance considerations\"\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users\n- Completeness: Cover all tables and meaningful columns\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms for each key concept\n- Realistic examples: Provide 2-3 actual sample values from the data\n- Query context: Explain how each element is commonly queried\n- Clear relationships: State the business meaning of every foreign key\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

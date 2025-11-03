@@ -19,7 +19,7 @@ from ..models.benchmark import (
     SpiderQuestion
 )
 from ..database.benchmark_store import BenchmarkStore
-from ..database.query_executor import QueryExecutor, PostgreSQLExecutor
+from ..database.query_executor import QueryExecutor, QueryExecutorFactory
 from ..services.text_to_sql import BaselineSQLGenerator, EnhancedSQLGenerator
 
 
@@ -42,7 +42,8 @@ class BenchmarkRunner:
         benchmark_store: BenchmarkStore,
         spider_data_path: Optional[str] = None,
         budget_limit_usd: float = 5.0,
-        connection_string: Optional[str] = None
+        connection_string: Optional[str] = None,
+        data_source: Optional[str] = None
     ):
         """
         Initialize benchmark runner
@@ -51,7 +52,8 @@ class BenchmarkRunner:
             benchmark_store: Store for persisting results
             spider_data_path: Path to Spider dev.json (defaults to data/spider/dev.json relative to project root)
             budget_limit_usd: Maximum cost per run
-            connection_string: PostgreSQL connection string for query execution
+            connection_string: PostgreSQL connection string (for Supabase). If None, uses DATABASE_URL env var
+            data_source: Database source ("supabase" or "turso"). If None, uses SPIDER_DATA_SOURCE env var
         """
         self.store = benchmark_store
 
@@ -65,8 +67,13 @@ class BenchmarkRunner:
         self.budget_limit = budget_limit_usd
         self.total_cost = 0.0
 
-        # Build connection string from env if not provided
-        if connection_string is None:
+        # Determine data source
+        if data_source is None:
+            data_source = os.getenv("SPIDER_DATA_SOURCE", "supabase").lower()
+        self.data_source = data_source.lower()
+
+        # Build connection string from env if not provided (for Supabase)
+        if connection_string is None and self.data_source in ["supabase", "postgresql"]:
             connection_string = os.getenv("DATABASE_URL")
             if not connection_string:
                 raise ValueError("DATABASE_URL environment variable not set")
@@ -74,8 +81,11 @@ class BenchmarkRunner:
         # Store connection string for generators
         self.connection_string = connection_string
 
-        # Create query executor (handles connection pooling and query execution)
-        self.query_executor: QueryExecutor = PostgreSQLExecutor(connection_string)
+        # Create query executor using factory (supports Supabase and Turso)
+        self.query_executor: QueryExecutor = QueryExecutorFactory.create(
+            source=self.data_source,
+            connection_string=connection_string
+        )
 
         # Cache for SQL generators (one per database)
         self._baseline_generators = {}
@@ -323,8 +333,12 @@ class BenchmarkRunner:
         Returns:
             True if normalized SQL strings match
         """
-        # Convert gold SQL from SQLite to PostgreSQL syntax
-        gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+        # Convert gold SQL from SQLite to PostgreSQL syntax if using Supabase
+        # For Turso, gold SQL is already in native SQLite format
+        if self.data_source in ["supabase", "postgresql"]:
+            gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+        else:
+            gold_sql_converted = gold_sql
 
         norm_generated = self.normalize_sql(generated_sql)
         norm_gold = self.normalize_sql(gold_sql_converted)
@@ -395,8 +409,12 @@ class BenchmarkRunner:
             match: True if results match (column order independent)
             error_message: Error from generated SQL execution (None if success)
         """
-        # Convert gold SQL from SQLite to PostgreSQL syntax
-        gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+        # Convert gold SQL from SQLite to PostgreSQL syntax if using Supabase
+        # For Turso, gold SQL is already in native SQLite format
+        if self.data_source in ["supabase", "postgresql"]:
+            gold_sql_converted = self.sqlite_to_postgres_sql(gold_sql)
+        else:
+            gold_sql_converted = gold_sql
 
         # Execute gold SQL
         gold_results, gold_error = self.execute_sql_safely(gold_sql_converted, database)

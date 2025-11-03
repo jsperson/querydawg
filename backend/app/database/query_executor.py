@@ -26,7 +26,7 @@ class QueryExecutor(ABC):
         self,
         query: str,
         database: str
-    ) -> Tuple[List[Tuple], Optional[str]]:
+    ) -> Tuple[List[Tuple], List[str], Optional[str]]:
         """
         Execute a SQL query against the specified database.
 
@@ -35,8 +35,9 @@ class QueryExecutor(ABC):
             database: Database/schema name
 
         Returns:
-            Tuple of (results, error_message)
+            Tuple of (results, columns, error_message)
             - results: List of tuples (sorted for deterministic comparison)
+            - columns: List of column names
             - error_message: None if success, error string if failure
         """
         pass
@@ -79,7 +80,7 @@ class PostgreSQLExecutor(QueryExecutor):
         self,
         query: str,
         database: str
-    ) -> Tuple[List[Tuple], Optional[str]]:
+    ) -> Tuple[List[Tuple], List[str], Optional[str]]:
         """
         Execute SQL query in read-only transaction with timeout.
 
@@ -90,8 +91,9 @@ class PostgreSQLExecutor(QueryExecutor):
             database: Database/schema name (used for search_path)
 
         Returns:
-            Tuple of (results, error_message)
+            Tuple of (results, columns, error_message)
             - results: List of tuples, sorted for deterministic comparison
+            - columns: List of column names
             - error_message: None if success, error string if failure
         """
         conn = self.db_pool.getconn()
@@ -111,12 +113,15 @@ class PostgreSQLExecutor(QueryExecutor):
                 cur.execute(query)
                 results = cur.fetchall()
 
+                # Get column names from cursor description
+                columns = [desc[0] for desc in cur.description] if cur.description else []
+
                 # Sort results for deterministic comparison
                 sorted_results = sorted(results, key=lambda x: str(x))
-                return sorted_results, None
+                return sorted_results, columns, None
 
         except Exception as e:
-            return [], str(e)
+            return [], [], str(e)
 
         finally:
             # Always rollback (read-only) and return connection
@@ -172,7 +177,7 @@ class TursoExecutor(QueryExecutor):
         self,
         query: str,
         database: str
-    ) -> Tuple[List[Tuple], Optional[str]]:
+    ) -> Tuple[List[Tuple], List[str], Optional[str]]:
         """
         Execute SQL query against Turso database.
 
@@ -181,8 +186,9 @@ class TursoExecutor(QueryExecutor):
             database: Database name (e.g., 'concert_singer')
 
         Returns:
-            Tuple of (results, error_message)
+            Tuple of (results, columns, error_message)
             - results: List of tuples, sorted for deterministic comparison
+            - columns: List of column names
             - error_message: None if success, error string if failure
         """
         try:
@@ -191,17 +197,20 @@ class TursoExecutor(QueryExecutor):
             # Execute via Turso HTTP API
             result = client.execute(query)
 
+            # Get column names
+            columns = result.get('columns', []) if result else []
+
             # Convert results to list of tuples
             if result and 'rows' in result:
                 rows = [tuple(row) for row in result['rows']]
                 # Sort for deterministic comparison
                 sorted_rows = sorted(rows, key=lambda x: str(x))
-                return sorted_rows, None
+                return sorted_rows, columns, None
 
-            return [], None
+            return [], columns, None
 
         except Exception as e:
-            return [], str(e)
+            return [], [], str(e)
 
     def close(self):
         """Close all Turso client connections"""

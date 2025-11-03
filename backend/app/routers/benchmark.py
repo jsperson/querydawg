@@ -361,7 +361,7 @@ async def execute_compare(
                 )
 
                 # Execute query
-                results, error = executor.execute_query(sql, request.database)
+                results, columns, error = executor.execute_query(sql, request.database)
                 execution_time_ms = int((time.time() - start_time) * 1000)
 
                 if error:
@@ -372,11 +372,7 @@ async def execute_compare(
 
                 # Convert tuple results to dict format for frontend
                 if results:
-                    # Get column count from first row
-                    num_cols = len(results[0]) if results else 0
-                    columns = [f"col{i}" for i in range(num_cols)]  # Generic column names
-
-                    # Convert tuples to dicts
+                    # Convert tuples to dicts using actual column names
                     dict_results = [
                         {columns[i]: val for i, val in enumerate(row)}
                         for row in results[:100]  # Limit to 100 rows for UI
@@ -393,7 +389,7 @@ async def execute_compare(
                     return QueryExecutionResult(
                         success=True,
                         results=[],
-                        columns=[],
+                        columns=columns,
                         row_count=0,
                         execution_time_ms=execution_time_ms
                     )

@@ -32,18 +32,47 @@ class TursoClient:
         self.org = os.getenv("TURSO_ORG", "querydawg")
         self.base_url = os.getenv("TURSO_BASE_URL", f"{self.org}.turso.io")
 
-        # Try database-specific token first (using normalized name)
-        self.token = os.getenv(f"TURSO_TOKEN_{self.db_name.upper().replace('-', '_')}")
+        # Get account-level token (required for creating database tokens)
+        self.account_token = os.getenv("TURSO_TOKEN")
+        if not self.account_token:
+            raise ValueError("TURSO_TOKEN environment variable not set")
 
-        # Fall back to shared token
-        if not self.token:
-            self.token = os.getenv("TURSO_TOKEN")
+        # Try database-specific token from environment first
+        db_token_env_var = f"TURSO_TOKEN_{self.db_name.upper().replace('-', '_')}"
+        self.token = os.getenv(db_token_env_var)
 
+        # If no database-specific token, create one using the API
         if not self.token:
-            raise ValueError(f"No Turso token found for {db_name}. Set TURSO_TOKEN or TURSO_TOKEN_{self.db_name.upper()}")
+            self.token = self._create_database_token()
+            if not self.token:
+                raise ValueError(f"Failed to create database token for {self.db_name}")
 
         # Build database URL using normalized name
         self.db_url = f"https://{self.db_name}-{self.base_url}"
+
+    def _create_database_token(self) -> Optional[str]:
+        """
+        Create a database-specific JWT token using Turso API
+
+        Returns:
+            Database-specific JWT token or None if creation fails
+        """
+        url = f"https://api.turso.tech/v1/organizations/{self.org}/databases/{self.db_name}/auth/tokens"
+        headers = {
+            "Authorization": f"Bearer {self.account_token}",
+            "Content-Type": "application/json"
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json={}, timeout=30)
+            if response.status_code in [200, 201]:
+                return response.json().get("jwt")
+            else:
+                print(f"Warning: Failed to create database token for {self.db_name}: {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"Warning: Exception creating database token for {self.db_name}: {e}")
+            return None
 
     def execute(self, sql: str, params: Optional[List[Any]] = None) -> Dict[str, Any]:
         """

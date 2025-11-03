@@ -37,7 +37,7 @@ export default function BenchmarkControlPanel() {
   // Form state
   const [name, setName] = useState('');
   const [runType, setRunType] = useState<'baseline' | 'enhanced' | 'both'>('both');
-  const [dataSource, setDataSource] = useState<'supabase' | 'turso'>('supabase');
+  const [dataSource, setDataSource] = useState<'supabase' | 'turso'>('turso');
   const [questionLimit, setQuestionLimit] = useState<number | null>(null);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('all');
 
@@ -222,22 +222,8 @@ export default function BenchmarkControlPanel() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="supabase">
-                    <div className="flex flex-col">
-                      <span>Supabase (PostgreSQL)</span>
-                      <span className="text-xs text-muted-foreground">
-                        SQLite→PostgreSQL conversion (existing setup)
-                      </span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="turso">
-                    <div className="flex flex-col">
-                      <span>Turso (SQLite) ⚡</span>
-                      <span className="text-xs text-muted-foreground">
-                        Native SQLite format (0 conversion errors expected)
-                      </span>
-                    </div>
-                  </SelectItem>
+                  <SelectItem value="supabase">Supabase (PostgreSQL)</SelectItem>
+                  <SelectItem value="turso">Turso (SQLite) ⚡</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">

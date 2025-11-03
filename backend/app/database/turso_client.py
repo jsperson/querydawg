@@ -19,29 +19,31 @@ class TursoClient:
         Initialize Turso client for a specific database
 
         Args:
-            db_name: Name of the Turso database (e.g., 'concert_singer')
+            db_name: Name of the Turso database (e.g., 'concert_singer' or 'concert-singer')
+                     Underscores will be automatically converted to dashes for Turso compatibility
 
         Raises:
             ValueError: If Turso configuration is missing
         """
-        self.db_name = db_name
+        # Normalize database name: Turso only allows lowercase, numbers, and dashes
+        self.db_name = db_name.replace("_", "-").lower()
 
         # Get configuration from environment
         self.org = os.getenv("TURSO_ORG", "querydawg")
         self.base_url = os.getenv("TURSO_BASE_URL", f"{self.org}.turso.io")
 
-        # Try database-specific token first
-        self.token = os.getenv(f"TURSO_TOKEN_{db_name.upper().replace('-', '_')}")
+        # Try database-specific token first (using normalized name)
+        self.token = os.getenv(f"TURSO_TOKEN_{self.db_name.upper().replace('-', '_')}")
 
         # Fall back to shared token
         if not self.token:
             self.token = os.getenv("TURSO_TOKEN")
 
         if not self.token:
-            raise ValueError(f"No Turso token found for {db_name}. Set TURSO_TOKEN or TURSO_TOKEN_{db_name.upper()}")
+            raise ValueError(f"No Turso token found for {db_name}. Set TURSO_TOKEN or TURSO_TOKEN_{self.db_name.upper()}")
 
-        # Build database URL
-        self.db_url = f"https://{db_name}-{self.base_url}"
+        # Build database URL using normalized name
+        self.db_url = f"https://{self.db_name}-{self.base_url}"
 
     def execute(self, sql: str, params: Optional[List[Any]] = None) -> Dict[str, Any]:
         """
@@ -62,15 +64,39 @@ class TursoClient:
         Raises:
             RuntimeError: If query execution fails
         """
-        # Build request payload
+        # Build request payload (Turso v2 API uses "requests" not "statements")
+        # Format params as Turso v2 expects (with type wrapping)
+        formatted_args = []
+        if params:
+            for param in params:
+                if param is None:
+                    formatted_args.append({"type": "null"})
+                elif isinstance(param, bool):
+                    formatted_args.append({"type": "integer", "value": str(1 if param else 0)})
+                elif isinstance(param, int):
+                    formatted_args.append({"type": "integer", "value": str(param)})
+                elif isinstance(param, float):
+                    formatted_args.append({"type": "float", "value": param})
+                elif isinstance(param, bytes):
+                    import base64
+                    formatted_args.append({"type": "blob", "base64": base64.b64encode(param).decode()})
+                else:
+                    formatted_args.append({"type": "text", "value": str(param)})
+
         payload = {
-            "statements": [
+            "requests": [
                 {
-                    "q": sql,
-                    "params": params or []
+                    "type": "execute",
+                    "stmt": {
+                        "sql": sql
+                    }
                 }
             ]
         }
+
+        # Add formatted params if provided
+        if formatted_args:
+            payload["requests"][0]["stmt"]["args"] = formatted_args
 
         # Execute via HTTP API
         headers = {
@@ -86,7 +112,19 @@ class TursoClient:
                 timeout=30
             )
 
-            response.raise_for_status()
+            # Check status code and capture error response if failed
+            if response.status_code >= 400:
+                try:
+                    error_json = response.json()
+                    error_detail = json.dumps(error_json, indent=2)
+                except:
+                    error_detail = response.text
+
+                raise RuntimeError(
+                    f"HTTP {response.status_code} error from Turso\n"
+                    f"URL: {response.url}\n"
+                    f"Response: {error_detail}"
+                )
 
             # Parse response
             data = response.json()

@@ -364,7 +364,8 @@ class BenchmarkRunner:
             results: List of tuples, sorted for comparison
             error_message: None if success, error string if failure
         """
-        return self.query_executor.execute_query(query, database)
+        results, columns, error = self.query_executor.execute_query(query, database)
+        return results, error
 
     def results_match(self, results1: List[Tuple], results2: List[Tuple]) -> bool:
         """

@@ -189,14 +189,11 @@ class TursoExecutor(QueryExecutor):
             client = self._get_client(database)
 
             # Execute via Turso HTTP API
-            results, error = client.execute(query)
-
-            if error:
-                return [], error
+            result = client.execute(query)
 
             # Convert results to list of tuples
-            if results and 'rows' in results:
-                rows = [tuple(row) for row in results['rows']]
+            if result and 'rows' in result:
+                rows = [tuple(row) for row in result['rows']]
                 # Sort for deterministic comparison
                 sorted_rows = sorted(rows, key=lambda x: str(x))
                 return sorted_rows, None

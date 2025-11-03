@@ -164,13 +164,36 @@ class TursoClient:
             result = data["results"][0]
 
             # Check for errors
-            if "error" in result:
-                raise RuntimeError(f"Query error: {result['error']}")
+            if result.get("type") == "error" or "error" in result:
+                error_msg = result.get("error", result)
+                raise RuntimeError(f"Query error: {error_msg}")
 
-            # Extract results
-            columns = result.get("columns", [])
-            rows = result.get("rows", [])
-            rows_affected = result.get("rows_affected", 0)
+            # Navigate to actual result (Turso v2 API structure)
+            if "response" in result and "result" in result["response"]:
+                actual_result = result["response"]["result"]
+
+                # Extract column names from "cols" array
+                cols = actual_result.get("cols", [])
+                columns = [col["name"] for col in cols]
+
+                # Extract and unwrap rows (each value is {"type": "...", "value": "..."})
+                raw_rows = actual_result.get("rows", [])
+                rows = []
+                for row in raw_rows:
+                    unwrapped_row = []
+                    for cell in row:
+                        if isinstance(cell, dict) and "value" in cell:
+                            unwrapped_row.append(cell["value"])
+                        else:
+                            unwrapped_row.append(cell)
+                    rows.append(unwrapped_row)
+
+                rows_affected = actual_result.get("affected_row_count", 0)
+            else:
+                # Fallback for older API format (if any)
+                columns = result.get("columns", [])
+                rows = result.get("rows", [])
+                rows_affected = result.get("rows_affected", 0)
 
             return {
                 "columns": columns,

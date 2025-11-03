@@ -94,17 +94,67 @@ Guidelines:
 5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
 6. Add ORDER BY and LIMIT clauses when relevant
 7. Use table aliases for clarity in multi-table queries
-8. Ensure column references are unambiguous
-9. **When the question explicitly asks for quantities ("how many", "what is the total", "what is the average"), INCLUDE the aggregation (COUNT, SUM, AVG) in the SELECT clause.** Only exclude aggregations when the question asks for superlatives or identifiers (e.g., "which year had the most concerts?" wants the year, not the count).
+8. **Ensure column references are unambiguous:**
+   - When a column name exists in multiple tables in a JOIN, ALWAYS qualify it
+   - Use table.column or alias.column syntax
+   - Example: If both `orders` and `customers` have a `status` column, use `orders.status`
+   - Check the schema carefully for duplicate column names across tables
+9. **AGGREGATION vs SORTING (CRITICAL):**
+   - **DO NOT use MIN/MAX/SUM/AVG when questions ask "which/what/who X has the min/max/most/least Y"**
+     - These questions want the IDENTIFIER (X), not the aggregated value
+     - Use ORDER BY + LIMIT instead
+     - Example: "Which product has minimum price?" → ORDER BY price ASC LIMIT 1 (NOT MIN(price))
+   - **DO use aggregations when questions explicitly ask for quantities:**
+     - "How many..." → COUNT(*)
+     - "What is the total..." → SUM(column)
+     - "What is the average..." → AVG(column)
+     - "What is the maximum..." (asking for the value, not the identifier) → MAX(column)
+   - **Key distinction:**
+     - "Which product has minimum price?" → wants product name (ORDER BY + LIMIT)
+     - "What is the minimum price?" → wants the value (SELECT MIN)
 10. Return ONLY the SQL query without explanations or markdown formatting
+11. **CASE SENSITIVITY (SQLite CRITICAL):**
+    - SQLite is CASE-SENSITIVE for all table and column identifiers
+    - You MUST use the EXACT case shown in the schema
+    - Example: If schema shows "Customer_ID", use "Customer_ID" NOT "customer_id" or "CustomerID"
+    - Always verify your SQL uses exact case from the schema before responding
+    - **This does not apply to PostgreSQL** (case-insensitive), but doesn't hurt to be precise
 
 Examples:
-- Question: "What city has the most customers?"
-  - WRONG: SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-  - CORRECT: SELECT city FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-- Question: "How many orders were placed each month?"
-  - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
-  - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
+
+AGGREGATION PATTERNS:
+1. Question: "What region has the most stores?"
+   - WRONG: SELECT region, COUNT(*) FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - CORRECT: SELECT region FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Question asks for "what region" (identifier), not "how many stores" (quantity)
+
+2. Question: "Which product has the minimum price?"
+   - WRONG: SELECT product_name, MIN(price) FROM products GROUP BY product_name ORDER BY MIN(price) LIMIT 1
+   - CORRECT: SELECT product_name FROM products ORDER BY price ASC LIMIT 1
+   - Why: Question asks for "which product" (identifier), not "what is the minimum" (value)
+
+3. Question: "What is the maximum salary?"
+   - WRONG: SELECT employee_name FROM employees ORDER BY salary DESC LIMIT 1
+   - CORRECT: SELECT MAX(salary) FROM employees
+   - Why: Question asks for the value itself, not which employee has it
+
+4. Question: "How many orders were placed each month?"
+   - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
+   - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month
+   - Why: "How many" explicitly asks for the count
+
+CASE SENSITIVITY (SQLite):
+5. Given schema: Customers(Customer_ID, First_Name, Last_Name)
+   - WRONG: SELECT first_name FROM customers WHERE customer_id = 1
+   - CORRECT: SELECT First_Name FROM Customers WHERE Customer_ID = 1
+   - Why: SQLite is case-sensitive; must match exact schema case
+
+COLUMN DISAMBIGUATION:
+6. Given: orders(status, ...) and customers(status, ...)
+   Question: "Which customer status has most orders?"
+   - WRONG: SELECT status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY status ORDER BY COUNT(*) DESC
+   - CORRECT: SELECT customers.status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY customers.status ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Column 'status' exists in both tables; must qualify to avoid ambiguity"""
 
     @staticmethod
     def baseline_sql_user(question: str, schema: Dict[str, Any], db_type: str = 'postgresql') -> str:
@@ -269,17 +319,67 @@ Guidelines:
 5. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
 6. Add ORDER BY and LIMIT clauses when relevant
 7. Use table aliases for clarity in multi-table queries
-8. Ensure column references are unambiguous
-9. **When the question explicitly asks for quantities ("how many", "what is the total", "what is the average"), INCLUDE the aggregation (COUNT, SUM, AVG) in the SELECT clause.** Only exclude aggregations when the question asks for superlatives or identifiers (e.g., "which year had the most concerts?" wants the year, not the count).
+8. **Ensure column references are unambiguous:**
+   - When a column name exists in multiple tables in a JOIN, ALWAYS qualify it
+   - Use table.column or alias.column syntax
+   - Example: If both `orders` and `customers` have a `status` column, use `orders.status`
+   - Check the schema carefully for duplicate column names across tables
+9. **AGGREGATION vs SORTING (CRITICAL):**
+   - **DO NOT use MIN/MAX/SUM/AVG when questions ask "which/what/who X has the min/max/most/least Y"**
+     - These questions want the IDENTIFIER (X), not the aggregated value
+     - Use ORDER BY + LIMIT instead
+     - Example: "Which product has minimum price?" → ORDER BY price ASC LIMIT 1 (NOT MIN(price))
+   - **DO use aggregations when questions explicitly ask for quantities:**
+     - "How many..." → COUNT(*)
+     - "What is the total..." → SUM(column)
+     - "What is the average..." → AVG(column)
+     - "What is the maximum..." (asking for the value, not the identifier) → MAX(column)
+   - **Key distinction:**
+     - "Which product has minimum price?" → wants product name (ORDER BY + LIMIT)
+     - "What is the minimum price?" → wants the value (SELECT MIN)
 10. Return ONLY the SQL query without explanations or markdown formatting
+11. **CASE SENSITIVITY (SQLite CRITICAL):**
+    - SQLite is CASE-SENSITIVE for all table and column identifiers
+    - You MUST use the EXACT case shown in the schema
+    - Example: If schema shows "Customer_ID", use "Customer_ID" NOT "customer_id" or "CustomerID"
+    - Always verify your SQL uses exact case from the schema before responding
+    - **This does not apply to PostgreSQL** (case-insensitive), but doesn't hurt to be precise
 
 Examples:
-- Question: "What city has the most customers?"
-  - WRONG: SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-  - CORRECT: SELECT city FROM customers GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1
-- Question: "How many orders were placed each month?"
-  - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
-  - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month"""
+
+AGGREGATION PATTERNS:
+1. Question: "What region has the most stores?"
+   - WRONG: SELECT region, COUNT(*) FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - CORRECT: SELECT region FROM stores GROUP BY region ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Question asks for "what region" (identifier), not "how many stores" (quantity)
+
+2. Question: "Which product has the minimum price?"
+   - WRONG: SELECT product_name, MIN(price) FROM products GROUP BY product_name ORDER BY MIN(price) LIMIT 1
+   - CORRECT: SELECT product_name FROM products ORDER BY price ASC LIMIT 1
+   - Why: Question asks for "which product" (identifier), not "what is the minimum" (value)
+
+3. Question: "What is the maximum salary?"
+   - WRONG: SELECT employee_name FROM employees ORDER BY salary DESC LIMIT 1
+   - CORRECT: SELECT MAX(salary) FROM employees
+   - Why: Question asks for the value itself, not which employee has it
+
+4. Question: "How many orders were placed each month?"
+   - WRONG: SELECT month FROM orders GROUP BY month ORDER BY month
+   - CORRECT: SELECT month, COUNT(*) FROM orders GROUP BY month
+   - Why: "How many" explicitly asks for the count
+
+CASE SENSITIVITY (SQLite):
+5. Given schema: Customers(Customer_ID, First_Name, Last_Name)
+   - WRONG: SELECT first_name FROM customers WHERE customer_id = 1
+   - CORRECT: SELECT First_Name FROM Customers WHERE Customer_ID = 1
+   - Why: SQLite is case-sensitive; must match exact schema case
+
+COLUMN DISAMBIGUATION:
+6. Given: orders(status, ...) and customers(status, ...)
+   Question: "Which customer status has most orders?"
+   - WRONG: SELECT status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY status ORDER BY COUNT(*) DESC
+   - CORRECT: SELECT customers.status FROM orders JOIN customers ON orders.customer_id = customers.id GROUP BY customers.status ORDER BY COUNT(*) DESC LIMIT 1
+   - Why: Column 'status' exists in both tables; must qualify to avoid ambiguity"""
 
     @staticmethod
     def enhanced_sql_user(question: str, schema: Dict[str, Any], semantic_layer: Optional[Dict[str, Any]], db_type: str = 'postgresql') -> str:

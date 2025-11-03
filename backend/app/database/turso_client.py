@@ -182,8 +182,24 @@ class TursoClient:
                 for row in raw_rows:
                     unwrapped_row = []
                     for cell in row:
-                        if isinstance(cell, dict) and "value" in cell:
-                            unwrapped_row.append(cell["value"])
+                        if isinstance(cell, dict):
+                            # Convert based on type
+                            cell_type = cell.get("type")
+                            if cell_type == "null":
+                                unwrapped_row.append(None)
+                            elif cell_type == "integer":
+                                # Integer values are strings, convert to int
+                                unwrapped_row.append(int(cell["value"]))
+                            elif cell_type == "float":
+                                # Float values can be float or string
+                                val = cell.get("value")
+                                unwrapped_row.append(float(val) if val is not None else None)
+                            elif cell_type == "blob":
+                                # Blob values are base64 encoded
+                                import base64
+                                unwrapped_row.append(base64.b64decode(cell.get("base64", "")))
+                            else:  # text or unknown
+                                unwrapped_row.append(cell.get("value"))
                         else:
                             unwrapped_row.append(cell)
                     rows.append(unwrapped_row)

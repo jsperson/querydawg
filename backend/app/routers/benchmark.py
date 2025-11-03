@@ -59,7 +59,24 @@ async def start_benchmark(
     Returns immediately with run_id, while processing continues in background
     """
     try:
-        runner = get_runner_instance()
+        # Create runner with specified data_source (defaults to 'supabase')
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        database_url = os.getenv("DATABASE_URL")
+
+        if not all([supabase_url, supabase_key]):
+            raise HTTPException(
+                status_code=500,
+                detail="Server configuration error: Missing Supabase credentials"
+            )
+
+        store = get_benchmark_store(supabase_url, supabase_key)
+        runner = BenchmarkRunner(
+            benchmark_store=store,
+            budget_limit_usd=5.0,
+            connection_string=database_url if config.data_source == 'supabase' else None,
+            data_source=config.data_source or 'supabase'
+        )
 
         # Get question count for response
         questions = runner.load_spider_questions(
@@ -75,8 +92,16 @@ async def start_benchmark(
         # Note: run_benchmark will create the run record itself
         def run_benchmark_task():
             try:
-                run_id = runner.run_benchmark(config_copy)
-                print(f"Benchmark {run_id} completed successfully")
+                # Create new runner instance for background task with same config
+                store_bg = get_benchmark_store(supabase_url, supabase_key)
+                runner_bg = BenchmarkRunner(
+                    benchmark_store=store_bg,
+                    budget_limit_usd=5.0,
+                    connection_string=database_url if config_copy.data_source == 'supabase' else None,
+                    data_source=config_copy.data_source or 'supabase'
+                )
+                run_id = runner_bg.run_benchmark(config_copy)
+                print(f"Benchmark {run_id} completed successfully using {config_copy.data_source}")
             except BudgetExceededError as e:
                 print(f"Budget exceeded: {str(e)}")
             except Exception as e:
@@ -89,11 +114,12 @@ async def start_benchmark(
 
         return {
             "status": "started",
-            "message": "Benchmark started in background. Use GET /api/benchmark/runs to see status.",
+            "message": f"Benchmark started in background using {config.data_source}. Use GET /api/benchmark/runs to see status.",
             "question_count": question_count,
             "config": {
                 "name": config.name,
                 "run_type": config.run_type,
+                "data_source": config.data_source,
                 "databases": config.databases
             }
         }

@@ -36,6 +36,7 @@ export default function BenchmarkControlPanel() {
   // Form state
   const [name, setName] = useState('');
   const [runType, setRunType] = useState<'baseline' | 'enhanced' | 'both'>('both');
+  const [dataSource, setDataSource] = useState<'supabase' | 'turso'>('supabase');
   const [questionLimit, setQuestionLimit] = useState<number | null>(null);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('all');
 
@@ -99,6 +100,7 @@ export default function BenchmarkControlPanel() {
       const config = {
         name: name.trim(),
         run_type: runType,
+        data_source: dataSource, // New: Supabase or Turso
         databases: selectedDatabase === 'all' ? null : [selectedDatabase], // null = all databases
         question_limit: questionLimit
       };
@@ -205,6 +207,44 @@ export default function BenchmarkControlPanel() {
                   <SelectItem value="both">Both (compare side-by-side)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Data Source */}
+            <div>
+              <Label htmlFor="dataSource">Database Source</Label>
+              <Select
+                value={dataSource}
+                onValueChange={(value: 'supabase' | 'turso') => setDataSource(value)}
+                disabled={isStarting}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="supabase">
+                    <div className="flex flex-col">
+                      <span>Supabase (PostgreSQL)</span>
+                      <span className="text-xs text-muted-foreground">
+                        SQLite→PostgreSQL conversion (existing setup)
+                      </span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="turso">
+                    <div className="flex flex-col">
+                      <span>Turso (SQLite) ⚡</span>
+                      <span className="text-xs text-muted-foreground">
+                        Native SQLite format (0 conversion errors expected)
+                      </span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                {dataSource === 'turso'
+                  ? '⚡ Turso: Native Spider format - eliminates 84 gold SQL conversion failures'
+                  : 'PostgreSQL: Requires SQLite→PostgreSQL conversion (84 known conversion issues)'
+                }
+              </p>
             </div>
 
             {/* Database Selector */}

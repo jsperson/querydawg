@@ -11,6 +11,7 @@ class BenchmarkConfig(BaseModel):
     """Configuration for creating a new benchmark run"""
     name: str = Field(..., description="User-friendly name for this benchmark run")
     run_type: Literal['baseline', 'enhanced', 'both'] = Field(..., description="Which approaches to test")
+    data_source: Optional[Literal['supabase', 'turso']] = Field('supabase', description="Database source: Supabase (PostgreSQL) or Turso (SQLite)")
     databases: Optional[List[str]] = Field(None, description="Specific databases to test (None = all 20)")
     question_limit: Optional[int] = Field(None, description="Limit number of questions (None = all 1034)")
 

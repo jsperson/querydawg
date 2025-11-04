@@ -158,9 +158,8 @@ async def generate_semantic_layer(
             )
 
             embedding_result = embedding_service.embed_semantic_layer(
-                database_name=request.database,
                 semantic_layer=result["semantic_layer"],
-                metadata=result["metadata"]
+                database_name=request.database
             )
 
             print(f"[GENERATE] Embeddings generated: "

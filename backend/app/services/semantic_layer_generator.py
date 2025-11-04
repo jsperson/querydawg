@@ -225,14 +225,50 @@ The schema below includes documented foreign key relationships. These are MANDAT
 
 **Missing a documented foreign key will cause query failures!**
 
+BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):
+Some tables exist solely to connect two other tables in many-to-many relationships.
+
+**Identifying Bridge Tables:**
+- Typically has 2+ foreign keys and few/no other meaningful columns
+- Often named like "table1_table2", "junction_*", or similar
+- Required for queries that connect the two referenced tables
+
+**Critical Requirements:**
+1. IDENTIFY all bridge tables in your analysis
+2. Document the COMPLETE join path through the bridge
+3. Mark as "is_bridge_table": true in relationships
+4. Explain WHY this table is needed (what M:M relationship it represents)
+5. List common mistakes (e.g., "DO NOT skip this table when joining X to Y")
+
+**Example**: If order_items bridges orders to products:
+- orders → order_items → products
+- Purpose: Enables queries connecting orders to product details (many-to-many relationship)
+- Common mistake: Trying to join orders directly to products (will fail or give wrong results)
+
+COLUMN NAME DISAMBIGUATION:
+Some column names appear in multiple tables with different meanings.
+
+**When documenting columns:**
+1. Identify all column names that appear in 2+ tables
+2. Explain the semantic difference between each occurrence
+3. Provide usage guidance (when to use table1.column vs table2.column)
+4. Warn about ambiguous references that need table qualification
+
+**Example**: If both "orders" and "customers" have a "status" column:
+- orders.status: Current fulfillment status (pending, shipped, delivered)
+- customers.status: Account status (active, inactive, suspended)
+- Usage: Always qualify which table's status is needed for the query
+
 ANALYSIS APPROACH:
 Think step-by-step before generating output:
 1. Domain identification: What business domain does this database serve?
 2. Entity analysis: What are the main business objects being tracked?
 3. **Relationship mapping: Document EVERY foreign key shown in schema below**
-4. Column semantics: What business concept does each column represent?
-5. Query patterns: What questions would users typically ask?
-6. Ambiguities: What might confuse an LLM during text-to-SQL translation?
+4. **Bridge table identification: Which tables serve as many-to-many bridges?**
+5. Column semantics: What business concept does each column represent?
+6. **Column disambiguation: Which column names appear in multiple tables?**
+7. Query patterns: What questions would users typically ask?
+8. Ambiguities: What might confuse an LLM during text-to-SQL translation?
 
 {self.custom_instructions}
 
@@ -273,7 +309,15 @@ Generate a JSON object with this structure:
           "synonyms": ["string - 3-5 alternate terms users might use"],
           "typical_filters": ["string - common WHERE clause patterns like 'column = ?' or 'column > ?'"],
           "aggregations": ["string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'"],
-          "common_values": ["string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'"]
+          "common_values": ["string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'"],
+          "disambiguation": {{
+            "appears_in_tables": ["string - other tables with this column name (if applicable)"],
+            "this_table_meaning": "string - what this column means in THIS table",
+            "other_table_meanings": {{
+              "table_name": "string - what it means in that table"
+            }},
+            "usage_guidance": "string - when to use which table's version"
+          }}
         }}
       ],
 
@@ -281,8 +325,12 @@ Generate a JSON object with this structure:
         {{
           "column": "string - FK column name",
           "references_table": "string - target table name",
+          "relationship_type": "string - 'one-to-many', 'many-to-one', or 'many-to-many'",
+          "is_bridge_table": "boolean - true if this table bridges a many-to-many relationship",
+          "complete_join_path": ["string - if multi-hop join required, show full path (e.g., 'table1 → bridge → table2')"],
           "business_meaning": "string - what this relationship represents in business terms",
-          "common_uses": ["string - when/why users would query across these tables"]
+          "common_uses": ["string - when/why users would query across these tables"],
+          "common_mistakes": ["string - typical errors when using this relationship (e.g., 'DO NOT skip bridge_table')"]
         }}
       ],
 

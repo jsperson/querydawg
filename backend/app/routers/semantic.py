@@ -147,6 +147,32 @@ async def generate_semantic_layer(
         )
         print("[GENERATE] Saved successfully!")
 
+        # Automatically generate embeddings for the new semantic layer
+        print("[GENERATE] Starting automatic embedding generation...")
+        try:
+            embedding_service = EmbeddingService(
+                openai_api_key=settings.openai_api_key,
+                pinecone_api_key=settings.pinecone_api_key,
+                pinecone_environment=settings.pinecone_environment,
+                pinecone_index_name=settings.pinecone_index_name
+            )
+
+            embedding_result = embedding_service.embed_semantic_layer(
+                database_name=request.database,
+                semantic_layer=result["semantic_layer"],
+                metadata=result["metadata"]
+            )
+
+            print(f"[GENERATE] Embeddings generated: "
+                  f"{embedding_result['chunks_created']} chunks, "
+                  f"{embedding_result['vectors_uploaded']} vectors, "
+                  f"${embedding_result['cost_usd']:.4f}")
+        except Exception as embed_error:
+            # Don't fail the whole request if embedding fails
+            print(f"[GENERATE WARNING] Embedding failed: {embed_error}")
+            print("[GENERATE WARNING] Semantic layer saved but embeddings not generated")
+            print("[GENERATE WARNING] You can manually run embeddings with: python scripts/embed_semantic_layers.py")
+
         return SemanticLayerResponse(
             database=request.database,
             semantic_layer=result["semantic_layer"],

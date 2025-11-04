@@ -66,6 +66,9 @@ data/spider/**/*.sqlite
 # Keep only the main README
 !data/spider/README.txt
 
+# Semantic layers (production data - generated on Vercel/Railway)
+data/semantic_layers/*.json
+
 # Temporary files
 *.tmp
 *.temp

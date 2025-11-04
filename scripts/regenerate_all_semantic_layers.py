@@ -164,6 +164,94 @@ def main():
 
     print(f'\n{"=" * 70}')
 
+    # If regeneration was successful, automatically run embeddings
+    if len(results['success']) > 0:
+        print(f'\n{"=" * 70}')
+        print('STARTING AUTOMATIC EMBEDDING GENERATION')
+        print(f'{"=" * 70}')
+        print('Regeneration complete. Now generating embeddings for Pinecone...')
+        print()
+
+        try:
+            # Import and run the embedding script
+            from app.services.embedding_service import EmbeddingService
+            from app.database.metadata_store import MetadataStore
+
+            # Get environment variables for embedding
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            pinecone_api_key = os.getenv("PINECONE_API_KEY")
+            pinecone_environment = os.getenv("PINECONE_ENVIRONMENT")
+            pinecone_index_name = os.getenv("PINECONE_INDEX_NAME", "querydawg-semantic")
+            supabase_url = os.getenv("SUPABASE_URL")
+            supabase_service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+            # Validate environment variables
+            if not all([openai_api_key, pinecone_api_key, pinecone_environment, supabase_url, supabase_service_role_key]):
+                print("⚠️  Warning: Missing required environment variables for embedding")
+                print("Skipping automatic embedding generation.")
+                print("You can run embeddings manually with: python scripts/embed_semantic_layers.py")
+            else:
+                # Initialize embedding services
+                print("Initializing embedding services...")
+                embedding_service = EmbeddingService(
+                    openai_api_key=openai_api_key,
+                    pinecone_api_key=pinecone_api_key,
+                    pinecone_environment=pinecone_environment,
+                    pinecone_index_name=pinecone_index_name
+                )
+
+                metadata_store = MetadataStore(supabase_url, supabase_service_role_key)
+
+                # Get semantic layers from Supabase
+                print("Fetching semantic layers from Supabase...")
+                semantic_layers = metadata_store.list_semantic_layers()
+                print(f"Found {len(semantic_layers)} semantic layer(s)")
+                print()
+
+                # Process each semantic layer
+                total_chunks = 0
+                total_vectors = 0
+                total_cost = 0.0
+
+                for i, layer_metadata in enumerate(semantic_layers, 1):
+                    database_name = layer_metadata['database_name']
+                    print(f"[{i}/{len(semantic_layers)}] Embedding {database_name}...")
+
+                    result = embedding_service.embed_semantic_layer(
+                        database_name=database_name,
+                        semantic_layer=layer_metadata['semantic_layer'],
+                        metadata=layer_metadata.get('metadata', {})
+                    )
+
+                    total_chunks += result['chunks_created']
+                    total_vectors += result['vectors_uploaded']
+                    total_cost += result['cost_usd']
+
+                    print(f"   ✅ Chunks: {result['chunks_created']}, "
+                          f"Vectors: {result['vectors_uploaded']}, "
+                          f"Cost: ${result['cost_usd']:.4f}")
+
+                print()
+                print(f'{"=" * 70}')
+                print('EMBEDDING SUMMARY')
+                print(f'{"=" * 70}')
+                print(f"Databases processed: {len(semantic_layers)}")
+                print(f"Total chunks: {total_chunks:,}")
+                print(f"Total vectors: {total_vectors:,}")
+                print(f"Total cost: ${total_cost:.2f}")
+                print(f'{"=" * 70}')
+                print('✅ REGENERATION AND EMBEDDING COMPLETE')
+                print(f'{"=" * 70}')
+
+        except Exception as e:
+            print(f'⚠️  Warning: Failed to run automatic embedding: {e}')
+            print('You can run embeddings manually with: python scripts/embed_semantic_layers.py')
+            import traceback
+            traceback.print_exc()
+    else:
+        print('\n⚠️  No semantic layers were successfully generated.')
+        print('Skipping automatic embedding generation.')
+
     return len(results['failed']) == 0
 
 if __name__ == '__main__':

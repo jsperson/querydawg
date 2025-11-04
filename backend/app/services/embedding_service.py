@@ -134,6 +134,14 @@ Typical Questions:
                 if col.get('common_values'):
                     col_text.append(f"    Example Values: {', '.join(col['common_values'])}")
 
+                # Phase 2: Column disambiguation
+                if col.get('disambiguation'):
+                    disamb = col['disambiguation']
+                    if disamb.get('usage_guidance'):
+                        col_text.append(f"    Disambiguation: {disamb['usage_guidance']}")
+                    if disamb.get('appears_in_tables'):
+                        col_text.append(f"    Also appears in: {', '.join(disamb['appears_in_tables'])}")
+
                 text_parts.extend(col_text)
 
             # Relationships - business meaning only
@@ -142,8 +150,22 @@ Typical Questions:
                 for rel in table["relationships"]:
                     rel_text = f"  - {rel.get('column')} → {rel.get('references_table')}"
                     rel_text += f"\n    {rel.get('business_meaning', 'N/A')}"
+
+                    # Phase 2: Relationship metadata
+                    if rel.get('relationship_type'):
+                        rel_text += f"\n    Type: {rel['relationship_type']}"
+                    if rel.get('is_bridge_table') is not None:
+                        rel_text += f"\n    Bridge table: {'Yes' if rel['is_bridge_table'] else 'No'}"
+                    if rel.get('complete_join_path'):
+                        rel_text += f"\n    Join path: {rel['complete_join_path']}"
+
                     if rel.get('common_uses'):
                         rel_text += f"\n    When to use: {'; '.join(rel['common_uses'])}"
+
+                    # Phase 2: Common mistakes
+                    if rel.get('common_mistakes'):
+                        rel_text += f"\n    Common mistakes: {'; '.join(rel['common_mistakes'])}"
+
                     text_parts.append(rel_text)
 
             # Common query patterns

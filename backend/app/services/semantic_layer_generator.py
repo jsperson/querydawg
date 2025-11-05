@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 from .llm.base import LLMProvider
-from ..database.sqlite_schema_extractor import SQLiteSchemaExtractor
+from ..database.turso_schema_extractor import TursoSchemaExtractor
 from ..database.supabase_schema_extractor import SupabaseSchemaExtractor
 
 
@@ -26,8 +26,7 @@ class SemanticLayerGenerator:
         llm: LLMProvider,
         database_url: str,
         custom_instructions: Optional[str] = None,
-        sample_rows: int = 10,
-        spider_data_path: str = "data/spider/database"
+        sample_rows: int = 10
     ):
         """
         Initialize the semantic layer generator.
@@ -37,17 +36,16 @@ class SemanticLayerGenerator:
             database_url: Supabase PostgreSQL connection string (for sample data)
             custom_instructions: Optional custom instructions to add to prompt
             sample_rows: Number of sample rows to extract per table
-            spider_data_path: Path to local Spider database files (for schema extraction)
         """
         self.llm = llm
         self.database_url = database_url
         self.custom_instructions = custom_instructions or ""
         self.sample_rows = sample_rows
 
-        # Use SQLite for schema extraction (preserves original case)
-        self.sqlite_extractor = SQLiteSchemaExtractor(spider_data_path)
+        # Use Turso for schema extraction (preserves original case from Spider SQLite)
+        self.turso_extractor = TursoSchemaExtractor()
 
-        # Use Supabase for sample data extraction
+        # Use Supabase for sample data extraction (has actual data)
         self.supabase_extractor = SupabaseSchemaExtractor(database_url, use_spider_metadata=False)
 
     def generate(
@@ -67,9 +65,9 @@ class SemanticLayerGenerator:
         Returns:
             Dictionary containing semantic layer and metadata
         """
-        # Extract schema from local SQLite file (preserves original case)
-        print(f"Extracting schema from local SQLite file for {database_name}...")
-        schema_info = self.sqlite_extractor.extract_schema(database_name)
+        # Extract schema from Turso (preserves original case from Spider SQLite)
+        print(f"Extracting schema from Turso for {database_name}...")
+        schema_info = self.turso_extractor.extract_schema(database_name)
 
         # Sample data from Supabase (has actual data)
         print(f"Sampling data from Supabase for {database_name}...")
@@ -165,8 +163,8 @@ class SemanticLayerGenerator:
         Returns:
             Dictionary containing the prompt and metadata
         """
-        # Extract schema from local SQLite file (preserves original case)
-        schema_info = self.sqlite_extractor.extract_schema(database_name)
+        # Extract schema from Turso (preserves original case from Spider SQLite)
+        schema_info = self.turso_extractor.extract_schema(database_name)
 
         # Sample data from Supabase (has actual data)
         sample_data = self.supabase_extractor.sample_all_tables(

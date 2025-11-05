@@ -1,188 +1,116 @@
 """
-Turso Schema Extractor for QueryDawg
+Schema extractor for Turso databases.
 
-Extracts schema information from Turso (SQLite) databases for semantic layer generation.
-Maintains high fidelity with Spider's native SQLite format.
+Extracts schema information directly from Turso databases,
+preserving the original case of table and column names.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, List, Any
 from .turso_client import TursoClient
 
 
 class TursoSchemaExtractor:
-    """Extract schema information from Turso (SQLite) databases"""
+    """Extract schema and sample data from Turso databases."""
 
-    def __init__(self, db_name: str):
+    def __init__(self):
+        """Initialize the Turso schema extractor."""
+        pass
+
+    def extract_schema(self, database_name: str) -> Dict[str, Any]:
         """
-        Initialize schema extractor for a Turso database
+        Extract schema information for a database from Turso.
 
         Args:
-            db_name: Name of the Turso database
-        """
-        self.db_name = db_name
-        self.client = TursoClient(db_name)
-
-    def extract_schema(self) -> Dict[str, Any]:
-        """
-        Extract complete schema information
+            database_name: Name of the database (e.g., 'network_1', 'world_1')
 
         Returns:
-            Dictionary containing schema information:
-            {
-                "database": str,
-                "tables": [
-                    {
-                        "name": str,
-                        "row_count": int,
-                        "columns": [
-                            {
-                                "name": str,
-                                "type": str,
-                                "nullable": bool,
-                                "default": Any,
-                                "primary_key": bool
-                            }
-                        ],
-                        "foreign_keys": [
-                            {
-                                "column": str,
-                                "referenced_table": str,
-                                "referenced_column": str
-                            }
-                        ]
-                    }
-                ]
-            }
+            Dictionary with tables, columns, foreign keys, row counts
         """
+        client = TursoClient(database_name)
+
         # Get all tables
-        tables_result = self.client.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        )
+        table_names = client.get_table_names()
 
         tables = []
-
-        for row in tables_result["rows"]:
-            table_name = row[0]
-            tables.append(self._extract_table_schema(table_name))
+        for table_name in table_names:
+            table_info = self._extract_table_info(client, table_name)
+            tables.append(table_info)
 
         return {
-            "database": self.db_name,
+            "database": database_name,
             "tables": tables
         }
 
-    def _extract_table_schema(self, table_name: str) -> Dict[str, Any]:
-        """
-        Extract schema for a single table
+    def _extract_table_info(self, client: TursoClient, table_name: str) -> Dict[str, Any]:
+        """Extract detailed information for a single table."""
 
-        Args:
-            table_name: Name of the table
-
-        Returns:
-            Table schema dictionary
-        """
         # Get table info using PRAGMA
-        table_info = self.client.execute(f"PRAGMA table_info({table_name})")
+        pragma_result = client.execute(f"PRAGMA table_info(`{table_name}`)")
 
-        # Get foreign keys
-        fk_info = self.client.execute(f"PRAGMA foreign_key_list({table_name})")
+        columns = []
+        pk_columns = set()
+
+        for row in pragma_result["rows"]:
+            cid, name, type_, notnull, default, pk = row
+
+            columns.append({
+                "name": name,  # Preserves original case!
+                "type": type_,
+                "nullable": notnull == 0,
+                "default": default,
+                "primary_key": pk > 0
+            })
+            if pk > 0:
+                pk_columns.add(name)
+
+        # Get foreign keys using PRAGMA
+        fk_result = client.execute(f"PRAGMA foreign_key_list(`{table_name}`)")
+
+        foreign_keys = []
+        for row in fk_result["rows"]:
+            id_, seq, referenced_table, from_column, to_column = row[:5]
+
+            foreign_keys.append({
+                "column": from_column,  # Preserves original case!
+                "referenced_table": referenced_table,
+                "referenced_column": to_column,
+                "source": "turso_schema"
+            })
 
         # Get row count
-        count_result = self.client.execute(f"SELECT COUNT(*) FROM {table_name}")
-        row_count = count_result["rows"][0][0]
-
-        # Build column schema
-        columns = []
-        for col in table_info["rows"]:
-            # PRAGMA table_info returns:
-            # [cid, name, type, notnull, dflt_value, pk]
-            columns.append({
-                "name": col[1],  # column name
-                "type": col[2] or "TEXT",  # data type (default to TEXT if empty)
-                "nullable": not col[3],  # notnull flag (inverted)
-                "default": col[4],  # default value
-                "primary_key": bool(col[5])  # pk flag
-            })
-
-        # Build foreign key schema
-        foreign_keys = []
-        for fk in fk_info["rows"]:
-            # PRAGMA foreign_key_list returns:
-            # [id, seq, table, from, to, on_update, on_delete, match]
-            foreign_keys.append({
-                "column": fk[3],  # from column
-                "referenced_table": fk[2],  # to table
-                "referenced_column": fk[4],  # to column
-                "source": "database"  # Indicate this came from actual DB constraints
-            })
+        row_count = client.get_row_count(f"`{table_name}`")
 
         return {
-            "name": table_name,
-            "row_count": row_count,
+            "name": table_name,  # Preserves original case!
             "columns": columns,
-            "foreign_keys": foreign_keys
+            "foreign_keys": foreign_keys,
+            "row_count": row_count
         }
 
-    def sample_all_tables(self, limit: int = 10) -> Dict[str, List[Dict[str, Any]]]:
+    def sample_all_tables(
+        self,
+        database_name: str,
+        limit: int = 10
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """
-        Sample data from all tables
+        Sample data from all tables in a database.
 
         Args:
-            limit: Maximum rows per table
+            database_name: Name of the database
+            limit: Maximum number of rows to sample per table
 
         Returns:
-            Dictionary mapping table names to sample rows:
-            {
-                "table_name": [
-                    {"col1": val1, "col2": val2, ...},
-                    ...
-                ]
-            }
+            Dictionary mapping table names to lists of row dictionaries
         """
-        tables_result = self.client.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        )
+        client = TursoClient(database_name)
+
+        # Get all tables
+        table_names = client.get_table_names()
 
         samples = {}
-
-        for row in tables_result["rows"]:
-            table_name = row[0]
-            samples[table_name] = self.client.sample_table(table_name, limit)
+        for table_name in table_names:
+            # Sample rows
+            rows = client.sample_table(f"`{table_name}`", limit=limit)
+            samples[table_name] = rows
 
         return samples
-
-    def sample_table(self, table_name: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """
-        Sample data from a specific table
-
-        Args:
-            table_name: Name of the table
-            limit: Maximum rows to return
-
-        Returns:
-            List of row dictionaries
-        """
-        return self.client.sample_table(table_name, limit)
-
-    def get_table_info(self, table_name: str) -> Dict[str, Any]:
-        """
-        Get detailed information about a specific table
-
-        Args:
-            table_name: Name of the table
-
-        Returns:
-            Table information dictionary
-        """
-        return self._extract_table_schema(table_name)
-
-    def test_connection(self) -> bool:
-        """
-        Test connection to Turso database
-
-        Returns:
-            True if connection successful
-
-        Raises:
-            RuntimeError: If connection fails
-        """
-        return self.client.test_connection()

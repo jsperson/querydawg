@@ -57,12 +57,74 @@ htmlcov/
 
 # Spider dataset (large files)
 data/spider/spider-fixed.zip
-data/spider/database/
 data/spider/*.json
 # Exception: Keep the dev.json dataset (required for benchmarks)
 !data/spider/dev.json
 data/spider/*.sql
-data/spider/**/*.sqlite
+
+# Keep schema.sql and .sqlite files for our 20 benchmark databases ONLY
+# (needed for semantic layer generation with correct case preservation)
+# Ignore all databases first
+data/spider/database/
+
+# Then explicitly allow only the 20 benchmark databases
+!data/spider/database/battle_death/
+!data/spider/database/battle_death/*.sqlite
+!data/spider/database/battle_death/schema.sql
+!data/spider/database/car_1/
+!data/spider/database/car_1/*.sqlite
+!data/spider/database/concert_singer/
+!data/spider/database/concert_singer/*.sqlite
+!data/spider/database/concert_singer/schema.sql
+!data/spider/database/course_teach/
+!data/spider/database/course_teach/*.sqlite
+!data/spider/database/course_teach/schema.sql
+!data/spider/database/cre_Doc_Template_Mgt/
+!data/spider/database/cre_Doc_Template_Mgt/*.sqlite
+!data/spider/database/cre_Doc_Template_Mgt/schema.sql
+!data/spider/database/dog_kennels/
+!data/spider/database/dog_kennels/*.sqlite
+!data/spider/database/dog_kennels/schema.sql
+!data/spider/database/employee_hire_evaluation/
+!data/spider/database/employee_hire_evaluation/*.sqlite
+!data/spider/database/employee_hire_evaluation/schema.sql
+!data/spider/database/flight_2/
+!data/spider/database/flight_2/*.sqlite
+!data/spider/database/museum_visit/
+!data/spider/database/museum_visit/*.sqlite
+!data/spider/database/museum_visit/schema.sql
+!data/spider/database/network_1/
+!data/spider/database/network_1/*.sqlite
+!data/spider/database/network_1/schema.sql
+!data/spider/database/orchestra/
+!data/spider/database/orchestra/*.sqlite
+!data/spider/database/orchestra/schema.sql
+!data/spider/database/pets_1/
+!data/spider/database/pets_1/*.sqlite
+!data/spider/database/pets_1/schema.sql
+!data/spider/database/poker_player/
+!data/spider/database/poker_player/*.sqlite
+!data/spider/database/poker_player/schema.sql
+!data/spider/database/real_estate_properties/
+!data/spider/database/real_estate_properties/*.sqlite
+!data/spider/database/real_estate_properties/schema.sql
+!data/spider/database/singer/
+!data/spider/database/singer/*.sqlite
+!data/spider/database/singer/schema.sql
+!data/spider/database/student_transcripts_tracking/
+!data/spider/database/student_transcripts_tracking/*.sqlite
+!data/spider/database/student_transcripts_tracking/schema.sql
+!data/spider/database/tvshow/
+!data/spider/database/tvshow/*.sqlite
+!data/spider/database/tvshow/schema.sql
+!data/spider/database/voter_1/
+!data/spider/database/voter_1/*.sqlite
+!data/spider/database/world_1/
+!data/spider/database/world_1/*.sqlite
+
+# Note: wta_1 excluded due to 100MB+ file size (exceeds GitHub limit)
+# wta_1 semantic layer can be generated on Railway using Supabase data
+
 # Keep only the main README
 !data/spider/README.txt
 

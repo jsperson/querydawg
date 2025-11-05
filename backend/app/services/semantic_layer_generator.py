@@ -4,7 +4,8 @@ Semantic Layer Generator
 Generates natural language documentation (semantic layers) for databases
 using LLM analysis of schema and sample data.
 
-Uses Supabase PostgreSQL as the source for schema and data extraction.
+Uses local SQLite files for schema extraction (preserving case) and
+Supabase PostgreSQL for sample data extraction.
 """
 
 import json
@@ -13,6 +14,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 from .llm.base import LLMProvider
+from ..database.sqlite_schema_extractor import SQLiteSchemaExtractor
 from ..database.supabase_schema_extractor import SupabaseSchemaExtractor
 
 
@@ -24,23 +26,29 @@ class SemanticLayerGenerator:
         llm: LLMProvider,
         database_url: str,
         custom_instructions: Optional[str] = None,
-        sample_rows: int = 10
+        sample_rows: int = 10,
+        spider_data_path: str = "data/spider/database"
     ):
         """
         Initialize the semantic layer generator.
 
         Args:
             llm: LLM provider instance to use for generation
-            database_url: Supabase PostgreSQL connection string
+            database_url: Supabase PostgreSQL connection string (for sample data)
             custom_instructions: Optional custom instructions to add to prompt
             sample_rows: Number of sample rows to extract per table
+            spider_data_path: Path to local Spider database files (for schema extraction)
         """
         self.llm = llm
         self.database_url = database_url
         self.custom_instructions = custom_instructions or ""
         self.sample_rows = sample_rows
-        # Don't use Spider metadata files - Supabase already has all FKs from data load
-        self.schema_extractor = SupabaseSchemaExtractor(database_url, use_spider_metadata=False)
+
+        # Use SQLite for schema extraction (preserves original case)
+        self.sqlite_extractor = SQLiteSchemaExtractor(spider_data_path)
+
+        # Use Supabase for sample data extraction
+        self.supabase_extractor = SupabaseSchemaExtractor(database_url, use_spider_metadata=False)
 
     def generate(
         self,
@@ -52,18 +60,20 @@ class SemanticLayerGenerator:
         Generate semantic layer for a database.
 
         Args:
-            database_name: Name of the database schema in Supabase (e.g., 'world_1')
+            database_name: Name of the database (e.g., 'world_1', 'network_1')
             anonymize: If True, use anonymous database name in prompt
             save_prompt: If True, include the prompt in the output
 
         Returns:
             Dictionary containing semantic layer and metadata
         """
-        # Extract schema from Supabase
-        schema_info = self.schema_extractor.extract_schema(database_name)
+        # Extract schema from local SQLite file (preserves original case)
+        print(f"Extracting schema from local SQLite file for {database_name}...")
+        schema_info = self.sqlite_extractor.extract_schema(database_name)
 
-        # Sample data from each table in Supabase
-        sample_data = self.schema_extractor.sample_all_tables(
+        # Sample data from Supabase (has actual data)
+        print(f"Sampling data from Supabase for {database_name}...")
+        sample_data = self.supabase_extractor.sample_all_tables(
             database_name,
             limit=self.sample_rows
         )
@@ -149,17 +159,17 @@ class SemanticLayerGenerator:
         Useful for previewing what will be sent to the LLM before generation.
 
         Args:
-            database_name: Name of the database schema in Supabase (e.g., 'world_1')
+            database_name: Name of the database (e.g., 'world_1', 'network_1')
             anonymize: If True, use anonymous database name in prompt
 
         Returns:
             Dictionary containing the prompt and metadata
         """
-        # Extract schema from Supabase
-        schema_info = self.schema_extractor.extract_schema(database_name)
+        # Extract schema from local SQLite file (preserves original case)
+        schema_info = self.sqlite_extractor.extract_schema(database_name)
 
-        # Sample data from each table in Supabase
-        sample_data = self.schema_extractor.sample_all_tables(
+        # Sample data from Supabase (has actual data)
+        sample_data = self.supabase_extractor.sample_all_tables(
             database_name,
             limit=self.sample_rows
         )
@@ -258,6 +268,40 @@ Some column names appear in multiple tables with different meanings.
 - orders.status: Current fulfillment status (pending, shipped, delivered)
 - customers.status: Account status (active, inactive, suspended)
 - Usage: Always qualify which table's status is needed for the query
+
+SQL QUERY GENERATION BEST PRACTICES:
+When creating query_guidelines, include these critical SQL best practices:
+
+**SELECT Clause:**
+- ALWAYS specify explicit column names, NEVER use SELECT *
+- When a question asks for specific values AND counts, include BOTH in SELECT
+  Example: "show customer names and order counts" → SELECT customer_name, COUNT(*)
+- Avoid selecting unnecessary columns that aren't mentioned in the question
+
+**GROUP BY Clause:**
+- ALWAYS GROUP BY unique identifiers (IDs), NEVER by display names or descriptions
+- Names/descriptions can have duplicates, leading to incorrect aggregation
+  Example: GROUP BY customer_id (correct), NOT GROUP BY customer_name (wrong)
+- Even if SELECT includes name, GROUP BY the ID and include name in SELECT
+
+**JOIN Type:**
+- Use INNER JOIN when the question implies "among entities that have a relationship"
+  Example: "customer with most orders" means customers WHO HAVE orders (INNER JOIN)
+- Use LEFT JOIN ONLY when explicitly asked to include entities without relationships
+  Example: "all customers and their order counts, including those with no orders"
+- Default to INNER JOIN unless question clearly asks for "all" or "including those without"
+
+**JOIN Column Selection (Bridge Tables):**
+- For directional relationships, specify WHICH foreign key column to use
+- Example in friendship table with student_id and friend_id:
+  * "friends OF John" → WHERE student_id = John's ID, JOIN ON friend_id
+  * "students who are friends WITH Mary" → WHERE friend_id = Mary's ID, JOIN ON student_id
+
+**Column Name Synonyms:**
+- Avoid ambiguous synonyms that match partial words in column names
+- BAD: "Degree ID" for degree_program_id (too similar to "degree")
+- GOOD: "Program Identifier" for degree_program_id (unambiguous)
+- Synonyms should be complete, distinct alternatives, not word fragments
 
 ANALYSIS APPROACH:
 Think step-by-step before generating output:
@@ -376,6 +420,11 @@ QUALITY REQUIREMENTS:
 - Completeness: Cover all tables and meaningful columns with business context
 - Specificity: Be concrete (e.g., "customer's shipping address" not just "address")
 - Rich synonyms: Include 3-5 alternate terms users might use for each concept
+  * CRITICAL: Synonyms must be UNAMBIGUOUS and NOT match partial words from the column name
+  * DO NOT use synonyms that contain fragments of the actual column name
+  * BAD examples: "Degree ID" for degree_program_id, "Course ID" for course_id, "Student Name" for student_name_id
+  * GOOD examples: "Program Identifier" for degree_program_id, "Enrollment Code" for course_id, "Learner Full Name Identifier" for student_name_id
+  * Filter out any synonym that could be confused with the actual business concept vs the ID column
 - Query context: Explain how users typically filter/aggregate each field
 - Clear relationships: State the BUSINESS MEANING of each relationship (e.g., "links orders to customers")
 - Common values: Provide realistic example values users might reference (e.g., 'Active', 'Pending', 'USA')

@@ -267,39 +267,30 @@ Some column names appear in multiple tables with different meanings.
 - customers.status: Account status (active, inactive, suspended)
 - Usage: Always qualify which table's status is needed for the query
 
-SQL QUERY GENERATION BEST PRACTICES:
-When creating query_guidelines, include these critical SQL best practices:
+SQL QUERY GENERATION GUIDELINES:
+When creating query_guidelines, focus on ERROR PREVENTION, not prescriptive rules.
+Include only guidelines that prevent common mistakes specific to this schema:
 
-**SELECT Clause:**
-- ALWAYS specify explicit column names, NEVER use SELECT *
-- When a question asks for specific values AND counts, include BOTH in SELECT
-  Example: "show customer names and order counts" → SELECT customer_name, COUNT(*)
-- Avoid selecting unnecessary columns that aren't mentioned in the question
+**Critical Guidelines (always include):**
+- Use exact table and column names as shown in schema (case-sensitive)
+- Only SELECT columns explicitly mentioned in the question
+- Only JOIN tables when the question requires data from multiple tables
 
-**GROUP BY Clause:**
-- ALWAYS GROUP BY unique identifiers (IDs), NEVER by display names or descriptions
-- Names/descriptions can have duplicates, leading to incorrect aggregation
-  Example: GROUP BY customer_id (correct), NOT GROUP BY customer_name (wrong)
-- Even if SELECT includes name, GROUP BY the ID and include name in SELECT
+**Conditional Guidelines (include only if schema has these patterns):**
+- If schema has duplicate names across tables: "Specify table aliases for clarity"
+- If schema has bridge tables: "For many-to-many relationships, include the bridge table"
+- If schema has directional relationships (friend_id/student_id): "Match foreign key direction to question intent"
+- If schema has ID columns with similar name columns: "GROUP BY ID columns when aggregating, not name columns"
 
-**JOIN Type:**
-- Use INNER JOIN when the question implies "among entities that have a relationship"
-  Example: "customer with most orders" means customers WHO HAVE orders (INNER JOIN)
-- Use LEFT JOIN ONLY when explicitly asked to include entities without relationships
-  Example: "all customers and their order counts, including those with no orders"
-- Default to INNER JOIN unless question clearly asks for "all" or "including those without"
+**Anti-Guidelines (NEVER include - these cause over-application):**
+- Do NOT say "ALWAYS use explicit columns" (causes LLM to add unrequested columns)
+- Do NOT say "Use INNER JOIN for relationships" (causes over-joining)
+- Do NOT say "NEVER use SELECT *" (too prescriptive)
 
-**JOIN Column Selection (Bridge Tables):**
-- For directional relationships, specify WHICH foreign key column to use
-- Example in friendship table with student_id and friend_id:
-  * "friends OF John" → WHERE student_id = John's ID, JOIN ON friend_id
-  * "students who are friends WITH Mary" → WHERE friend_id = Mary's ID, JOIN ON student_id
-
-**Column Name Synonyms:**
+**Synonym Guidance:**
 - Avoid ambiguous synonyms that match partial words in column names
 - BAD: "Degree ID" for degree_program_id (too similar to "degree")
 - GOOD: "Program Identifier" for degree_program_id (unambiguous)
-- Synonyms should be complete, distinct alternatives, not word fragments
 
 ANALYSIS APPROACH:
 Think step-by-step before generating output:

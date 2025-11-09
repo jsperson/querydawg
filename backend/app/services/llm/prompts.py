@@ -314,29 +314,16 @@ Use this semantic information to:
 Guidelines:
 1. {db_info['syntax_instruction']}
 2. {db_info['table_qualification']}
-3. **JOIN Types - Be Precise:**
-   - Use INNER JOIN when question implies "among those that have/with" or requires a relationship exists
-   - Use LEFT JOIN ONLY when explicitly asked to include entities "without" or "including those with no"
-   - Examples:
-     * "customers who placed orders" → INNER JOIN (only customers WITH orders)
-     * "contestants who got voted" → INNER JOIN (only contestants WITH votes)
-     * "all customers and their orders, including those with no orders" → LEFT JOIN
-4. **SELECT Only Requested Columns:**
-   - Only include columns explicitly mentioned in the question
-   - Do NOT add columns just because they're used in WHERE, ORDER BY, or GROUP BY
-   - Examples:
-     * "How many votes from NY or CA?" → SELECT COUNT(*), NOT SELECT state, COUNT(*)
-     * "What is the youngest pet's type and weight?" → SELECT type, weight, NOT SELECT type, age, weight
-5. Include proper WHERE clauses for filtering
-6. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
-7. Add ORDER BY and LIMIT clauses when relevant
-8. Use table aliases for clarity in multi-table queries
-9. **Ensure column references are unambiguous:**
+3. Include proper WHERE clauses for filtering
+4. Use aggregate functions (COUNT, SUM, AVG, etc.) when appropriate
+5. Add ORDER BY and LIMIT clauses when relevant
+6. Use table aliases for clarity in multi-table queries
+7. **Ensure column references are unambiguous:**
    - When a column name exists in multiple tables in a JOIN, ALWAYS qualify it
    - Use table.column or alias.column syntax
    - Example: If both `orders` and `customers` have a `status` column, use `orders.status`
    - Check the schema carefully for duplicate column names across tables
-10. **AGGREGATION vs SORTING (CRITICAL):**
+8. **AGGREGATION vs SORTING (CRITICAL):**
    - **DO NOT use MIN/MAX/SUM/AVG when questions ask "which/what/who X has the min/max/most/least Y"**
      - These questions want the IDENTIFIER (X), not the aggregated value
      - Use ORDER BY + LIMIT instead
@@ -349,8 +336,8 @@ Guidelines:
    - **Key distinction:**
      - "Which product has minimum price?" → wants product name (ORDER BY + LIMIT)
      - "What is the minimum price?" → wants the value (SELECT MIN)
-11. Return ONLY the SQL query without explanations or markdown formatting
-12. **CASE SENSITIVITY (SQLite CRITICAL):**
+9. Return ONLY the SQL query without explanations or markdown formatting
+10. **CASE SENSITIVITY (SQLite CRITICAL):**
     - SQLite is CASE-SENSITIVE for all table and column identifiers
     - You MUST use the EXACT case shown in the schema
     - Example: If schema shows "Customer_ID", use "Customer_ID" NOT "customer_id" or "CustomerID"

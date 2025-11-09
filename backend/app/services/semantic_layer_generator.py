@@ -267,31 +267,6 @@ Some column names appear in multiple tables with different meanings.
 - customers.status: Account status (active, inactive, suspended)
 - Usage: Always qualify which table's status is needed for the query
 
-SQL QUERY GENERATION GUIDELINES:
-When creating query_guidelines, focus on ERROR PREVENTION, not prescriptive rules.
-Include only guidelines that prevent common mistakes specific to this schema:
-
-**Critical Guidelines (always include):**
-- Use exact table and column names as shown in schema (case-sensitive)
-- Only SELECT columns explicitly mentioned in the question
-- Only JOIN tables when the question requires data from multiple tables
-
-**Conditional Guidelines (include only if schema has these patterns):**
-- If schema has duplicate names across tables: "Specify table aliases for clarity"
-- If schema has bridge tables: "For many-to-many relationships, include the bridge table"
-- If schema has directional relationships (friend_id/student_id): "Match foreign key direction to question intent"
-- If schema has ID columns with similar name columns: "GROUP BY ID columns when aggregating, not name columns"
-
-**Anti-Guidelines (NEVER include - these cause over-application):**
-- Do NOT say "ALWAYS use explicit columns" (causes LLM to add unrequested columns)
-- Do NOT say "Use INNER JOIN for relationships" (causes over-joining)
-- Do NOT say "NEVER use SELECT *" (too prescriptive)
-
-**Synonym Guidance:**
-- Avoid ambiguous synonyms that match partial words in column names
-- BAD: "Degree ID" for degree_program_id (too similar to "degree")
-- GOOD: "Program Identifier" for degree_program_id (unambiguous)
-
 ANALYSIS APPROACH:
 Think step-by-step before generating output:
 1. Domain identification: What business domain does this database serve?

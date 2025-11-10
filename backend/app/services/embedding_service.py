@@ -24,7 +24,7 @@ class EmbeddingService:
         'cross_table_patterns': 1.1,  # BOOST: Multi-table patterns are helpful
         'overview': 0.7,           # PENALIZE: Generic overviews less specific
         'ambiguities': 0.6,        # PENALIZE: Ambiguities add noise
-        'guidelines': 0.8,         # PENALIZE: Generic guidelines less specific
+        # NOTE: 'guidelines' removed - now frozen in system prompt instead
     }
 
     def __init__(
@@ -69,7 +69,9 @@ class EmbeddingService:
         2. Table Documentation - One chunk per table with all its details
         3. Cross-Table Patterns - One chunk per pattern
         4. Ambiguities - One chunk with all ambiguities
-        5. Query Guidelines - One chunk with all guidelines
+
+        NOTE: Query guidelines are now frozen in the system prompt (prompts.py)
+              and are no longer embedded as database-specific chunks.
 
         Args:
             semantic_layer: The semantic layer JSON
@@ -235,25 +237,9 @@ Typical Questions:
                 }
             })
 
-        # 5. Query Guidelines
-        if semantic_layer.get("query_guidelines"):
-            text_parts = [f"Query Guidelines for {database_name}:", ""]
-
-            for guideline in semantic_layer["query_guidelines"]:
-                if isinstance(guideline, str):
-                    text_parts.append(f"- {guideline}")
-                elif isinstance(guideline, dict):
-                    text_parts.append(f"- {guideline.get('guideline', guideline)}")
-
-            chunks.append({
-                "id": self._generate_id(database_name, "guidelines"),
-                "text": "\n".join(text_parts),
-                "metadata": {
-                    "database": database_name,
-                    "chunk_type": "guidelines",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            })
+        # NOTE: Query guidelines are now frozen in the system prompt (prompts.py)
+        # We no longer create database-specific guideline chunks
+        # This prevents non-deterministic guideline generation
 
         return chunks
 

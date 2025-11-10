@@ -112,6 +112,16 @@ def main():
 
             semantic_layer = full_layer['semantic_layer']
 
+            # Delete old vectors first to avoid orphaned chunks (e.g., old guideline chunks)
+            normalized_name = database_name.lower()
+            print(f"🗑️  Deleting old vectors for {database_name}...")
+            try:
+                embedding_service.delete_database_embeddings(normalized_name)
+                print(f"   ✅ Old vectors deleted")
+            except Exception as delete_error:
+                print(f"   ⚠️  Warning: Could not delete old vectors: {delete_error}")
+                print(f"   Continuing with embedding anyway...")
+
             # Embed and upload
             result = embedding_service.embed_semantic_layer(
                 semantic_layer=semantic_layer,

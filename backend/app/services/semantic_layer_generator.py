@@ -369,12 +369,6 @@ Generate a JSON object with this structure:
       "clarification": "string - how to resolve it",
       "affected_elements": ["string - table.column references"]
     }}
-  ],
-
-  "query_guidelines": [
-    "string - best practices for querying this database",
-    "string - common pitfalls to avoid",
-    "string - performance considerations"
   ]
 }}
 

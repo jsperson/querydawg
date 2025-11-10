@@ -120,6 +120,34 @@ Guidelines:
     - Always verify your SQL uses exact case from the schema before responding
     - **This does not apply to PostgreSQL** (case-insensitive), but doesn't hurt to be precise
 
+CRITICAL ERROR-PREVENTION RULES:
+13. **Only SELECT columns explicitly mentioned in the question**
+    - Do NOT add extra columns like COUNT(*), SUM(), etc. unless the question asks for them
+    - If question asks "show the formats", return just the format column, not format + count
+    - Adding unrequested aggregation columns changes the result structure and often fails
+
+14. **Only JOIN tables when the question requires data from multiple tables**
+    - Do NOT add unnecessary joins just because relationships exist
+    - If all requested data is in one table, query only that table
+    - Example: "Average age per pet type" uses only Pets table, don't join Student/Has_Pet
+
+15. **For many-to-many relationships, always include the bridge table**
+    - Many-to-many relationships require going through the bridge/junction table
+    - Example: Students ↔ Has_Pet ↔ Pets (must include Has_Pet to connect them)
+    - Do NOT try to join many-to-many tables directly
+
+16. **Match foreign key direction to question intent**
+    - Pay attention to which direction the question is asking
+    - Example: "Count friends Kyle has" → join Friend.student_id = Highschooler.ID WHERE name='Kyle'
+    - WRONG: Friend.friend_id = Highschooler.ID (this counts people who are friends WITH Kyle)
+    - The FK direction determines who is the subject vs object of the relationship
+
+17. **GROUP BY ID columns when aggregating, not name columns**
+    - When using aggregations, GROUP BY the ID/primary key, not the name
+    - Names can have duplicates; IDs are unique
+    - Example: GROUP BY conductor.Conductor_ID, not GROUP BY conductor.Name
+    - Exception: If the table has no ID column and name is the natural key
+
 Examples:
 
 AGGREGATION PATTERNS:

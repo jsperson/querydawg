@@ -1,0 +1,1020 @@
+{
+  "tables": [
+    {
+      "name": "car_makers",
+      "columns": [
+        {
+          "name": "Id",
+          "synonyms": [
+            "Manufacturer ID",
+            "Car Maker ID",
+            "Company ID"
+          ],
+          "aggregations": [],
+          "business_name": "Manufacturer Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "car_makers",
+            "appears_in_tables": [
+              "car_makers",
+              "model_list"
+            ],
+            "directional_guidance": "Use car_makers.Id when the question is about the manufacturer itself. Use model_list.Maker when the question is about models produced by a manufacturer.",
+            "foreign_key_locations": [
+              "model_list"
+            ],
+            "subject_vs_relationship": "car_makers.Id = the manufacturer entity itself, model_list.Maker = models related to that manufacturer"
+          },
+          "typical_filters": [
+            "Id = ?",
+            "Id IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each car manufacturer."
+        },
+        {
+          "name": "Maker",
+          "synonyms": [
+            "Brand",
+            "Car Maker",
+            "Automaker"
+          ],
+          "aggregations": [],
+          "business_name": "Manufacturer Name",
+          "common_values": [
+            "AMC",
+            "Volkswagen",
+            "BMW"
+          ],
+          "disambiguation": {
+            "primary_location": "car_makers",
+            "appears_in_tables": [
+              "car_makers",
+              "car_names"
+            ],
+            "directional_guidance": "Use car_makers.Maker when the question is about the manufacturer itself. Use car_names.Make when the question is about specific car models.",
+            "foreign_key_locations": [
+              "car_names"
+            ],
+            "subject_vs_relationship": "car_makers.Maker = the manufacturer entity itself, car_names.Make = models related to that manufacturer"
+          },
+          "typical_filters": [
+            "Maker = ?",
+            "Maker LIKE ?"
+          ],
+          "business_meaning": "The short name of the car manufacturer."
+        },
+        {
+          "name": "FullName",
+          "synonyms": [
+            "Full Brand Name",
+            "Complete Company Name",
+            "Official Name"
+          ],
+          "aggregations": [],
+          "business_name": "Full Manufacturer Name",
+          "common_values": [
+            "American Motor Company",
+            "Volkswagen",
+            "BMW"
+          ],
+          "disambiguation": {
+            "primary_location": "car_makers",
+            "appears_in_tables": [
+              "car_makers"
+            ],
+            "directional_guidance": "Use car_makers.FullName when the question is about the full name of the manufacturer.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "car_makers.FullName = the full name of the manufacturer"
+          },
+          "typical_filters": [
+            "FullName = ?",
+            "FullName LIKE ?"
+          ],
+          "business_meaning": "The complete name of the car manufacturer."
+        },
+        {
+          "name": "Country",
+          "synonyms": [
+            "Origin Country",
+            "Home Country",
+            "Nation"
+          ],
+          "aggregations": [],
+          "business_name": "Country of Origin",
+          "common_values": [
+            "USA",
+            "Germany",
+            "Japan"
+          ],
+          "disambiguation": {
+            "primary_location": "countries",
+            "appears_in_tables": [
+              "car_makers",
+              "countries"
+            ],
+            "directional_guidance": "Use countries.CountryId when the question is about the country itself. Use car_makers.Country when the question is about the country of a manufacturer.",
+            "foreign_key_locations": [
+              "car_makers"
+            ],
+            "subject_vs_relationship": "countries.CountryId = the country entity itself, car_makers.Country = the country related to a manufacturer"
+          },
+          "typical_filters": [
+            "Country = ?",
+            "Country IN (?)"
+          ],
+          "business_meaning": "The country where the car manufacturer is based."
+        }
+      ],
+      "purpose": "This table represents companies that manufacture cars, including their names and countries of origin.",
+      "business_name": "Car Manufacturers",
+      "relationships": [
+        {
+          "column": "Country",
+          "when_to_use": [
+            "Questions about the country of a car manufacturer",
+            "Finding manufacturers in a specific country",
+            "Listing countries with car manufacturers"
+          ],
+          "join_pattern": "car_makers.Country = countries.CountryId",
+          "vs_confusion": "DO NOT confuse with continents.ContId (that's for continents, not countries)",
+          "common_mistakes": [
+            "DO NOT assume all manufacturers are from the same country"
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links car manufacturers to their country of origin",
+          "references_table": "countries",
+          "relationship_type": "many-to-one",
+          "complete_join_path": []
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which car manufacturers are based in Germany?",
+          "explanation": "Filter car_makers by the country column where it matches Germany's CountryId.",
+          "involves_joins": [
+            "countries"
+          ]
+        },
+        {
+          "question": "What is the full name of the manufacturer for a given maker?",
+          "explanation": "Select FullName from car_makers where Maker matches the given maker.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "car_names",
+      "columns": [
+        {
+          "name": "MakeId",
+          "synonyms": [
+            "Model ID",
+            "Car Model ID",
+            "Vehicle ID"
+          ],
+          "aggregations": [],
+          "business_name": "Model Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "car_names",
+            "appears_in_tables": [
+              "car_names",
+              "cars_data"
+            ],
+            "directional_guidance": "Use car_names.MakeId when the question is about the model itself. Use cars_data.Id when the question is about specifications of a model.",
+            "foreign_key_locations": [
+              "cars_data"
+            ],
+            "subject_vs_relationship": "car_names.MakeId = the model entity itself, cars_data.Id = specifications related to that model"
+          },
+          "typical_filters": [
+            "MakeId = ?",
+            "MakeId IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each car model."
+        },
+        {
+          "name": "Model",
+          "synonyms": [
+            "Car Model",
+            "Vehicle Model",
+            "Model Type"
+          ],
+          "aggregations": [],
+          "business_name": "Model Name",
+          "common_values": [
+            "Chevrolet",
+            "Buick",
+            "Plymouth"
+          ],
+          "disambiguation": {
+            "primary_location": "model_list",
+            "appears_in_tables": [
+              "car_names",
+              "model_list"
+            ],
+            "directional_guidance": "Use model_list.Model when the question is about the model itself. Use car_names.Model when the question is about the model in relation to its make.",
+            "foreign_key_locations": [
+              "car_names"
+            ],
+            "subject_vs_relationship": "model_list.Model = the model entity itself, car_names.Model = the model related to a make"
+          },
+          "typical_filters": [
+            "Model = ?",
+            "Model LIKE ?"
+          ],
+          "business_meaning": "The name of the car model."
+        },
+        {
+          "name": "Make",
+          "synonyms": [
+            "Full Model Name",
+            "Complete Model Name",
+            "Model Description"
+          ],
+          "aggregations": [],
+          "business_name": "Model Full Name",
+          "common_values": [
+            "Chevrolet Chevelle Malibu",
+            "Buick Skylark 320",
+            "Plymouth Satellite"
+          ],
+          "disambiguation": {
+            "primary_location": "car_names",
+            "appears_in_tables": [
+              "car_names"
+            ],
+            "directional_guidance": "Use car_names.Make when the question is about the full name of the model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "car_names.Make = the full name of the model"
+          },
+          "typical_filters": [
+            "Make = ?",
+            "Make LIKE ?"
+          ],
+          "business_meaning": "The full name of the car model, including the make."
+        }
+      ],
+      "purpose": "This table represents specific car models and their associated manufacturers.",
+      "business_name": "Car Models",
+      "relationships": [
+        {
+          "column": "Model",
+          "when_to_use": [
+            "Questions about the model details",
+            "Finding models by a specific maker",
+            "Listing all models in the database"
+          ],
+          "join_pattern": "car_names.Model = model_list.Model",
+          "vs_confusion": "DO NOT confuse with car_makers.Maker (that's for manufacturers, not models)",
+          "common_mistakes": [
+            "DO NOT assume all models have the same specifications"
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links car models to their detailed information",
+          "references_table": "model_list",
+          "relationship_type": "many-to-one",
+          "complete_join_path": []
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What models are produced by AMC?",
+          "explanation": "Filter car_names by the Maker column where it matches AMC.",
+          "involves_joins": []
+        },
+        {
+          "question": "What is the full name of the model for a given MakeId?",
+          "explanation": "Select Make from car_names where MakeId matches the given ID.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "cars_data",
+      "columns": [
+        {
+          "name": "Id",
+          "synonyms": [
+            "Spec ID",
+            "Car Spec ID",
+            "Vehicle Spec ID"
+          ],
+          "aggregations": [],
+          "business_name": "Specification Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data",
+              "car_names"
+            ],
+            "directional_guidance": "Use cars_data.Id when the question is about the specifications themselves. Use car_names.MakeId when the question is about the model related to these specifications.",
+            "foreign_key_locations": [
+              "car_names"
+            ],
+            "subject_vs_relationship": "cars_data.Id = the specifications entity itself, car_names.MakeId = the model related to these specifications"
+          },
+          "typical_filters": [
+            "Id = ?",
+            "Id IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each set of car specifications."
+        },
+        {
+          "name": "MPG",
+          "synonyms": [
+            "Fuel Efficiency",
+            "Gas Mileage",
+            "Miles/Gallon"
+          ],
+          "aggregations": [
+            "AVG(MPG)",
+            "MAX(MPG)",
+            "MIN(MPG)"
+          ],
+          "business_name": "Miles Per Gallon",
+          "common_values": [
+            "18.0",
+            "15.0",
+            "16.0"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.MPG when the question is about the fuel efficiency of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.MPG = the fuel efficiency of the car model"
+          },
+          "typical_filters": [
+            "MPG = ?",
+            "MPG > ?",
+            "MPG < ?"
+          ],
+          "business_meaning": "The fuel efficiency of the car model, measured in miles per gallon."
+        },
+        {
+          "name": "Cylinders",
+          "synonyms": [
+            "Engine Cylinders",
+            "Cylinder Count",
+            "Cylinders"
+          ],
+          "aggregations": [
+            "AVG(Cylinders)",
+            "MAX(Cylinders)",
+            "MIN(Cylinders)"
+          ],
+          "business_name": "Number of Cylinders",
+          "common_values": [
+            "4",
+            "6",
+            "8"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Cylinders when the question is about the engine configuration of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Cylinders = the engine configuration of the car model"
+          },
+          "typical_filters": [
+            "Cylinders = ?",
+            "Cylinders > ?",
+            "Cylinders < ?"
+          ],
+          "business_meaning": "The number of cylinders in the car's engine."
+        },
+        {
+          "name": "Edispl",
+          "synonyms": [
+            "Engine Size",
+            "Displacement",
+            "Engine Volume"
+          ],
+          "aggregations": [
+            "AVG(Edispl)",
+            "MAX(Edispl)",
+            "MIN(Edispl)"
+          ],
+          "business_name": "Engine Displacement",
+          "common_values": [
+            "2.0",
+            "3.5",
+            "4.0"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Edispl when the question is about the engine size of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Edispl = the engine size of the car model"
+          },
+          "typical_filters": [
+            "Edispl = ?",
+            "Edispl > ?",
+            "Edispl < ?"
+          ],
+          "business_meaning": "The total volume of all the cylinders in the car's engine, measured in liters."
+        },
+        {
+          "name": "Horsepower",
+          "synonyms": [
+            "Power Output",
+            "HP",
+            "Engine Power"
+          ],
+          "aggregations": [
+            "AVG(Horsepower)",
+            "MAX(Horsepower)",
+            "MIN(Horsepower)"
+          ],
+          "business_name": "Engine Horsepower",
+          "common_values": [
+            "130",
+            "150",
+            "200"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Horsepower when the question is about the power output of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Horsepower = the power output of the car model"
+          },
+          "typical_filters": [
+            "Horsepower = ?",
+            "Horsepower > ?",
+            "Horsepower < ?"
+          ],
+          "business_meaning": "The power output of the car's engine, measured in horsepower."
+        },
+        {
+          "name": "Weight",
+          "synonyms": [
+            "Vehicle Weight",
+            "Mass",
+            "Car Mass"
+          ],
+          "aggregations": [
+            "AVG(Weight)",
+            "MAX(Weight)",
+            "MIN(Weight)"
+          ],
+          "business_name": "Car Weight",
+          "common_values": [
+            "3500",
+            "4000",
+            "4500"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Weight when the question is about the weight of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Weight = the weight of the car model"
+          },
+          "typical_filters": [
+            "Weight = ?",
+            "Weight > ?",
+            "Weight < ?"
+          ],
+          "business_meaning": "The weight of the car model, measured in pounds."
+        },
+        {
+          "name": "Accelerate",
+          "synonyms": [
+            "0-60 Time",
+            "Acceleration Time",
+            "Speed Up Time"
+          ],
+          "aggregations": [
+            "AVG(Accelerate)",
+            "MAX(Accelerate)",
+            "MIN(Accelerate)"
+          ],
+          "business_name": "Acceleration",
+          "common_values": [
+            "10.0",
+            "12.0",
+            "15.0"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Accelerate when the question is about the acceleration performance of a car model.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Accelerate = the acceleration performance of the car model"
+          },
+          "typical_filters": [
+            "Accelerate = ?",
+            "Accelerate > ?",
+            "Accelerate < ?"
+          ],
+          "business_meaning": "The time it takes for the car to accelerate from 0 to 60 mph, measured in seconds."
+        },
+        {
+          "name": "Year",
+          "synonyms": [
+            "Manufacture Year",
+            "Production Year",
+            "Year of Make"
+          ],
+          "aggregations": [
+            "AVG(Year)",
+            "MAX(Year)",
+            "MIN(Year)"
+          ],
+          "business_name": "Model Year",
+          "common_values": [
+            "1970",
+            "1980",
+            "1990"
+          ],
+          "disambiguation": {
+            "primary_location": "cars_data",
+            "appears_in_tables": [
+              "cars_data"
+            ],
+            "directional_guidance": "Use cars_data.Year when the question is about the year a car model was manufactured.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "cars_data.Year = the year of manufacture for the car model"
+          },
+          "typical_filters": [
+            "Year = ?",
+            "Year > ?",
+            "Year < ?"
+          ],
+          "business_meaning": "The year the car model was manufactured."
+        }
+      ],
+      "purpose": "This table contains detailed specifications for each car model, such as MPG, horsepower, and weight.",
+      "business_name": "Car Specifications",
+      "relationships": [
+        {
+          "column": "Id",
+          "when_to_use": [
+            "Questions about the specifications of a car model",
+            "Finding specifications for a specific model",
+            "Listing all specifications in the database"
+          ],
+          "join_pattern": "cars_data.Id = car_names.MakeId",
+          "vs_confusion": "DO NOT confuse with car_makers.Id (that's for manufacturers, not models)",
+          "common_mistakes": [
+            "DO NOT assume all models have the same specifications"
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links car specifications to their respective models",
+          "references_table": "car_names",
+          "relationship_type": "many-to-one",
+          "complete_join_path": []
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the specifications for the Chevrolet Chevelle Malibu?",
+          "explanation": "Join cars_data with car_names on Id and MakeId, then filter by the Make column.",
+          "involves_joins": [
+            "car_names"
+          ]
+        },
+        {
+          "question": "What is the average MPG for cars manufactured in 1970?",
+          "explanation": "Filter cars_data by the Year column and calculate the average MPG.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "continents",
+      "columns": [
+        {
+          "name": "ContId",
+          "synonyms": [
+            "Continent ID",
+            "Continent Code",
+            "Continent Key"
+          ],
+          "aggregations": [],
+          "business_name": "Continent Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "continents",
+            "appears_in_tables": [
+              "continents",
+              "countries"
+            ],
+            "directional_guidance": "Use continents.ContId when the question is about the continent itself. Use countries.Continent when the question is about the continent related to a country.",
+            "foreign_key_locations": [
+              "countries"
+            ],
+            "subject_vs_relationship": "continents.ContId = the continent entity itself, countries.Continent = the continent related to a country"
+          },
+          "typical_filters": [
+            "ContId = ?",
+            "ContId IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each continent."
+        },
+        {
+          "name": "Continent",
+          "synonyms": [
+            "Continent",
+            "Region",
+            "Landmass"
+          ],
+          "aggregations": [],
+          "business_name": "Continent Name",
+          "common_values": [
+            "America",
+            "Europe",
+            "Asia"
+          ],
+          "disambiguation": {
+            "primary_location": "continents",
+            "appears_in_tables": [
+              "continents"
+            ],
+            "directional_guidance": "Use continents.Continent when the question is about the name of the continent.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "continents.Continent = the name of the continent"
+          },
+          "typical_filters": [
+            "Continent = ?",
+            "Continent LIKE ?"
+          ],
+          "business_meaning": "The name of the continent."
+        }
+      ],
+      "purpose": "This table represents the continents where countries are located.",
+      "business_name": "Continents",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which continents have car manufacturers?",
+          "explanation": "Join continents with countries and car_makers to find continents with manufacturers.",
+          "involves_joins": [
+            "countries",
+            "car_makers"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "countries",
+      "columns": [
+        {
+          "name": "CountryId",
+          "synonyms": [
+            "Country ID",
+            "Nation ID",
+            "Country Code"
+          ],
+          "aggregations": [],
+          "business_name": "Country Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "countries",
+            "appears_in_tables": [
+              "countries",
+              "car_makers"
+            ],
+            "directional_guidance": "Use countries.CountryId when the question is about the country itself. Use car_makers.Country when the question is about the country of a manufacturer.",
+            "foreign_key_locations": [
+              "car_makers"
+            ],
+            "subject_vs_relationship": "countries.CountryId = the country entity itself, car_makers.Country = the country related to a manufacturer"
+          },
+          "typical_filters": [
+            "CountryId = ?",
+            "CountryId IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each country."
+        },
+        {
+          "name": "CountryName",
+          "synonyms": [
+            "Nation",
+            "State",
+            "Country"
+          ],
+          "aggregations": [],
+          "business_name": "Country Name",
+          "common_values": [
+            "USA",
+            "Germany",
+            "Japan"
+          ],
+          "disambiguation": {
+            "primary_location": "countries",
+            "appears_in_tables": [
+              "countries"
+            ],
+            "directional_guidance": "Use countries.CountryName when the question is about the name of the country.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "countries.CountryName = the name of the country"
+          },
+          "typical_filters": [
+            "CountryName = ?",
+            "CountryName LIKE ?"
+          ],
+          "business_meaning": "The name of the country."
+        },
+        {
+          "name": "Continent",
+          "synonyms": [
+            "Continent",
+            "Region",
+            "Landmass"
+          ],
+          "aggregations": [],
+          "business_name": "Continent Association",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "continents",
+            "appears_in_tables": [
+              "countries",
+              "continents"
+            ],
+            "directional_guidance": "Use continents.ContId when the question is about the continent itself. Use countries.Continent when the question is about the continent related to a country.",
+            "foreign_key_locations": [
+              "countries"
+            ],
+            "subject_vs_relationship": "continents.ContId = the continent entity itself, countries.Continent = the continent related to a country"
+          },
+          "typical_filters": [
+            "Continent = ?",
+            "Continent IN (?)"
+          ],
+          "business_meaning": "The continent to which the country belongs."
+        }
+      ],
+      "purpose": "This table represents countries and their associated continents.",
+      "business_name": "Countries",
+      "relationships": [
+        {
+          "column": "Continent",
+          "when_to_use": [
+            "Questions about the continent of a country",
+            "Finding countries in a specific continent",
+            "Listing continents with countries"
+          ],
+          "join_pattern": "countries.Continent = continents.ContId",
+          "vs_confusion": "DO NOT confuse with car_makers.Country (that's for manufacturers, not continents)",
+          "common_mistakes": [
+            "DO NOT assume all countries are in the same continent"
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links countries to their respective continents",
+          "references_table": "continents",
+          "relationship_type": "many-to-one",
+          "complete_join_path": []
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which countries are in Europe?",
+          "explanation": "Filter countries by the Continent column where it matches Europe's ContId.",
+          "involves_joins": [
+            "continents"
+          ]
+        },
+        {
+          "question": "What continent is Germany in?",
+          "explanation": "Join countries with continents on Continent and ContId, then filter by CountryName.",
+          "involves_joins": [
+            "continents"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "model_list",
+      "columns": [
+        {
+          "name": "ModelId",
+          "synonyms": [
+            "Model ID",
+            "Car Model ID",
+            "Vehicle ID"
+          ],
+          "aggregations": [],
+          "business_name": "Model Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "model_list",
+            "appears_in_tables": [
+              "model_list"
+            ],
+            "directional_guidance": "Use model_list.ModelId when the question is about the model itself.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "model_list.ModelId = the model entity itself"
+          },
+          "typical_filters": [
+            "ModelId = ?",
+            "ModelId IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each car model."
+        },
+        {
+          "name": "Maker",
+          "synonyms": [
+            "Manufacturer ID",
+            "Car Maker ID",
+            "Company ID"
+          ],
+          "aggregations": [],
+          "business_name": "Manufacturer Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "car_makers",
+            "appears_in_tables": [
+              "model_list",
+              "car_makers"
+            ],
+            "directional_guidance": "Use car_makers.Id when the question is about the manufacturer itself. Use model_list.Maker when the question is about models produced by a manufacturer.",
+            "foreign_key_locations": [
+              "model_list"
+            ],
+            "subject_vs_relationship": "car_makers.Id = the manufacturer entity itself, model_list.Maker = models related to that manufacturer"
+          },
+          "typical_filters": [
+            "Maker = ?",
+            "Maker IN (?)"
+          ],
+          "business_meaning": "The identifier for the manufacturer of the car model."
+        },
+        {
+          "name": "Model",
+          "synonyms": [
+            "Car Model",
+            "Vehicle Model",
+            "Model Type"
+          ],
+          "aggregations": [],
+          "business_name": "Model Name",
+          "common_values": [
+            "AMC",
+            "Audi",
+            "BMW"
+          ],
+          "disambiguation": {
+            "primary_location": "model_list",
+            "appears_in_tables": [
+              "model_list",
+              "car_names"
+            ],
+            "directional_guidance": "Use model_list.Model when the question is about the model itself. Use car_names.Model when the question is about the model in relation to its make.",
+            "foreign_key_locations": [
+              "car_names"
+            ],
+            "subject_vs_relationship": "model_list.Model = the model entity itself, car_names.Model = the model related to a make"
+          },
+          "typical_filters": [
+            "Model = ?",
+            "Model LIKE ?"
+          ],
+          "business_meaning": "The name of the car model."
+        }
+      ],
+      "purpose": "This table provides a list of car models and their associated manufacturers.",
+      "business_name": "Model List",
+      "relationships": [
+        {
+          "column": "Maker",
+          "when_to_use": [
+            "Questions about the manufacturer of a model",
+            "Finding models by a specific manufacturer",
+            "Listing all models in the database"
+          ],
+          "join_pattern": "model_list.Maker = car_makers.Id",
+          "vs_confusion": "DO NOT confuse with car_names.Make (that's for models, not manufacturers)",
+          "common_mistakes": [
+            "DO NOT assume all models have the same manufacturer"
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links car models to their respective manufacturers",
+          "references_table": "car_makers",
+          "relationship_type": "many-to-one",
+          "complete_join_path": []
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What models are produced by BMW?",
+          "explanation": "Filter model_list by the Maker column where it matches BMW's Id.",
+          "involves_joins": [
+            "car_makers"
+          ]
+        },
+        {
+          "question": "What is the manufacturer for the model 'Audi'?",
+          "explanation": "Join model_list with car_makers on Maker and Id, then filter by the Model column.",
+          "involves_joins": [
+            "car_makers"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Automotive Industry",
+    "purpose": "This database is used to track information about car manufacturers, models, and specifications, as well as their geographical origins.",
+    "key_entities": [
+      "Car Makers",
+      "Car Models",
+      "Car Specifications",
+      "Countries",
+      "Continents"
+    ],
+    "typical_questions": [
+      "What are the specifications of a specific car model?",
+      "Which car makers are based in a particular country?",
+      "What models are produced by a specific car maker?",
+      "Which continent has the most car manufacturers?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Confusion between car model and manufacturer",
+      "example": "What is the horsepower of BMW?",
+      "clarification": "Clarify if the question is about a specific BMW model or the manufacturer in general.",
+      "affected_elements": [
+        "car_names.Model",
+        "car_makers.Maker"
+      ]
+    },
+    {
+      "issue": "Confusion between country and continent",
+      "example": "List all car makers in America.",
+      "clarification": "Determine if 'America' refers to the continent or the country (USA).",
+      "affected_elements": [
+        "countries.CountryName",
+        "continents.Continent"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-13T04:26:31.597573",
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Manufacturer and Model Details",
+      "tables_involved": [
+        "car_makers",
+        "countries",
+        "continents",
+        "model_list"
+      ],
+      "example_question": "What are the details of models produced by manufacturers in Europe?",
+      "typical_structure": "SELECT ... FROM car_makers JOIN countries ON car_makers.Country = countries.CountryId JOIN continents ON countries.Continent = continents.ContId JOIN model_list ON model_list.Maker = car_makers.Id WHERE continents.Continent = 'Europe'",
+      "key_considerations": [
+        "Ensure correct joins between car_makers, countries, and continents"
+      ]
+    }
+  ]
+}

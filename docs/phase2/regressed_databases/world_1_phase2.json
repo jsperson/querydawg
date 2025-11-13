@@ -1,0 +1,547 @@
+{
+  "tables": [
+    {
+      "name": "city",
+      "columns": [
+        {
+          "name": "ID",
+          "synonyms": [
+            "City Code",
+            "City Reference",
+            "Urban Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "City Identifier",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "disambiguation": {
+            "primary_location": "city",
+            "appears_in_tables": [
+              "city"
+            ],
+            "directional_guidance": "Use city.ID when identifying or referencing a specific city.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "city.ID = the city entity itself"
+          },
+          "typical_filters": [
+            "ID = ?",
+            "ID IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each city."
+        },
+        {
+          "name": "Name",
+          "synonyms": [
+            "Urban Name",
+            "Municipality Name",
+            "City Title"
+          ],
+          "aggregations": [],
+          "business_name": "City Name",
+          "common_values": [
+            "Kabul",
+            "Amsterdam",
+            "Herat"
+          ],
+          "disambiguation": {
+            "primary_location": "city",
+            "appears_in_tables": [
+              "city"
+            ],
+            "directional_guidance": "Use city.Name when querying or filtering by the name of a city.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "city.Name = the name of the city itself"
+          },
+          "typical_filters": [
+            "Name = ?",
+            "Name LIKE ?"
+          ],
+          "business_meaning": "The name of the city."
+        },
+        {
+          "name": "CountryCode",
+          "synonyms": [
+            "Nation Code",
+            "Country Identifier",
+            "Country Abbreviation"
+          ],
+          "aggregations": [],
+          "business_name": "Country Code",
+          "common_values": [
+            "AFG",
+            "NLD",
+            "USA"
+          ],
+          "disambiguation": {
+            "primary_location": "country",
+            "appears_in_tables": [
+              "city",
+              "countrylanguage"
+            ],
+            "directional_guidance": "Use city.CountryCode when identifying the country a city belongs to.",
+            "foreign_key_locations": [
+              "city",
+              "countrylanguage"
+            ],
+            "subject_vs_relationship": "country.Code = the country entity itself, city.CountryCode = relationship to the country"
+          },
+          "typical_filters": [
+            "CountryCode = ?",
+            "CountryCode IN (?)"
+          ],
+          "business_meaning": "The code representing the country to which the city belongs."
+        },
+        {
+          "name": "District",
+          "synonyms": [
+            "Region",
+            "Area",
+            "Zone"
+          ],
+          "aggregations": [],
+          "business_name": "District",
+          "common_values": [
+            "Kabol",
+            "Noord-Holland",
+            "Balkh"
+          ],
+          "disambiguation": {
+            "primary_location": "city",
+            "appears_in_tables": [
+              "city"
+            ],
+            "directional_guidance": "Use city.District when querying or filtering by the district of a city.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "city.District = the district of the city itself"
+          },
+          "typical_filters": [
+            "District = ?",
+            "District LIKE ?"
+          ],
+          "business_meaning": "The administrative district within which the city is located."
+        },
+        {
+          "name": "Population",
+          "synonyms": [
+            "Inhabitants",
+            "Residents",
+            "City Demographics"
+          ],
+          "aggregations": [
+            "SUM(Population)",
+            "AVG(Population)"
+          ],
+          "business_name": "City Population",
+          "common_values": [
+            "1780000",
+            "237500",
+            "731200"
+          ],
+          "disambiguation": {
+            "primary_location": "N/A",
+            "appears_in_tables": [
+              "city",
+              "country"
+            ],
+            "directional_guidance": "Use city.Population for city-specific population queries.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "city.Population = population of the city, country.Population = population of the country"
+          },
+          "typical_filters": [
+            "Population > ?",
+            "Population < ?"
+          ],
+          "business_meaning": "The number of people living in the city."
+        }
+      ],
+      "purpose": "Represents individual cities within countries, including demographic and geographic information.",
+      "business_name": "City",
+      "relationships": [
+        {
+          "column": "CountryCode",
+          "when_to_use": [
+            "Questions about which country a city belongs to",
+            "Questions about cities within a specific country",
+            "Questions about the population of cities in a country"
+          ],
+          "join_pattern": "city.CountryCode = country.Code",
+          "vs_confusion": "DO NOT confuse with countrylanguage.CountryCode, which relates to languages spoken in a country",
+          "common_mistakes": [
+            "DO NOT assume city.CountryCode is unique to cities; it references countries."
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links each city to its corresponding country.",
+          "references_table": "country",
+          "relationship_type": "many-to-one",
+          "complete_join_path": [
+            "city \u2192 country"
+          ]
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What is the population of Amsterdam?",
+          "explanation": "Query the city table filtering by Name to find the population.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which cities are in the Netherlands?",
+          "explanation": "Join city with country on CountryCode and filter by country.Name.",
+          "involves_joins": [
+            "country"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "country",
+      "columns": [
+        {
+          "name": "Code",
+          "synonyms": [
+            "Nation Code",
+            "Country Identifier",
+            "Country Abbreviation"
+          ],
+          "aggregations": [],
+          "business_name": "Country Code",
+          "common_values": [
+            "AFG",
+            "NLD",
+            "USA"
+          ],
+          "disambiguation": {
+            "primary_location": "country",
+            "appears_in_tables": [
+              "country",
+              "city",
+              "countrylanguage"
+            ],
+            "directional_guidance": "Use country.Code when identifying or referencing a specific country.",
+            "foreign_key_locations": [
+              "city",
+              "countrylanguage"
+            ],
+            "subject_vs_relationship": "country.Code = the country entity itself, city.CountryCode = relationship to the country"
+          },
+          "typical_filters": [
+            "Code = ?",
+            "Code IN (?)"
+          ],
+          "business_meaning": "A unique code representing each country."
+        },
+        {
+          "name": "Name",
+          "synonyms": [
+            "Nation Name",
+            "Country Title",
+            "State Name"
+          ],
+          "aggregations": [],
+          "business_name": "Country Name",
+          "common_values": [
+            "Afghanistan",
+            "Netherlands",
+            "United States"
+          ],
+          "disambiguation": {
+            "primary_location": "country",
+            "appears_in_tables": [
+              "country"
+            ],
+            "directional_guidance": "Use country.Name when querying or filtering by the name of a country.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "country.Name = the name of the country itself"
+          },
+          "typical_filters": [
+            "Name = ?",
+            "Name LIKE ?"
+          ],
+          "business_meaning": "The name of the country."
+        },
+        {
+          "name": "Population",
+          "synonyms": [
+            "Inhabitants",
+            "Residents",
+            "Nation Demographics"
+          ],
+          "aggregations": [
+            "SUM(Population)",
+            "AVG(Population)"
+          ],
+          "business_name": "Country Population",
+          "common_values": [
+            "329500000",
+            "17000000",
+            "38000000"
+          ],
+          "disambiguation": {
+            "primary_location": "N/A",
+            "appears_in_tables": [
+              "country",
+              "city"
+            ],
+            "directional_guidance": "Use country.Population for country-specific population queries.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "country.Population = population of the country, city.Population = population of the city"
+          },
+          "typical_filters": [
+            "Population > ?",
+            "Population < ?"
+          ],
+          "business_meaning": "The total number of people living in the country."
+        }
+      ],
+      "purpose": "Represents countries, including demographic, geographic, and political information.",
+      "business_name": "Country",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the population of the Netherlands?",
+          "explanation": "Query the country table filtering by Name to find the population.",
+          "involves_joins": []
+        },
+        {
+          "question": "What is the capital of Afghanistan?",
+          "explanation": "Query the country table filtering by Name and retrieve the Capital.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "countrylanguage",
+      "columns": [
+        {
+          "name": "CountryCode",
+          "synonyms": [
+            "Nation Code",
+            "Country Identifier",
+            "Country Abbreviation"
+          ],
+          "aggregations": [],
+          "business_name": "Country Code",
+          "common_values": [
+            "AFG",
+            "NLD",
+            "USA"
+          ],
+          "disambiguation": {
+            "primary_location": "country",
+            "appears_in_tables": [
+              "countrylanguage",
+              "city"
+            ],
+            "directional_guidance": "Use countrylanguage.CountryCode when identifying the country a language is spoken in.",
+            "foreign_key_locations": [
+              "countrylanguage",
+              "city"
+            ],
+            "subject_vs_relationship": "country.Code = the country entity itself, countrylanguage.CountryCode = relationship to the country"
+          },
+          "typical_filters": [
+            "CountryCode = ?",
+            "CountryCode IN (?)"
+          ],
+          "business_meaning": "The code representing the country where the language is spoken."
+        },
+        {
+          "name": "Language",
+          "synonyms": [
+            "Dialect",
+            "Tongue",
+            "Linguistic"
+          ],
+          "aggregations": [],
+          "business_name": "Language",
+          "common_values": [
+            "Dutch",
+            "English",
+            "Pashto"
+          ],
+          "disambiguation": {
+            "primary_location": "countrylanguage",
+            "appears_in_tables": [
+              "countrylanguage"
+            ],
+            "directional_guidance": "Use countrylanguage.Language when querying or filtering by the language spoken in a country.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "countrylanguage.Language = the language itself"
+          },
+          "typical_filters": [
+            "Language = ?",
+            "Language LIKE ?"
+          ],
+          "business_meaning": "The name of the language spoken in the country."
+        },
+        {
+          "name": "IsOfficial",
+          "synonyms": [
+            "Official Status",
+            "Recognized Language",
+            "Formal Language"
+          ],
+          "aggregations": [],
+          "business_name": "Is Official Language",
+          "common_values": [
+            "T",
+            "F"
+          ],
+          "disambiguation": {
+            "primary_location": "countrylanguage",
+            "appears_in_tables": [
+              "countrylanguage"
+            ],
+            "directional_guidance": "Use countrylanguage.IsOfficial to determine if a language is officially recognized.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "countrylanguage.IsOfficial = official status of the language"
+          },
+          "typical_filters": [
+            "IsOfficial = 'T'",
+            "IsOfficial = 'F'"
+          ],
+          "business_meaning": "Indicates whether the language is officially recognized in the country."
+        },
+        {
+          "name": "Percentage",
+          "synonyms": [
+            "Language Share",
+            "Speaker Percentage",
+            "Linguistic Proportion"
+          ],
+          "aggregations": [
+            "AVG(Percentage)",
+            "SUM(Percentage)"
+          ],
+          "business_name": "Language Percentage",
+          "common_values": [
+            "50.0",
+            "75.5",
+            "20.0"
+          ],
+          "disambiguation": {
+            "primary_location": "countrylanguage",
+            "appears_in_tables": [
+              "countrylanguage"
+            ],
+            "directional_guidance": "Use countrylanguage.Percentage to find the proportion of speakers.",
+            "foreign_key_locations": [],
+            "subject_vs_relationship": "countrylanguage.Percentage = percentage of speakers of the language"
+          },
+          "typical_filters": [
+            "Percentage > ?",
+            "Percentage < ?"
+          ],
+          "business_meaning": "The percentage of the population that speaks the language."
+        }
+      ],
+      "purpose": "Represents languages spoken in each country, including whether they are official and the percentage of speakers.",
+      "business_name": "Country Language",
+      "relationships": [
+        {
+          "column": "CountryCode",
+          "when_to_use": [
+            "Questions about languages spoken in a specific country",
+            "Questions about the official language of a country",
+            "Questions about the percentage of language speakers in a country"
+          ],
+          "join_pattern": "countrylanguage.CountryCode = country.Code",
+          "vs_confusion": "DO NOT confuse with city.CountryCode, which relates to cities within a country",
+          "common_mistakes": [
+            "DO NOT assume countrylanguage.CountryCode is unique to languages; it references countries."
+          ],
+          "is_bridge_table": false,
+          "business_meaning": "Links each language to the country where it is spoken.",
+          "references_table": "country",
+          "relationship_type": "many-to-one",
+          "complete_join_path": [
+            "countrylanguage \u2192 country"
+          ]
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What languages are spoken in Afghanistan?",
+          "explanation": "Join countrylanguage with country on CountryCode and filter by country.Name.",
+          "involves_joins": [
+            "country"
+          ]
+        },
+        {
+          "question": "Is Dutch an official language in the Netherlands?",
+          "explanation": "Join countrylanguage with country on CountryCode, filter by Language and country.Name, and check IsOfficial.",
+          "involves_joins": [
+            "country"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Geopolitical and Demographic Data",
+    "purpose": "This database is used to track information about countries, their cities, and languages spoken within them.",
+    "key_entities": [
+      "City",
+      "Country",
+      "Language"
+    ],
+    "typical_questions": [
+      "What is the population of a specific city?",
+      "Which languages are spoken in a particular country?",
+      "What is the capital city of a country?",
+      "What is the population of a country?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Confusion between city and country population",
+      "example": "What is the population of the Netherlands?",
+      "clarification": "Use country.Population for country-level queries, city.Population for city-level queries.",
+      "affected_elements": [
+        "country.Population",
+        "city.Population"
+      ]
+    },
+    {
+      "issue": "Misinterpretation of CountryCode usage",
+      "example": "List all cities in a country using CountryCode.",
+      "clarification": "Ensure to join city with country using city.CountryCode = country.Code.",
+      "affected_elements": [
+        "city.CountryCode",
+        "country.Code"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-13T04:36:23.972304",
+  "cross_table_patterns": [
+    {
+      "pattern_type": "country-city population aggregation",
+      "tables_involved": [
+        "city",
+        "country"
+      ],
+      "example_question": "What is the total population of all cities in the Netherlands?",
+      "typical_structure": "SELECT SUM(city.Population) FROM city JOIN country ON city.CountryCode = country.Code WHERE country.Name = 'Netherlands'",
+      "key_considerations": [
+        "Ensure correct join between city and country using CountryCode."
+      ]
+    },
+    {
+      "pattern_type": "language distribution in a country",
+      "tables_involved": [
+        "countrylanguage",
+        "country"
+      ],
+      "example_question": "What percentage of people speak English in the USA?",
+      "typical_structure": "SELECT Percentage FROM countrylanguage JOIN country ON countrylanguage.CountryCode = country.Code WHERE country.Name = 'USA' AND Language = 'English'",
+      "key_considerations": [
+        "Check for correct language and country match."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "tables": [
+    {
+      "name": "course",
+      "columns": [
+        {
+          "name": "course_id",
+          "synonyms": [
+            "Course Number",
+            "Course Code",
+            "Class ID"
+          ],
+          "aggregations": [],
+          "business_name": "Course ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "course_id = ?",
+            "course_id IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each course."
+        },
+        {
+          "name": "staring_date",
+          "synonyms": [
+            "Start Date",
+            "Commencement Date",
+            "Beginning Date"
+          ],
+          "aggregations": [],
+          "business_name": "Starting Date",
+          "common_values": [
+            "5 May",
+            "6 May",
+            "7 May"
+          ],
+          "typical_filters": [
+            "staring_date = ?",
+            "staring_date > ?"
+          ],
+          "business_meaning": "The date when the course begins."
+        },
+        {
+          "name": "course",
+          "synonyms": [
+            "Course Title",
+            "Class Name",
+            "Subject"
+          ],
+          "aggregations": [],
+          "business_name": "Course Name",
+          "common_values": [
+            "Language Arts",
+            "Math",
+            "Science"
+          ],
+          "typical_filters": [
+            "course = ?",
+            "course LIKE ?"
+          ],
+          "business_meaning": "The name of the course."
+        }
+      ],
+      "purpose": "This table represents the courses offered in the educational institution.",
+      "business_name": "Course",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What courses are available?",
+          "explanation": "Query the course table to list all courses.",
+          "involves_joins": []
+        },
+        {
+          "question": "When does the Math course start?",
+          "explanation": "Filter the course table by course name to find the starting date.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "course_arrange",
+      "columns": [
+        {
+          "name": "course_id",
+          "synonyms": [
+            "Course Number",
+            "Course Code",
+            "Class ID"
+          ],
+          "aggregations": [],
+          "business_name": "Course ID",
+          "common_values": [
+            "2",
+            "3",
+            "4"
+          ],
+          "typical_filters": [
+            "course_id = ?",
+            "course_id IN (?)"
+          ],
+          "business_meaning": "Links to the course being arranged."
+        },
+        {
+          "name": "teacher_id",
+          "synonyms": [
+            "Instructor ID",
+            "Educator ID",
+            "Faculty ID"
+          ],
+          "aggregations": [],
+          "business_name": "Teacher ID",
+          "common_values": [
+            "5",
+            "3",
+            "2"
+          ],
+          "typical_filters": [
+            "teacher_id = ?",
+            "teacher_id IN (?)"
+          ],
+          "business_meaning": "Links to the teacher assigned to the course."
+        },
+        {
+          "name": "grade",
+          "synonyms": [
+            "Class Level",
+            "Year",
+            "Grade"
+          ],
+          "aggregations": [
+            "AVG(grade)",
+            "MAX(grade)"
+          ],
+          "business_name": "Grade Level",
+          "common_values": [
+            "1",
+            "3",
+            "5"
+          ],
+          "typical_filters": [
+            "grade = ?",
+            "grade > ?"
+          ],
+          "business_meaning": "The grade level for which the course is arranged."
+        }
+      ],
+      "purpose": "This table details the arrangement of courses, including which teacher is assigned to which course and the grade level.",
+      "business_name": "Course Arrangement",
+      "relationships": [
+        {
+          "column": "course_id",
+          "common_uses": [
+            "To find details about the course for a given arrangement."
+          ],
+          "business_meaning": "Associates the course arrangement with a specific course.",
+          "references_table": "course"
+        },
+        {
+          "column": "teacher_id",
+          "common_uses": [
+            "To identify which teacher is assigned to a course."
+          ],
+          "business_meaning": "Associates the course arrangement with a specific teacher.",
+          "references_table": "teacher"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Who is teaching the Math course?",
+          "explanation": "Join course_arrange with course and teacher to find the teacher for a specific course.",
+          "involves_joins": [
+            "course",
+            "teacher"
+          ]
+        },
+        {
+          "question": "What courses is teacher Joseph Huts assigned to?",
+          "explanation": "Join course_arrange with teacher and course to list courses for a specific teacher.",
+          "involves_joins": [
+            "course",
+            "teacher"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "teacher",
+      "columns": [
+        {
+          "name": "teacher_id",
+          "synonyms": [
+            "Instructor ID",
+            "Educator ID",
+            "Faculty ID"
+          ],
+          "aggregations": [],
+          "business_name": "Teacher ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "teacher_id = ?",
+            "teacher_id IN (?)"
+          ],
+          "business_meaning": "A unique identifier for each teacher."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Instructor Name",
+            "Educator Name",
+            "Faculty Name"
+          ],
+          "aggregations": [],
+          "business_name": "Teacher Name",
+          "common_values": [
+            "Joseph Huts",
+            "Gustaaf Deloor",
+            "Vicente Carretero"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the teacher."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "Years",
+            "Age in Years",
+            "Teacher Age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "MAX(age)"
+          ],
+          "business_name": "Age",
+          "common_values": [
+            "32",
+            "29",
+            "26"
+          ],
+          "typical_filters": [
+            "age = ?",
+            "age > ?"
+          ],
+          "business_meaning": "The age of the teacher."
+        },
+        {
+          "name": "hometown",
+          "synonyms": [
+            "Place of Origin",
+            "City",
+            "Birthplace"
+          ],
+          "aggregations": [],
+          "business_name": "Hometown",
+          "common_values": [
+            "Blackrod Urban District",
+            "Bolton County Borough",
+            "Farnworth Municipal Borough"
+          ],
+          "typical_filters": [
+            "hometown = ?",
+            "hometown LIKE ?"
+          ],
+          "business_meaning": "The hometown of the teacher."
+        }
+      ],
+      "purpose": "This table contains information about the teachers, including their names, ages, and hometowns.",
+      "business_name": "Teacher",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the age of teacher Joseph Huts?",
+          "explanation": "Filter the teacher table by name to find the age.",
+          "involves_joins": []
+        },
+        {
+          "question": "Where is Gustaaf Deloor from?",
+          "explanation": "Filter the teacher table by name to find the hometown.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Education",
+    "purpose": "This database is used to manage and organize information about courses, teachers, and their arrangements in an educational setting.",
+    "key_entities": [
+      "Course",
+      "Teacher",
+      "Course Arrangement"
+    ],
+    "typical_questions": [
+      "What courses are available?",
+      "Who is teaching a specific course?",
+      "What courses is a particular teacher assigned to?",
+      "When does a specific course start?",
+      "What is the grade level for a course arrangement?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in course names",
+      "example": "What is the starting date for the Math course?",
+      "clarification": "Ensure the course name is correctly matched in the course table.",
+      "affected_elements": [
+        "course.course"
+      ]
+    },
+    {
+      "issue": "Teacher name similarity",
+      "example": "Who is teaching the course?",
+      "clarification": "Use teacher_id for precise identification if names are similar.",
+      "affected_elements": [
+        "teacher.name"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:51:55.053646",
+  "query_guidelines": [
+    "Always use joins as specified in the foreign key relationships to ensure data integrity.",
+    "Avoid using ambiguous terms; specify full course or teacher names when possible.",
+    "Consider performance implications of joining large tables; filter early in the query.",
+    "Use common values as examples to guide users in formulating their queries.",
+    "Ensure that filters on text fields like names and courses are case-sensitive if the database is configured as such."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "teacher-course assignment",
+      "tables_involved": [
+        "course",
+        "course_arrange",
+        "teacher"
+      ],
+      "example_question": "Who is teaching the Science course?",
+      "typical_structure": "SELECT teacher.name FROM course_arrange JOIN course ON course_arrange.course_id = course.course_id JOIN teacher ON course_arrange.teacher_id = teacher.teacher_id WHERE course.course = 'Science'",
+      "key_considerations": [
+        "Ensure correct joins between course_arrange, course, and teacher."
+      ]
+    },
+    {
+      "pattern_type": "course schedule",
+      "tables_involved": [
+        "course"
+      ],
+      "example_question": "When does the History course start?",
+      "typical_structure": "SELECT staring_date FROM course WHERE course = 'History'",
+      "key_considerations": [
+        "Direct query on the course table without joins."
+      ]
+    }
+  ]
+}

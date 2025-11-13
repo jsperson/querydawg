@@ -1,0 +1,488 @@
+{
+  "tables": [
+    {
+      "name": "employee",
+      "columns": [
+        {
+          "name": "employee_id",
+          "synonyms": [
+            "ID",
+            "Employee Number",
+            "Staff ID"
+          ],
+          "aggregations": [],
+          "business_name": "Employee ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "employee_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each employee."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Full Name",
+            "Staff Name",
+            "Name"
+          ],
+          "aggregations": [],
+          "business_name": "Employee Name",
+          "common_values": [
+            "George Chuter",
+            "Lee Mears"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the employee."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "Years",
+            "Age",
+            "Employee Age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "MAX(age)",
+            "MIN(age)"
+          ],
+          "business_name": "Employee Age",
+          "common_values": [
+            "23",
+            "29",
+            "43"
+          ],
+          "typical_filters": [
+            "age > ?",
+            "age < ?"
+          ],
+          "business_meaning": "The age of the employee."
+        },
+        {
+          "name": "city",
+          "synonyms": [
+            "Location",
+            "Residence",
+            "City"
+          ],
+          "aggregations": [],
+          "business_name": "City",
+          "common_values": [
+            "Bristol",
+            "Bath"
+          ],
+          "typical_filters": [
+            "city = ?",
+            "city LIKE ?"
+          ],
+          "business_meaning": "The city where the employee resides."
+        }
+      ],
+      "purpose": "This table stores information about employees.",
+      "business_name": "Employee",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the age of a specific employee?",
+          "explanation": "Filter the employee table by the employee's name or ID to find their age.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "evaluation",
+      "columns": [
+        {
+          "name": "employee_id",
+          "synonyms": [
+            "ID",
+            "Employee Number",
+            "Staff ID"
+          ],
+          "aggregations": [],
+          "business_name": "Employee ID",
+          "common_values": [
+            "1",
+            "2",
+            "4"
+          ],
+          "typical_filters": [
+            "employee_id = ?"
+          ],
+          "business_meaning": "Links the evaluation to a specific employee."
+        },
+        {
+          "name": "year_awarded",
+          "synonyms": [
+            "Year",
+            "Award Year",
+            "Bonus Year"
+          ],
+          "aggregations": [],
+          "business_name": "Year Awarded",
+          "common_values": [
+            "2011",
+            "2015",
+            "2016"
+          ],
+          "typical_filters": [
+            "year_awarded = ?",
+            "year_awarded BETWEEN ? AND ?"
+          ],
+          "business_meaning": "The year in which the bonus was awarded."
+        },
+        {
+          "name": "bonus",
+          "synonyms": [
+            "Bonus Amount",
+            "Award",
+            "Incentive"
+          ],
+          "aggregations": [
+            "SUM(bonus)",
+            "AVG(bonus)"
+          ],
+          "business_name": "Bonus",
+          "common_values": [
+            "3000.0",
+            "3200.0"
+          ],
+          "typical_filters": [
+            "bonus > ?",
+            "bonus < ?"
+          ],
+          "business_meaning": "The amount of bonus awarded to the employee."
+        }
+      ],
+      "purpose": "This table records the bonuses awarded to employees in specific years.",
+      "business_name": "Evaluation",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What bonuses were awarded to employees in a specific year?",
+          "explanation": "Filter the evaluation table by the year_awarded column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "hiring",
+      "columns": [
+        {
+          "name": "shop_id",
+          "synonyms": [
+            "Store ID",
+            "Shop Number",
+            "Outlet ID"
+          ],
+          "aggregations": [],
+          "business_name": "Shop ID",
+          "common_values": [
+            "1",
+            "4",
+            "5"
+          ],
+          "typical_filters": [
+            "shop_id = ?"
+          ],
+          "business_meaning": "Identifies the shop where the employee is hired."
+        },
+        {
+          "name": "employee_id",
+          "synonyms": [
+            "ID",
+            "Employee Number",
+            "Staff ID"
+          ],
+          "aggregations": [],
+          "business_name": "Employee ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "employee_id = ?"
+          ],
+          "business_meaning": "Links the hiring record to a specific employee."
+        },
+        {
+          "name": "start_from",
+          "synonyms": [
+            "Start Date",
+            "Employment Date",
+            "Joining Date"
+          ],
+          "aggregations": [],
+          "business_name": "Start Date",
+          "common_values": [
+            "2009",
+            "2011",
+            "2013"
+          ],
+          "typical_filters": [
+            "start_from = ?",
+            "start_from > ?"
+          ],
+          "business_meaning": "The date when the employee started working at the shop."
+        },
+        {
+          "name": "is_full_time",
+          "synonyms": [
+            "Full-Time",
+            "Employment Type",
+            "Work Status"
+          ],
+          "aggregations": [],
+          "business_name": "Full-Time Status",
+          "common_values": [
+            "T",
+            "F"
+          ],
+          "typical_filters": [
+            "is_full_time = ?"
+          ],
+          "business_meaning": "Indicates whether the employee is working full-time."
+        }
+      ],
+      "purpose": "This table tracks the employment details of employees, including their shop assignments.",
+      "business_name": "Hiring",
+      "relationships": [
+        {
+          "column": "employee_id",
+          "common_uses": [
+            "To find which shop an employee works at."
+          ],
+          "business_meaning": "Links hiring records to employee details.",
+          "references_table": "employee"
+        },
+        {
+          "column": "shop_id",
+          "common_uses": [
+            "To determine which employees work at a specific shop."
+          ],
+          "business_meaning": "Associates employees with the shops they work at.",
+          "references_table": "shop"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which employees are working full-time?",
+          "explanation": "Filter the hiring table by the is_full_time column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "shop",
+      "columns": [
+        {
+          "name": "shop_id",
+          "synonyms": [
+            "Store ID",
+            "Shop Number",
+            "Outlet ID"
+          ],
+          "aggregations": [],
+          "business_name": "Shop ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "shop_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each shop."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Store Name",
+            "Outlet Name",
+            "Business Name"
+          ],
+          "aggregations": [],
+          "business_name": "Shop Name",
+          "common_values": [
+            "FC Haka",
+            "HJK"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The name of the shop."
+        },
+        {
+          "name": "location",
+          "synonyms": [
+            "City",
+            "Area",
+            "Place"
+          ],
+          "aggregations": [],
+          "business_name": "Location",
+          "common_values": [
+            "Valkeakoski",
+            "Helsinki"
+          ],
+          "typical_filters": [
+            "location = ?",
+            "location LIKE ?"
+          ],
+          "business_meaning": "The city or area where the shop is located."
+        },
+        {
+          "name": "district",
+          "synonyms": [
+            "Region",
+            "Area",
+            "Zone"
+          ],
+          "aggregations": [],
+          "business_name": "District",
+          "common_values": [
+            "Tehtaan kenttä",
+            "Finnair Stadium"
+          ],
+          "typical_filters": [
+            "district = ?",
+            "district LIKE ?"
+          ],
+          "business_meaning": "The district or region where the shop is situated."
+        },
+        {
+          "name": "number_products",
+          "synonyms": [
+            "Product Count",
+            "Inventory Size",
+            "Stock"
+          ],
+          "aggregations": [
+            "SUM(number_products)",
+            "AVG(number_products)"
+          ],
+          "business_name": "Number of Products",
+          "common_values": [
+            "3516",
+            "10770"
+          ],
+          "typical_filters": [
+            "number_products > ?",
+            "number_products < ?"
+          ],
+          "business_meaning": "The total number of products available in the shop."
+        },
+        {
+          "name": "manager_name",
+          "synonyms": [
+            "Manager",
+            "Store Manager",
+            "Supervisor"
+          ],
+          "aggregations": [],
+          "business_name": "Manager Name",
+          "common_values": [
+            "Olli Huttunen",
+            "Antti Muurinen"
+          ],
+          "typical_filters": [
+            "manager_name = ?",
+            "manager_name LIKE ?"
+          ],
+          "business_meaning": "The name of the shop's manager."
+        }
+      ],
+      "purpose": "This table contains information about the shops, including their location and management.",
+      "business_name": "Shop",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the location of a specific shop?",
+          "explanation": "Filter the shop table by the shop's name or ID to find its location.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Retail and Human Resources",
+    "purpose": "This database is used to manage employee information, their evaluations, and their association with retail shops.",
+    "key_entities": [
+      "Employee",
+      "Evaluation",
+      "Hiring",
+      "Shop"
+    ],
+    "typical_questions": [
+      "What is the bonus awarded to a specific employee in a given year?",
+      "Which employees work at a particular shop?",
+      "What are the details of shops managed by a specific manager?",
+      "How many products are available in a specific shop?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Employee ID vs. Shop ID",
+      "example": "What is the ID of the shop where an employee works?",
+      "clarification": "Specify whether the ID refers to an employee or a shop.",
+      "affected_elements": [
+        "hiring.employee_id",
+        "hiring.shop_id"
+      ]
+    },
+    {
+      "issue": "Full-Time Status Interpretation",
+      "example": "Is the employee full-time?",
+      "clarification": "Use 'T' for true and 'F' for false when filtering by full-time status.",
+      "affected_elements": [
+        "hiring.is_full_time"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:53:47.188747",
+  "query_guidelines": [
+    "Always specify the correct table and column names to avoid ambiguity.",
+    "Use joins carefully to ensure relationships between tables are correctly represented.",
+    "Filter by specific columns to improve query performance and accuracy.",
+    "Avoid using ambiguous terms; specify whether you are referring to an employee or a shop.",
+    "Consider indexing frequently queried columns for better performance."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Employee-Shop Association",
+      "tables_involved": [
+        "hiring",
+        "employee",
+        "shop"
+      ],
+      "example_question": "Which employees work at a specific shop?",
+      "typical_structure": "SELECT employee.name FROM hiring JOIN employee ON hiring.employee_id = employee.employee_id JOIN shop ON hiring.shop_id = shop.shop_id WHERE shop.name = ?",
+      "key_considerations": [
+        "Ensure the correct shop name or ID is used for filtering."
+      ]
+    },
+    {
+      "pattern_type": "Employee Bonus Information",
+      "tables_involved": [
+        "evaluation",
+        "employee"
+      ],
+      "example_question": "What bonuses were awarded to employees in a specific year?",
+      "typical_structure": "SELECT employee.name, evaluation.bonus FROM evaluation JOIN employee ON evaluation.employee_id = employee.employee_id WHERE evaluation.year_awarded = ?",
+      "key_considerations": [
+        "Year should be specified correctly to filter the results."
+      ]
+    }
+  ]
+}

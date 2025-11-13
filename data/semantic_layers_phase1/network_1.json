@@ -1,0 +1,336 @@
+{
+  "tables": [
+    {
+      "name": "friend",
+      "columns": [
+        {
+          "name": "student_id",
+          "synonyms": [
+            "student",
+            "pupil",
+            "learner",
+            "scholar",
+            "attendee"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1510",
+            "1689",
+            "1709"
+          ],
+          "typical_filters": [
+            "student_id = ?",
+            "student_id IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a student who has friends."
+        },
+        {
+          "name": "friend_id",
+          "synonyms": [
+            "companion",
+            "buddy",
+            "pal",
+            "mate",
+            "acquaintance"
+          ],
+          "aggregations": [],
+          "business_name": "Friend ID",
+          "common_values": [
+            "1381",
+            "1247",
+            "1709"
+          ],
+          "typical_filters": [
+            "friend_id = ?",
+            "friend_id IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a student who is a friend of another student."
+        }
+      ],
+      "purpose": "This table represents the friendship relationships between students.",
+      "business_name": "Friendship",
+      "relationships": [
+        {
+          "column": "student_id",
+          "common_uses": [
+            "To find all friends of a specific student."
+          ],
+          "business_meaning": "Links a student to their list of friends.",
+          "references_table": "highschooler"
+        },
+        {
+          "column": "friend_id",
+          "common_uses": [
+            "To identify who is a friend of a specific student."
+          ],
+          "business_meaning": "Identifies the friend in the friendship relationship.",
+          "references_table": "highschooler"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Who are the friends of a particular student?",
+          "explanation": "Query the friend table to find all friend_ids for a given student_id.",
+          "involves_joins": [
+            "highschooler"
+          ]
+        },
+        {
+          "question": "Who are the mutual friends between two students?",
+          "explanation": "Find common friend_ids for two different student_ids.",
+          "involves_joins": [
+            "highschooler"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "highschooler",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "student number",
+            "learner ID",
+            "pupil ID",
+            "scholar ID",
+            "attendee ID"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1510",
+            "1689",
+            "1709"
+          ],
+          "typical_filters": [
+            "id = ?",
+            "id IN (?)"
+          ],
+          "business_meaning": "The unique identifier for each student."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "full name",
+            "first name",
+            "last name",
+            "nickname",
+            "alias"
+          ],
+          "aggregations": [],
+          "business_name": "Student Name",
+          "common_values": [
+            "Jordan",
+            "Gabriel",
+            "Cassandra"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the student."
+        },
+        {
+          "name": "grade",
+          "synonyms": [
+            "year",
+            "class",
+            "level",
+            "form",
+            "standard"
+          ],
+          "aggregations": [
+            "AVG(grade)",
+            "MAX(grade)",
+            "MIN(grade)"
+          ],
+          "business_name": "Grade Level",
+          "common_values": [
+            "9",
+            "10",
+            "11"
+          ],
+          "typical_filters": [
+            "grade = ?",
+            "grade > ?"
+          ],
+          "business_meaning": "The academic grade level of the student."
+        }
+      ],
+      "purpose": "This table contains information about high school students, including their names and grades.",
+      "business_name": "High School Student",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What grade is a specific student in?",
+          "explanation": "Query the highschooler table to find the grade for a given student ID.",
+          "involves_joins": []
+        },
+        {
+          "question": "List all students in a specific grade.",
+          "explanation": "Filter the highschooler table by the grade column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "likes",
+      "columns": [
+        {
+          "name": "student_id",
+          "synonyms": [
+            "student",
+            "pupil",
+            "learner",
+            "scholar",
+            "attendee"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1689",
+            "1709",
+            "1782"
+          ],
+          "typical_filters": [
+            "student_id = ?",
+            "student_id IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a student who likes another student."
+        },
+        {
+          "name": "liked_id",
+          "synonyms": [
+            "admired",
+            "favored",
+            "preferred",
+            "chosen",
+            "selected"
+          ],
+          "aggregations": [],
+          "business_name": "Liked Student ID",
+          "common_values": [
+            "1709",
+            "1247",
+            "1468"
+          ],
+          "typical_filters": [
+            "liked_id = ?",
+            "liked_id IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a student who is liked by another student."
+        }
+      ],
+      "purpose": "This table tracks which students like other students.",
+      "business_name": "Likes",
+      "relationships": [
+        {
+          "column": "student_id",
+          "common_uses": [
+            "To find all students liked by a specific student."
+          ],
+          "business_meaning": "Links a student to the students they like.",
+          "references_table": "highschooler"
+        },
+        {
+          "column": "liked_id",
+          "common_uses": [
+            "To identify who is liked by a specific student."
+          ],
+          "business_meaning": "Identifies the student who is liked in the relationship.",
+          "references_table": "highschooler"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which students like each other?",
+          "explanation": "Query the likes table to find pairs of student_ids and liked_ids.",
+          "involves_joins": [
+            "highschooler"
+          ]
+        },
+        {
+          "question": "Who has the most likes?",
+          "explanation": "Aggregate the likes table to count likes for each liked_id.",
+          "involves_joins": [
+            "highschooler"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Education",
+    "purpose": "This database tracks social interactions and preferences among high school students, including friendships and likes.",
+    "key_entities": [
+      "Highschooler",
+      "Friendship",
+      "Likes"
+    ],
+    "typical_questions": [
+      "Who are the friends of a particular student?",
+      "Which students like each other?",
+      "What grade is a specific student in?",
+      "Who are the mutual friends between two students?",
+      "Which students have the most likes?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in identifying relationships",
+      "example": "Who are the friends of a student?",
+      "clarification": "Ensure to join the friend table with highschooler to get names.",
+      "affected_elements": [
+        "friend.student_id",
+        "friend.friend_id"
+      ]
+    },
+    {
+      "issue": "Confusion between likes and friendships",
+      "example": "Who does a student like?",
+      "clarification": "Use the likes table, not the friend table, to find liked students.",
+      "affected_elements": [
+        "likes.student_id",
+        "likes.liked_id"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:55:16.433025",
+  "query_guidelines": [
+    "Always join with the highschooler table to get student names.",
+    "Differentiate between friendships and likes to avoid incorrect data retrieval.",
+    "Use aggregations carefully to summarize data, especially in the likes table.",
+    "Consider performance when joining large tables, especially with multiple conditions.",
+    "Ensure clarity in natural language questions to avoid ambiguous SQL translations."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "mutual friendships",
+      "tables_involved": [
+        "friend",
+        "highschooler"
+      ],
+      "example_question": "Who are the mutual friends between two students?",
+      "typical_structure": "SELECT ... FROM friend f1 JOIN friend f2 ON f1.friend_id = f2.friend_id WHERE f1.student_id = ? AND f2.student_id = ?",
+      "key_considerations": [
+        "Ensure both student_ids are different to find mutual friends."
+      ]
+    },
+    {
+      "pattern_type": "reciprocal likes",
+      "tables_involved": [
+        "likes",
+        "highschooler"
+      ],
+      "example_question": "Which students like each other mutually?",
+      "typical_structure": "SELECT ... FROM likes l1 JOIN likes l2 ON l1.student_id = l2.liked_id AND l1.liked_id = l2.student_id",
+      "key_considerations": [
+        "Check for reciprocal relationships in the likes table."
+      ]
+    }
+  ]
+}

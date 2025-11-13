@@ -1,0 +1,17 @@
+{
+  "backup_timestamp": "20251104_152447",
+  "backup_phase": "phase1",
+  "git_tag": "phase1-semantic-layers",
+  "supabase_backup": "data/backups/semantic_layers_phase1_20251104_152447.json",
+  "supabase_records": 20,
+  "pinecone_info": {
+    "index_name": "querydawg-semantic",
+    "total_vectors": 180,
+    "dimensions": 1536,
+    "namespaces": {
+      "": {
+        "vector_count": 180
+      }
+    }
+  }
+}

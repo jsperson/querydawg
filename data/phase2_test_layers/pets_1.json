@@ -1,0 +1,515 @@
+{
+  "database": "pets_1",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-13T04:09:50.420478",
+    "overview": {
+      "domain": "Pet Ownership",
+      "purpose": "This database tracks students and their pets, including details about the pets and the relationships between students and their pets.",
+      "key_entities": [
+        "Students",
+        "Pets"
+      ],
+      "typical_questions": [
+        "Which students own pets?",
+        "What types of pets do students have?",
+        "How many pets does a specific student own?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "Student",
+        "business_name": "Students",
+        "purpose": "This table represents the students enrolled in the institution.",
+        "columns": [
+          {
+            "name": "StuID",
+            "business_name": "Student ID",
+            "business_meaning": "A unique identifier for each student.",
+            "synonyms": [
+              "Student Identifier",
+              "Learner ID",
+              "Student Number"
+            ],
+            "typical_filters": [
+              "StuID = ?",
+              "StuID > ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1001",
+              "1002",
+              "1003"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student",
+                "Has_Pet"
+              ],
+              "primary_location": "Student",
+              "foreign_key_locations": [
+                "Has_Pet"
+              ],
+              "directional_guidance": "Use Student.StuID when question is ABOUT a student (their name, age, info). Use Has_Pet.StuID when question is about what pets a student OWNS.",
+              "subject_vs_relationship": "Student.StuID = the student entity themselves; Has_Pet.StuID = relationships of that student."
+            }
+          },
+          {
+            "name": "LName",
+            "business_name": "Last Name",
+            "business_meaning": "The last name of the student.",
+            "synonyms": [
+              "Surname",
+              "Family Name",
+              "Last Identifier"
+            ],
+            "typical_filters": [
+              "LName = ?",
+              "LName LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Smith",
+              "Kim",
+              "Jones"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student"
+              ],
+              "primary_location": "Student",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Student.LName when question is ABOUT a student's last name.",
+              "subject_vs_relationship": "Student.LName = the last name of the student entity."
+            }
+          },
+          {
+            "name": "Fname",
+            "business_name": "First Name",
+            "business_meaning": "The first name of the student.",
+            "synonyms": [
+              "Given Name",
+              "Forename",
+              "First Identifier"
+            ],
+            "typical_filters": [
+              "Fname = ?",
+              "Fname LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Linda",
+              "Tracy",
+              "Shiela"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student"
+              ],
+              "primary_location": "Student",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Student.Fname when question is ABOUT a student's first name.",
+              "subject_vs_relationship": "Student.Fname = the first name of the student entity."
+            }
+          },
+          {
+            "name": "Age",
+            "business_name": "Age",
+            "business_meaning": "The age of the student.",
+            "synonyms": [
+              "Years",
+              "Age in Years",
+              "Student Age"
+            ],
+            "typical_filters": [
+              "Age = ?",
+              "Age > ?",
+              "Age < ?"
+            ],
+            "aggregations": [
+              "AVG(Age)",
+              "MAX(Age)",
+              "MIN(Age)"
+            ],
+            "common_values": [
+              "18",
+              "19",
+              "21"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student"
+              ],
+              "primary_location": "Student",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Student.Age when question is ABOUT a student's age.",
+              "subject_vs_relationship": "Student.Age = the age of the student entity."
+            }
+          },
+          {
+            "name": "Sex",
+            "business_name": "Gender",
+            "business_meaning": "The gender of the student.",
+            "synonyms": [
+              "Gender Identity",
+              "Sexual Identity",
+              "Gender Type"
+            ],
+            "typical_filters": [
+              "Sex = ?",
+              "Sex IN (?, ?)"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "M",
+              "F"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student"
+              ],
+              "primary_location": "Student",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Student.Sex when question is ABOUT a student's gender.",
+              "subject_vs_relationship": "Student.Sex = the gender of the student entity."
+            }
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What is the age of student with ID 1001?",
+            "explanation": "Query the Student table to find the age of the student with the specified ID.",
+            "involves_joins": []
+          },
+          {
+            "question": "List all students with the last name 'Kim'.",
+            "explanation": "Query the Student table filtering by the last name.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "Pets",
+        "business_name": "Pets",
+        "purpose": "This table represents the pets owned by students.",
+        "columns": [
+          {
+            "name": "PetID",
+            "business_name": "Pet ID",
+            "business_meaning": "A unique identifier for each pet.",
+            "synonyms": [
+              "Pet Identifier",
+              "Animal ID",
+              "Pet Number"
+            ],
+            "typical_filters": [
+              "PetID = ?",
+              "PetID > ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "2001",
+              "2002",
+              "2003"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Pets"
+              ],
+              "primary_location": "Pets",
+              "foreign_key_locations": [
+                "Has_Pet"
+              ],
+              "directional_guidance": "Use Pets.PetID when question is ABOUT a pet (its type, age, weight). Use Has_Pet.PetID when question is about which students own that pet.",
+              "subject_vs_relationship": "Pets.PetID = the pet entity itself; Has_Pet.PetID = relationships of that pet."
+            }
+          },
+          {
+            "name": "PetType",
+            "business_name": "Type of Pet",
+            "business_meaning": "The type of animal (e.g., dog, cat) that the pet is.",
+            "synonyms": [
+              "Animal Type",
+              "Pet Species",
+              "Pet Classification"
+            ],
+            "typical_filters": [
+              "PetType = ?",
+              "PetType LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "cat",
+              "dog"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Pets"
+              ],
+              "primary_location": "Pets",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Pets.PetType when question is ABOUT the type of a pet.",
+              "subject_vs_relationship": "Pets.PetType = the type of the pet entity."
+            }
+          },
+          {
+            "name": "pet_age",
+            "business_name": "Pet Age",
+            "business_meaning": "The age of the pet in years.",
+            "synonyms": [
+              "Years Old",
+              "Age of Animal",
+              "Pet's Age"
+            ],
+            "typical_filters": [
+              "pet_age = ?",
+              "pet_age > ?",
+              "pet_age < ?"
+            ],
+            "aggregations": [
+              "AVG(pet_age)",
+              "MAX(pet_age)",
+              "MIN(pet_age)"
+            ],
+            "common_values": [
+              "1",
+              "2",
+              "3"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Pets"
+              ],
+              "primary_location": "Pets",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Pets.pet_age when question is ABOUT the age of a pet.",
+              "subject_vs_relationship": "Pets.pet_age = the age of the pet entity."
+            }
+          },
+          {
+            "name": "weight",
+            "business_name": "Weight",
+            "business_meaning": "The weight of the pet in pounds.",
+            "synonyms": [
+              "Pet Weight",
+              "Animal Weight",
+              "Weight in Pounds"
+            ],
+            "typical_filters": [
+              "weight = ?",
+              "weight > ?",
+              "weight < ?"
+            ],
+            "aggregations": [
+              "AVG(weight)",
+              "SUM(weight)",
+              "MAX(weight)"
+            ],
+            "common_values": [
+              "12.0",
+              "13.4",
+              "9.3"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Pets"
+              ],
+              "primary_location": "Pets",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Pets.weight when question is ABOUT the weight of a pet.",
+              "subject_vs_relationship": "Pets.weight = the weight of the pet entity."
+            }
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What type of pet does student with ID 1002 own?",
+            "explanation": "Join the Has_Pet table with Pets to find the type of pet owned by the student.",
+            "involves_joins": [
+              "Has_Pet",
+              "Pets"
+            ]
+          },
+          {
+            "question": "How many pets are there in total?",
+            "explanation": "Query the Pets table to count the total number of pets.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "Has_Pet",
+        "business_name": "Student Pet Ownership",
+        "purpose": "This table links students to their pets, indicating which student owns which pet.",
+        "columns": [
+          {
+            "name": "StuID",
+            "business_name": "Student ID",
+            "business_meaning": "A unique identifier for each student who owns a pet.",
+            "synonyms": [
+              "Student Identifier",
+              "Learner ID",
+              "Student Number"
+            ],
+            "typical_filters": [
+              "StuID = ?",
+              "StuID > ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1001",
+              "1002"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Has_Pet"
+              ],
+              "primary_location": "Has_Pet",
+              "foreign_key_locations": [
+                "Student"
+              ],
+              "directional_guidance": "Use Has_Pet.StuID when question is about which pets a student owns.",
+              "subject_vs_relationship": "Has_Pet.StuID = the student entity related to pet ownership."
+            }
+          },
+          {
+            "name": "PetID",
+            "business_name": "Pet ID",
+            "business_meaning": "A unique identifier for each pet owned by a student.",
+            "synonyms": [
+              "Pet Identifier",
+              "Animal ID",
+              "Pet Number"
+            ],
+            "typical_filters": [
+              "PetID = ?",
+              "PetID > ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "2001",
+              "2002"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Has_Pet"
+              ],
+              "primary_location": "Has_Pet",
+              "foreign_key_locations": [
+                "Pets"
+              ],
+              "directional_guidance": "Use Has_Pet.PetID when question is about which student owns a specific pet.",
+              "subject_vs_relationship": "Has_Pet.PetID = the pet entity related to student ownership."
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "StuID",
+            "references_table": "Student",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": true,
+            "join_pattern": "Has_Pet.StuID = Student.StuID",
+            "when_to_use": [
+              "Questions about which students own pets",
+              "Questions about a specific student's pet ownership",
+              "Questions about the number of pets owned by students"
+            ],
+            "vs_confusion": "DO NOT confuse with other student identifiers; this specifically relates to pet ownership.",
+            "complete_join_path": [
+              "Has_Pet → Student"
+            ],
+            "business_meaning": "Links students to their respective pets, indicating ownership.",
+            "common_mistakes": [
+              "DO NOT skip the Has_Pet table when querying student-pet relationships."
+            ]
+          },
+          {
+            "column": "PetID",
+            "references_table": "Pets",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": true,
+            "join_pattern": "Has_Pet.PetID = Pets.PetID",
+            "when_to_use": [
+              "Questions about pet details for a specific student",
+              "Questions about the types of pets owned by students",
+              "Questions about pet characteristics based on ownership"
+            ],
+            "vs_confusion": "DO NOT confuse with other pet identifiers; this specifically relates to pets owned by students.",
+            "complete_join_path": [
+              "Has_Pet → Pets"
+            ],
+            "business_meaning": "Links pets to the students who own them, providing pet details.",
+            "common_mistakes": [
+              "DO NOT skip the Has_Pet table when querying pet ownership details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which students own dogs?",
+            "explanation": "Join the Has_Pet table with Pets to filter students based on pet type.",
+            "involves_joins": [
+              "Pets"
+            ]
+          },
+          {
+            "question": "How many pets does student with ID 1002 have?",
+            "explanation": "Query the Has_Pet table to count the number of pets linked to the student.",
+            "involves_joins": []
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "student pet ownership details",
+        "example_question": "What pets does student with ID 1001 own?",
+        "tables_involved": [
+          "Has_Pet",
+          "Pets",
+          "Student"
+        ],
+        "typical_structure": "SELECT Pets.* FROM Has_Pet JOIN Pets ON Has_Pet.PetID = Pets.PetID WHERE Has_Pet.StuID = ?",
+        "key_considerations": [
+          "Ensure to join through Has_Pet to get accurate pet ownership details."
+        ]
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Confusion between student identifiers.",
+        "example": "Which pets does student 1001 own?",
+        "clarification": "Clarify that the question is about the student ID specifically related to pet ownership.",
+        "affected_elements": [
+          "Has_Pet.StuID",
+          "Student.StuID"
+        ]
+      },
+      {
+        "issue": "Ambiguity in pet types.",
+        "example": "What pets do students have?",
+        "clarification": "Specify if the question is about a specific type of pet or all pets owned by students.",
+        "affected_elements": [
+          "Pets.PetType"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-13T04:11:00.179784",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 6729,
+    "cost_usd": 0.00245115,
+    "generation_time_ms": 69758,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**PHASE 2 STRUCTURED RELATIONSHIP DOCUMENTATION:**\nFor each relationship, you MUST provide these fields in this EXACT format:\n\n1. **relationship_type**: Exactly one of: \"one-to-many\", \"many-to-one\", \"many-to-many\"\n2. **is_bridge_table**: boolean - true only if this table serves as a many-to-many bridge\n3. **join_pattern**: EXPLICIT SQL join syntax showing the exact columns to join\n   - Format: \"{source_table}.{fk_column} = {target_table}.{pk_column}\"\n   - Example: \"Students.permanent_address_id = Addresses.address_id\"\n4. **when_to_use**: LIST of specific question patterns that require this join\n   - Be concrete: \"Questions about student's permanent address\", \"Questions about home location\"\n   - NOT vague: \"When you need address information\" (too generic)\n5. **vs_confusion**: What this relationship should NOT be confused with\n   - Example: \"DO NOT confuse with current_address_id (that's temporary address)\"\n6. **complete_join_path**: For multi-hop joins, show full path\n   - Example: [\"Students → Has_Pet → Pets\"]\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Use the EXACT field names above - do not deviate from this structure\n3. join_pattern must be actual SQL that can be copy-pasted\n4. when_to_use must list 2-3 specific question patterns\n5. Every relationship MUST have vs_confusion (what NOT to confuse it with)\n\n**BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):**\nSome tables exist solely to connect two other tables.\n\n**Identifying Bridge Tables:**\n- Typically has 2+ foreign keys and few/no other meaningful columns\n- Often named like \"table1_table2\", \"junction_*\", or similar\n- Required for queries that connect the two referenced tables\n\n**Bridge Table Requirements:**\n1. Mark \"is_bridge_table\": true\n2. Document BOTH foreign keys as separate relationships\n3. complete_join_path shows full path through bridge (e.g., [\"orders → order_items → products\"])\n4. when_to_use explains what M:M relationship this enables\n5. vs_confusion warns: \"DO NOT skip this bridge table when joining X to Y\"\n\n**Example**: If order_items bridges orders to products:\n```\nRelationship from order_items to orders:\n- relationship_type: \"many-to-one\"\n- is_bridge_table: true\n- join_pattern: \"order_items.order_id = orders.order_id\"\n- when_to_use: [\"Questions connecting orders to product details\", \"What products are in an order\"]\n- vs_confusion: \"DO NOT join orders directly to products - must go through order_items bridge\"\n- complete_join_path: [\"orders → order_items → products\"]\n```\n\nCOLUMN NAME DISAMBIGUATION:\nSome column names appear in multiple tables with different meanings and purposes.\n\n**PHASE 2 STRUCTURED COLUMN DISAMBIGUATION:**\nFor columns that appear in 2+ tables, you MUST provide:\n\n1. **primary_location**: Which table \"owns\" this column (source of truth)\n   - For `student_id`: primary_location is \"Students\" (the entity itself)\n   - For `status`: identify which table's status is the main entity\n\n2. **foreign_key_locations**: List of OTHER tables where this column appears as a FK\n   - Example: student_id also appears in [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\n\n3. **directional_guidance**: CRITICAL - explain subject vs relationship usage\n   - **Primary table usage**: \"Use {primary_table}.{column} when question is ABOUT the entity\"\n     * Example: \"Use Students.student_id when question is ABOUT a student (their name, age, info)\"\n   - **Foreign key usage**: \"Use {fk_table}.{column} when question is about what entity IS DOING/HAS\"\n     * Example: \"Use Enrollments.student_id when question is about courses a student IS TAKING\"\n     * Example: \"Use Has_Pet.student_id when question is about pets a student OWNS\"\n\n4. **subject_vs_relationship**: Make this distinction explicit\n   - \"{primary_table}.{column} = the entity themselves (SUBJECT)\"\n   - \"{fk_table}.{column} = things related to/owned by that entity (RELATIONSHIP)\"\n\n**Example - student_id disambiguation:**\n```\nColumn: student_id\nPrimary location: Students (source of truth for student records)\nForeign key locations: [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\nDirectional guidance:\n  - Use Students.student_id when: Question is ABOUT a student (their name, age, address, demographics)\n  - Use Enrollments.student_id when: Question is about what courses a student IS TAKING or ENROLLED IN\n  - Use Has_Pet.student_id when: Question is about what pets a student OWNS or HAS\n  - Use Transcript_Contents.student_id when: Question is about a student's GRADES or TRANSCRIPT\nSubject vs relationship:\n  - Students.student_id = the student entity itself\n  - FK.student_id = relationships/actions/possessions of that student\n```\n\n**Example - status column (different meanings):**\n```\nColumn: status\nPrimary location: N/A (different meaning in each table)\nAppears in: [\"orders\", \"customers\"]\nDisambiguation:\n  - orders.status: Fulfillment stage (pending, shipped, delivered)\n  - customers.status: Account state (active, inactive, suspended)\n  - NEVER confuse these - they represent completely different business concepts\n  - Always qualify: \"customer status\" vs \"order status\" in natural language\n```\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. **Bridge table identification: Which tables serve as many-to-many bridges?**\n5. Column semantics: What business concept does each column represent?\n6. **Column disambiguation: Which column names appear in multiple tables?**\n7. Query patterns: What questions would users typically ask?\n8. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: Has_Pet =====\nRow count: 0\nPrimary key: unknown\n\nColumns:\n  • StuID: INTEGER NULL\n  • PetID: INTEGER NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → StuID REFERENCES Student.StuID\n     JOIN: JOIN Student ON Has_Pet.StuID = Student.StuID\n     Source: turso_schema\n  → PetID REFERENCES Pets.PetID\n     JOIN: JOIN Pets ON Has_Pet.PetID = Pets.PetID\n     Source: turso_schema\n\n===== Table: Pets =====\nRow count: 3\nPrimary key: PetID\n\nColumns:\n  • PetID: INTEGER [PRIMARY KEY] NULL\n  • PetType: VARCHAR(20) NULL\n  • pet_age: INTEGER NULL\n  • weight: REAL NULL\n\n(No foreign keys)\n\n===== Table: Student =====\nRow count: 34\nPrimary key: StuID\n\nColumns:\n  • StuID: INTEGER [PRIMARY KEY] NULL\n  • LName: VARCHAR(12) NULL\n  • Fname: VARCHAR(12) NULL\n  • Age: INTEGER NULL\n  • Sex: VARCHAR(1) NULL\n  • Major: INTEGER NULL\n  • Advisor: INTEGER NULL\n  • city_code: VARCHAR(3) NULL\n\n(No foreign keys)\n\nSAMPLE DATA:\n\nTable: student\n  Sample rows (10):\n    1. {\"stuid\": 1001, \"lname\": \"Smith\", \"fname\": \"Linda\", \"age\": 18, \"sex\": \"F\", \"major\": 600, \"advisor\": 1121, \"city_code\": \"BAL\"}\n    2. {\"stuid\": 1002, \"lname\": \"Kim\", \"fname\": \"Tracy\", \"age\": 19, \"sex\": \"F\", \"major\": 600, \"advisor\": 7712, \"city_code\": \"HKG\"}\n    3. {\"stuid\": 1003, \"lname\": \"Jones\", \"fname\": \"Shiela\", \"age\": 21, \"sex\": \"F\", \"major\": 600, \"advisor\": 7792, \"city_code\": \"WAS\"}\n    4. {\"stuid\": 1004, \"lname\": \"Kumar\", \"fname\": \"Dinesh\", \"age\": 20, \"sex\": \"M\", \"major\": 600, \"advisor\": 8423, \"city_code\": \"CHI\"}\n    5. {\"stuid\": 1005, \"lname\": \"Gompers\", \"fname\": \"Paul\", \"age\": 26, \"sex\": \"M\", \"major\": 600, \"advisor\": 1121, \"city_code\": \"YYZ\"}\n\nTable: has_pet\n  Sample rows (3):\n    1. {\"stuid\": 1001, \"petid\": 2001}\n    2. {\"stuid\": 1002, \"petid\": 2002}\n    3. {\"stuid\": 1002, \"petid\": 2003}\n\nTable: pets\n  Sample rows (3):\n    1. {\"petid\": 2001, \"pettype\": \"cat\", \"pet_age\": 3, \"weight\": 12.0}\n    2. {\"petid\": 2002, \"pettype\": \"dog\", \"pet_age\": 2, \"weight\": 13.4}\n    3. {\"petid\": 2003, \"pettype\": \"dog\", \"pet_age\": 1, \"weight\": 9.3}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-13T04:09:50.420478\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns like 'column = ?' or 'column > ?'\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'\"],\n          \"common_values\": [\"string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'\"],\n          \"disambiguation\": {\n            \"appears_in_tables\": [\"string - ALL tables where this column name appears\"],\n            \"primary_location\": \"string - which table 'owns' this column (source of truth), or 'N/A' if different meanings\",\n            \"foreign_key_locations\": [\"string - tables where this appears as a FK reference\"],\n            \"directional_guidance\": \"string - explain when to use primary vs FK versions with SUBJECT vs RELATIONSHIP pattern\",\n            \"subject_vs_relationship\": \"string - explicit explanation: 'primary_table.column = subject, fk_table.column = relationship'\"\n          }\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"column\": \"string - FK column name\",\n          \"references_table\": \"string - target table name\",\n          \"relationship_type\": \"string - exactly one of: 'one-to-many', 'many-to-one', 'many-to-many'\",\n          \"is_bridge_table\": \"boolean - true if this table bridges a many-to-many relationship\",\n          \"join_pattern\": \"string - explicit SQL join syntax: 'source_table.fk_column = target_table.pk_column'\",\n          \"when_to_use\": [\"string - specific question patterns that need this join (be concrete, not vague)\"],\n          \"vs_confusion\": \"string - what this relationship should NOT be confused with\",\n          \"complete_join_path\": [\"string - for multi-hop joins, show full path (e.g., 'table1 → bridge → table2')\"],\n          \"business_meaning\": \"string - what this relationship represents in business terms\",\n          \"common_mistakes\": [\"string - typical errors when using this relationship (e.g., 'DO NOT skip bridge_table')\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users, focus on WHAT data means, not HOW it's stored\n- NO technical schema details: Do NOT include data types, row counts, primary keys, nullability, or FK references - these will be provided separately from the live database schema\n- Completeness: Cover all tables and meaningful columns with business context\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms users might use for each concept\n  * CRITICAL: Synonyms must be UNAMBIGUOUS and NOT match partial words from the column name\n  * DO NOT use synonyms that contain fragments of the actual column name\n  * BAD examples: \"Degree ID\" for degree_program_id, \"Course ID\" for course_id, \"Student Name\" for student_name_id\n  * GOOD examples: \"Program Identifier\" for degree_program_id, \"Enrollment Code\" for course_id, \"Learner Full Name Identifier\" for student_name_id\n  * Filter out any synonym that could be confused with the actual business concept vs the ID column\n- Query context: Explain how users typically filter/aggregate each field\n- Clear relationships: State the BUSINESS MEANING of each relationship (e.g., \"links orders to customers\")\n- Common values: Provide realistic example values users might reference (e.g., 'Active', 'Pending', 'USA')\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

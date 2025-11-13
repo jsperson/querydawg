@@ -1,0 +1,598 @@
+{
+  "tables": [
+    {
+      "name": "conductor",
+      "columns": [
+        {
+          "name": "conductor_id",
+          "synonyms": [
+            "Conductor Number",
+            "Leader ID",
+            "Maestro ID"
+          ],
+          "aggregations": [],
+          "business_name": "Conductor ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "conductor_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each conductor."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Conductor Name",
+            "Leader Name",
+            "Maestro Name"
+          ],
+          "aggregations": [],
+          "business_name": "Name",
+          "common_values": [
+            "Antal Doráti",
+            "Igor Stravinsky"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the conductor."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "Conductor Age",
+            "Leader Age",
+            "Maestro Age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "MAX(age)"
+          ],
+          "business_name": "Age",
+          "common_values": [
+            "40",
+            "41",
+            "42"
+          ],
+          "typical_filters": [
+            "age > ?",
+            "age < ?"
+          ],
+          "business_meaning": "The age of the conductor."
+        },
+        {
+          "name": "nationality",
+          "synonyms": [
+            "Country",
+            "Origin",
+            "Citizenship"
+          ],
+          "aggregations": [],
+          "business_name": "Nationality",
+          "common_values": [
+            "USA",
+            "UK"
+          ],
+          "typical_filters": [
+            "nationality = ?"
+          ],
+          "business_meaning": "The country of origin of the conductor."
+        },
+        {
+          "name": "year_of_work",
+          "synonyms": [
+            "Experience",
+            "Work Years",
+            "Career Length"
+          ],
+          "aggregations": [
+            "AVG(year_of_work)",
+            "SUM(year_of_work)"
+          ],
+          "business_name": "Years of Experience",
+          "common_values": [
+            "10",
+            "11",
+            "20"
+          ],
+          "typical_filters": [
+            "year_of_work > ?",
+            "year_of_work < ?"
+          ],
+          "business_meaning": "The number of years the conductor has been working."
+        }
+      ],
+      "purpose": "Represents individuals who lead orchestras.",
+      "business_name": "Conductor",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Who is the conductor of the London Symphony Orchestra?",
+          "explanation": "Find the conductor associated with the London Symphony Orchestra.",
+          "involves_joins": [
+            "orchestra"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "orchestra",
+      "columns": [
+        {
+          "name": "orchestra_id",
+          "synonyms": [
+            "Orchestra Number",
+            "Ensemble ID",
+            "Group ID"
+          ],
+          "aggregations": [],
+          "business_name": "Orchestra ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "orchestra_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each orchestra."
+        },
+        {
+          "name": "orchestra",
+          "synonyms": [
+            "Ensemble Name",
+            "Group Name",
+            "Band Name"
+          ],
+          "aggregations": [],
+          "business_name": "Orchestra Name",
+          "common_values": [
+            "London Symphony Orchestra",
+            "Columbia Symphony Orchestra"
+          ],
+          "typical_filters": [
+            "orchestra = ?",
+            "orchestra LIKE ?"
+          ],
+          "business_meaning": "The name of the orchestra."
+        },
+        {
+          "name": "conductor_id",
+          "synonyms": [
+            "Leader ID",
+            "Maestro ID",
+            "Conductor Number"
+          ],
+          "aggregations": [],
+          "business_name": "Conductor ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "conductor_id = ?"
+          ],
+          "business_meaning": "The ID of the conductor leading the orchestra."
+        },
+        {
+          "name": "record_company",
+          "synonyms": [
+            "Label",
+            "Music Company",
+            "Recording Label"
+          ],
+          "aggregations": [],
+          "business_name": "Record Company",
+          "common_values": [
+            "Mercury Records",
+            "Columbia Masterworks"
+          ],
+          "typical_filters": [
+            "record_company = ?",
+            "record_company LIKE ?"
+          ],
+          "business_meaning": "The record company associated with the orchestra."
+        },
+        {
+          "name": "year_of_founded",
+          "synonyms": [
+            "Foundation Year",
+            "Established Year",
+            "Start Year"
+          ],
+          "aggregations": [
+            "AVG(year_of_founded)",
+            "MIN(year_of_founded)"
+          ],
+          "business_name": "Year Founded",
+          "common_values": [
+            "2003",
+            "2009"
+          ],
+          "typical_filters": [
+            "year_of_founded > ?",
+            "year_of_founded < ?"
+          ],
+          "business_meaning": "The year the orchestra was founded."
+        },
+        {
+          "name": "major_record_format",
+          "synonyms": [
+            "Format",
+            "Media Type",
+            "Recording Format"
+          ],
+          "aggregations": [],
+          "business_name": "Major Record Format",
+          "common_values": [
+            "CD",
+            "DVD"
+          ],
+          "typical_filters": [
+            "major_record_format = ?"
+          ],
+          "business_meaning": "The primary format in which the orchestra's records are available."
+        }
+      ],
+      "purpose": "Represents musical ensembles and their associated details.",
+      "business_name": "Orchestra",
+      "relationships": [
+        {
+          "column": "conductor_id",
+          "common_uses": [
+            "To find the conductor of a specific orchestra."
+          ],
+          "business_meaning": "Links each orchestra to its conductor.",
+          "references_table": "conductor"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which orchestras are led by conductors from the USA?",
+          "explanation": "Find orchestras with conductors whose nationality is USA.",
+          "involves_joins": [
+            "conductor"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "performance",
+      "columns": [
+        {
+          "name": "performance_id",
+          "synonyms": [
+            "Performance Number",
+            "Show ID",
+            "Event ID"
+          ],
+          "aggregations": [],
+          "business_name": "Performance ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "performance_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each performance."
+        },
+        {
+          "name": "orchestra_id",
+          "synonyms": [
+            "Ensemble ID",
+            "Group ID",
+            "Band ID"
+          ],
+          "aggregations": [],
+          "business_name": "Orchestra ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "orchestra_id = ?"
+          ],
+          "business_meaning": "The ID of the orchestra performing."
+        },
+        {
+          "name": "type",
+          "synonyms": [
+            "Event Type",
+            "Show Type",
+            "Category"
+          ],
+          "aggregations": [],
+          "business_name": "Performance Type",
+          "common_values": [
+            "Auditions 1",
+            "Auditions 2"
+          ],
+          "typical_filters": [
+            "type = ?",
+            "type LIKE ?"
+          ],
+          "business_meaning": "The type or category of the performance."
+        },
+        {
+          "name": "date",
+          "synonyms": [
+            "Event Date",
+            "Show Date",
+            "Performance Date"
+          ],
+          "aggregations": [],
+          "business_name": "Date",
+          "common_values": [
+            "9 June",
+            "10 June"
+          ],
+          "typical_filters": [
+            "date = ?",
+            "date > ?"
+          ],
+          "business_meaning": "The date on which the performance took place."
+        },
+        {
+          "name": "Official_ratings_(millions)",
+          "synonyms": [
+            "Ratings",
+            "Viewership",
+            "Audience Size"
+          ],
+          "aggregations": [
+            "AVG(Official_ratings_(millions))",
+            "MAX(Official_ratings_(millions))"
+          ],
+          "business_name": "Official Ratings",
+          "common_values": [
+            "5.2",
+            "6.73"
+          ],
+          "typical_filters": [
+            "Official_ratings_(millions) > ?",
+            "Official_ratings_(millions) < ?"
+          ],
+          "business_meaning": "The official ratings of the performance in millions."
+        },
+        {
+          "name": "weekly_rank",
+          "synonyms": [
+            "Rank",
+            "Position",
+            "Standing"
+          ],
+          "aggregations": [],
+          "business_name": "Weekly Rank",
+          "common_values": [
+            "12",
+            "8"
+          ],
+          "typical_filters": [
+            "weekly_rank = ?",
+            "weekly_rank < ?"
+          ],
+          "business_meaning": "The rank of the performance for the week."
+        },
+        {
+          "name": "share",
+          "synonyms": [
+            "Audience Share",
+            "Market Share",
+            "Viewership Share"
+          ],
+          "aggregations": [],
+          "business_name": "Share",
+          "common_values": [
+            "22.7%",
+            "28.0%"
+          ],
+          "typical_filters": [
+            "share = ?",
+            "share > ?"
+          ],
+          "business_meaning": "The share percentage of the audience."
+        }
+      ],
+      "purpose": "Tracks individual performances by orchestras, including ratings and rankings.",
+      "business_name": "Performance",
+      "relationships": [
+        {
+          "column": "orchestra_id",
+          "common_uses": [
+            "To find performances by a specific orchestra."
+          ],
+          "business_meaning": "Associates each performance with the orchestra that performed.",
+          "references_table": "orchestra"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the ratings of performances by the London Symphony Orchestra?",
+          "explanation": "Retrieve ratings for performances by the London Symphony Orchestra.",
+          "involves_joins": [
+            "orchestra"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "show",
+      "columns": [
+        {
+          "name": "show_id",
+          "synonyms": [
+            "Show Number",
+            "Event ID",
+            "Performance ID"
+          ],
+          "aggregations": [],
+          "business_name": "Show ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "show_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each show."
+        },
+        {
+          "name": "performance_id",
+          "synonyms": [
+            "Performance Number",
+            "Event ID",
+            "Show ID"
+          ],
+          "aggregations": [],
+          "business_name": "Performance ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "performance_id = ?"
+          ],
+          "business_meaning": "The ID of the performance associated with the show."
+        },
+        {
+          "name": "if_first_show",
+          "synonyms": [
+            "Initial Show",
+            "Debut Location",
+            "First Venue"
+          ],
+          "aggregations": [],
+          "business_name": "First Show Location",
+          "common_values": [
+            "Glebe Park",
+            "Fir Park"
+          ],
+          "typical_filters": [
+            "if_first_show = ?",
+            "if_first_show LIKE ?"
+          ],
+          "business_meaning": "Indicates if the show was the first at a particular location."
+        },
+        {
+          "name": "result",
+          "synonyms": [
+            "Outcome",
+            "Conclusion",
+            "End Result"
+          ],
+          "aggregations": [],
+          "business_name": "Result",
+          "common_values": [
+            "T",
+            "F"
+          ],
+          "typical_filters": [
+            "result = ?"
+          ],
+          "business_meaning": "The outcome or result of the show."
+        },
+        {
+          "name": "attendance",
+          "synonyms": [
+            "Audience Size",
+            "Spectators",
+            "Crowd"
+          ],
+          "aggregations": [
+            "SUM(attendance)",
+            "AVG(attendance)"
+          ],
+          "business_name": "Attendance",
+          "common_values": [
+            "1026",
+            "695"
+          ],
+          "typical_filters": [
+            "attendance > ?",
+            "attendance < ?"
+          ],
+          "business_meaning": "The number of people who attended the show."
+        }
+      ],
+      "purpose": "Details individual shows, including attendance and results.",
+      "business_name": "Show",
+      "relationships": [
+        {
+          "column": "performance_id",
+          "common_uses": [
+            "To find details about a specific performance's show."
+          ],
+          "business_meaning": "Links each show to its corresponding performance.",
+          "references_table": "performance"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "How many people attended the first show at Glebe Park?",
+          "explanation": "Find the attendance for the first show at Glebe Park.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Performing Arts",
+    "purpose": "This database tracks orchestras, their conductors, performances, and shows, including details about ratings, attendance, and other performance metrics.",
+    "key_entities": [
+      "Conductor",
+      "Orchestra",
+      "Performance",
+      "Show"
+    ],
+    "typical_questions": [
+      "Who is the conductor of a specific orchestra?",
+      "What are the ratings of performances by a particular orchestra?",
+      "How many people attended a specific show?",
+      "Which orchestras have the highest-rated performances?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in performance date format",
+      "example": "What performances happened in June?",
+      "clarification": "Ensure the date format is consistent and correctly parsed.",
+      "affected_elements": [
+        "performance.date"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:57:54.492038",
+  "query_guidelines": [
+    "Always use the correct foreign key relationships to join tables.",
+    "Be cautious of date formats and ensure consistency.",
+    "Use aggregations wisely to avoid performance issues with large datasets.",
+    "Filter on specific columns to improve query performance.",
+    "Avoid ambiguous terms; be specific about the entities and attributes you are querying."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "orchestra performance analysis",
+      "tables_involved": [
+        "orchestra",
+        "performance"
+      ],
+      "example_question": "Which orchestras have the highest-rated performances?",
+      "typical_structure": "SELECT orchestra.orchestra, MAX(performance.Official_ratings_(millions)) FROM orchestra JOIN performance ON orchestra.orchestra_id = performance.orchestra_id GROUP BY orchestra.orchestra",
+      "key_considerations": [
+        "Ensure correct join on orchestra_id to link performances with orchestras."
+      ]
+    }
+  ]
+}

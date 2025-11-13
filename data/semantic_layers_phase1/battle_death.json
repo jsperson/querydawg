@@ -1,0 +1,470 @@
+{
+  "tables": [
+    {
+      "name": "battle",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Battle Number",
+            "Conflict ID",
+            "Engagement ID"
+          ],
+          "aggregations": [],
+          "business_name": "Battle ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each battle."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Conflict Name",
+            "Engagement Name",
+            "Skirmish Name"
+          ],
+          "aggregations": [],
+          "business_name": "Battle Name",
+          "common_values": [
+            "Battle of Adrianople",
+            "Battle of Serres"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The name of the battle."
+        },
+        {
+          "name": "date",
+          "synonyms": [
+            "Conflict Date",
+            "Engagement Date",
+            "Skirmish Date"
+          ],
+          "aggregations": [],
+          "business_name": "Battle Date",
+          "common_values": [
+            "14 April 1205",
+            "June 1205"
+          ],
+          "typical_filters": [
+            "date = ?",
+            "date BETWEEN ? AND ?"
+          ],
+          "business_meaning": "The date when the battle took place."
+        },
+        {
+          "name": "bulgarian_commander",
+          "synonyms": [
+            "Bulgarian Leader",
+            "Bulgarian General",
+            "Bulgarian Chief"
+          ],
+          "aggregations": [],
+          "business_name": "Bulgarian Commander",
+          "common_values": [
+            "Kaloyan",
+            "Unknown"
+          ],
+          "typical_filters": [
+            "bulgarian_commander = ?"
+          ],
+          "business_meaning": "The commander leading the Bulgarian forces."
+        },
+        {
+          "name": "latin_commander",
+          "synonyms": [
+            "Latin Leader",
+            "Latin General",
+            "Latin Chief"
+          ],
+          "aggregations": [],
+          "business_name": "Latin Commander",
+          "common_values": [
+            "Baldwin I",
+            "Unknown"
+          ],
+          "typical_filters": [
+            "latin_commander = ?"
+          ],
+          "business_meaning": "The commander leading the Latin forces."
+        },
+        {
+          "name": "result",
+          "synonyms": [
+            "Outcome",
+            "Victory Status",
+            "Result"
+          ],
+          "aggregations": [],
+          "business_name": "Battle Result",
+          "common_values": [
+            "Bulgarian victory",
+            "Latin victory"
+          ],
+          "typical_filters": [
+            "result = ?"
+          ],
+          "business_meaning": "The outcome of the battle."
+        }
+      ],
+      "purpose": "This table represents historical battles, including details about the commanders and the outcome.",
+      "business_name": "Battle",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What was the outcome of the Battle of Adrianople?",
+          "explanation": "Filter the battle table by name to find the result.",
+          "involves_joins": []
+        },
+        {
+          "question": "Who was the Bulgarian commander at the Battle of Serres?",
+          "explanation": "Filter the battle table by name to find the Bulgarian commander.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "ship",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Ship Number",
+            "Vessel ID",
+            "Boat ID"
+          ],
+          "aggregations": [],
+          "business_name": "Ship ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each ship."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Vessel Name",
+            "Boat Name",
+            "Craft Name"
+          ],
+          "aggregations": [],
+          "business_name": "Ship Name",
+          "common_values": [
+            "Lettice",
+            "Bon Accord"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The name of the ship."
+        },
+        {
+          "name": "tonnage",
+          "synonyms": [
+            "Weight",
+            "Capacity",
+            "Displacement"
+          ],
+          "aggregations": [
+            "AVG(tonnage)",
+            "SUM(tonnage)"
+          ],
+          "business_name": "Tonnage",
+          "common_values": [
+            "t",
+            "391"
+          ],
+          "typical_filters": [
+            "tonnage = ?",
+            "tonnage > ?"
+          ],
+          "business_meaning": "The weight or carrying capacity of the ship."
+        },
+        {
+          "name": "ship_type",
+          "synonyms": [
+            "Vessel Type",
+            "Boat Type",
+            "Craft Type"
+          ],
+          "aggregations": [],
+          "business_name": "Ship Type",
+          "common_values": [
+            "Brig",
+            "18-gun Brig"
+          ],
+          "typical_filters": [
+            "ship_type = ?"
+          ],
+          "business_meaning": "The classification of the ship based on its design and purpose."
+        },
+        {
+          "name": "location",
+          "synonyms": [
+            "Area",
+            "Region",
+            "Place"
+          ],
+          "aggregations": [],
+          "business_name": "Location",
+          "common_values": [
+            "English Channel",
+            "SW Approaches"
+          ],
+          "typical_filters": [
+            "location = ?",
+            "location LIKE ?"
+          ],
+          "business_meaning": "The geographical area where the ship was located."
+        },
+        {
+          "name": "disposition_of_ship",
+          "synonyms": [
+            "Fate",
+            "Status",
+            "Outcome"
+          ],
+          "aggregations": [],
+          "business_name": "Disposition of Ship",
+          "common_values": [
+            "Captured",
+            "Wrecked"
+          ],
+          "typical_filters": [
+            "disposition_of_ship = ?"
+          ],
+          "business_meaning": "The final status or fate of the ship."
+        }
+      ],
+      "purpose": "This table tracks ships involved in battles, including their type, location, and fate.",
+      "business_name": "Ship",
+      "relationships": [
+        {
+          "column": "lost_in_battle",
+          "common_uses": [
+            "To find which battle a ship was lost in",
+            "To link ships to their respective battles"
+          ],
+          "business_meaning": "Indicates the battle in which the ship was lost.",
+          "references_table": "battle"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which ships were lost in the Battle of Messinopolis?",
+          "explanation": "Join the ship table with the battle table using lost_in_battle to filter by battle name.",
+          "involves_joins": [
+            "battle"
+          ]
+        },
+        {
+          "question": "What is the fate of the ship named 'HMS Avon'?",
+          "explanation": "Filter the ship table by name to find the disposition.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "death",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Casualty Number",
+            "Incident ID",
+            "Record ID"
+          ],
+          "aggregations": [],
+          "business_name": "Casualty ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each casualty record."
+        },
+        {
+          "name": "note",
+          "synonyms": [
+            "Incident Note",
+            "Location Description",
+            "Event Note"
+          ],
+          "aggregations": [],
+          "business_name": "Location Note",
+          "common_values": [
+            "Dantewada, Chhattisgarh",
+            "Gajapati, Odisha"
+          ],
+          "typical_filters": [
+            "note = ?",
+            "note LIKE ?"
+          ],
+          "business_meaning": "Additional information about the location of the incident."
+        },
+        {
+          "name": "killed",
+          "synonyms": [
+            "Fatalities",
+            "Deaths",
+            "Casualties"
+          ],
+          "aggregations": [
+            "SUM(killed)",
+            "AVG(killed)"
+          ],
+          "business_name": "Number Killed",
+          "common_values": [
+            "8",
+            "3",
+            "25"
+          ],
+          "typical_filters": [
+            "killed = ?",
+            "killed > ?"
+          ],
+          "business_meaning": "The number of fatalities in the incident."
+        },
+        {
+          "name": "injured",
+          "synonyms": [
+            "Injuries",
+            "Wounded",
+            "Hurt"
+          ],
+          "aggregations": [
+            "SUM(injured)",
+            "AVG(injured)"
+          ],
+          "business_name": "Number Injured",
+          "common_values": [
+            "0",
+            "1",
+            "2"
+          ],
+          "typical_filters": [
+            "injured = ?",
+            "injured > ?"
+          ],
+          "business_meaning": "The number of injuries in the incident."
+        }
+      ],
+      "purpose": "This table records casualties, including deaths and injuries, associated with specific ships.",
+      "business_name": "Casualty",
+      "relationships": [
+        {
+          "column": "caused_by_ship_id",
+          "common_uses": [
+            "To find casualties caused by a specific ship",
+            "To link casualty records to ships"
+          ],
+          "business_meaning": "Indicates the ship responsible for the casualties.",
+          "references_table": "ship"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "How many people were killed by the ship 'Lettice'?",
+          "explanation": "Join the death table with the ship table using caused_by_ship_id to filter by ship name and sum the killed column.",
+          "involves_joins": [
+            "ship"
+          ]
+        },
+        {
+          "question": "What incidents occurred in Dantewada, Chhattisgarh?",
+          "explanation": "Filter the death table by note to find relevant incidents.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Historical Military Conflicts",
+    "purpose": "This database is used to track historical battles, the ships involved, and the casualties resulting from these conflicts.",
+    "key_entities": [
+      "Battles",
+      "Ships",
+      "Casualties"
+    ],
+    "typical_questions": [
+      "What battles did a specific commander lead?",
+      "Which ships were lost in a particular battle?",
+      "How many casualties were caused by a specific ship?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Date format inconsistency",
+      "example": "What battles occurred in 1205?",
+      "clarification": "Ensure date filtering accounts for different formats like '14 April 1205' and 'June 1205'.",
+      "affected_elements": [
+        "battle.date"
+      ]
+    },
+    {
+      "issue": "Commander name ambiguity",
+      "example": "Who was the commander at the Battle of Rusion?",
+      "clarification": "Specify whether the query is for the Bulgarian or Latin commander.",
+      "affected_elements": [
+        "battle.bulgarian_commander",
+        "battle.latin_commander"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:50:25.962604",
+  "query_guidelines": [
+    "Always use the correct join patterns for foreign keys to ensure data integrity.",
+    "Be mindful of date formats when filtering by date.",
+    "Use aggregation functions appropriately to summarize data.",
+    "Avoid ambiguous terms; specify which commander or ship is being referenced.",
+    "Consider performance implications of joining large tables."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Battle and Ship Loss Analysis",
+      "tables_involved": [
+        "battle",
+        "ship"
+      ],
+      "example_question": "Which battles resulted in the loss of ships?",
+      "typical_structure": "SELECT battle.name FROM battle JOIN ship ON battle.id = ship.lost_in_battle WHERE ship.name = ?",
+      "key_considerations": [
+        "Ensure the correct join on lost_in_battle",
+        "Filter by specific ship names if needed"
+      ]
+    },
+    {
+      "pattern_type": "Casualty Analysis by Ship",
+      "tables_involved": [
+        "battle",
+        "ship",
+        "death"
+      ],
+      "example_question": "How many casualties were caused by ships lost in a specific battle?",
+      "typical_structure": "SELECT SUM(death.killed) FROM death JOIN ship ON death.caused_by_ship_id = ship.id JOIN battle ON ship.lost_in_battle = battle.id WHERE battle.name = ?",
+      "key_considerations": [
+        "Ensure all joins are correctly applied",
+        "Aggregate casualty data accurately"
+      ]
+    }
+  ]
+}

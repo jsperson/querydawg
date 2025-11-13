@@ -1,0 +1,579 @@
+{
+  "tables": [
+    {
+      "name": "concert",
+      "columns": [
+        {
+          "name": "concert_id",
+          "synonyms": [
+            "concert number",
+            "event ID",
+            "concert code"
+          ],
+          "aggregations": [],
+          "business_name": "Concert ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "concert_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each concert."
+        },
+        {
+          "name": "concert_name",
+          "synonyms": [
+            "event name",
+            "show title",
+            "concert title"
+          ],
+          "aggregations": [],
+          "business_name": "Concert Name",
+          "common_values": [
+            "Auditions",
+            "Super bootcamp"
+          ],
+          "typical_filters": [
+            "concert_name = ?",
+            "concert_name LIKE ?"
+          ],
+          "business_meaning": "The name of the concert."
+        },
+        {
+          "name": "theme",
+          "synonyms": [
+            "concept",
+            "motif",
+            "subject"
+          ],
+          "aggregations": [],
+          "business_name": "Theme",
+          "common_values": [
+            "Free choice",
+            "Bleeding Love"
+          ],
+          "typical_filters": [
+            "theme = ?",
+            "theme LIKE ?"
+          ],
+          "business_meaning": "The theme or main focus of the concert."
+        },
+        {
+          "name": "stadium_id",
+          "synonyms": [
+            "venue ID",
+            "location ID",
+            "stadium number"
+          ],
+          "aggregations": [],
+          "business_name": "Stadium ID",
+          "common_values": [
+            "1",
+            "2",
+            "9"
+          ],
+          "typical_filters": [
+            "stadium_id = ?"
+          ],
+          "business_meaning": "The identifier for the stadium where the concert is held."
+        },
+        {
+          "name": "year",
+          "synonyms": [
+            "concert year",
+            "event year",
+            "year of concert"
+          ],
+          "aggregations": [
+            "COUNT(year)",
+            "MAX(year)",
+            "MIN(year)"
+          ],
+          "business_name": "Year",
+          "common_values": [
+            "2014",
+            "2015"
+          ],
+          "typical_filters": [
+            "year = ?",
+            "year > ?",
+            "year < ?"
+          ],
+          "business_meaning": "The year in which the concert takes place."
+        }
+      ],
+      "purpose": "This table represents the concerts being organized, including their themes and locations.",
+      "business_name": "Concert",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What concerts were held in 2014?",
+          "explanation": "Filter the concert table by the year column.",
+          "involves_joins": []
+        },
+        {
+          "question": "What is the theme of the concert named 'Auditions'?",
+          "explanation": "Filter the concert table by concert_name to find the theme.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "singer",
+      "columns": [
+        {
+          "name": "singer_id",
+          "synonyms": [
+            "artist ID",
+            "performer ID",
+            "singer number"
+          ],
+          "aggregations": [],
+          "business_name": "Singer ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "singer_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each singer."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "artist name",
+            "performer name",
+            "singer name"
+          ],
+          "aggregations": [],
+          "business_name": "Name",
+          "common_values": [
+            "Joe Sharp",
+            "Timbaland"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The name of the singer."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "nationality",
+            "home country",
+            "country of origin"
+          ],
+          "aggregations": [
+            "COUNT(country)"
+          ],
+          "business_name": "Country",
+          "common_values": [
+            "Netherlands",
+            "United States"
+          ],
+          "typical_filters": [
+            "country = ?",
+            "country LIKE ?"
+          ],
+          "business_meaning": "The country of origin of the singer."
+        },
+        {
+          "name": "song_name",
+          "synonyms": [
+            "track name",
+            "song title",
+            "music title"
+          ],
+          "aggregations": [],
+          "business_name": "Song Name",
+          "common_values": [
+            "You",
+            "Dangerous"
+          ],
+          "typical_filters": [
+            "song_name = ?",
+            "song_name LIKE ?"
+          ],
+          "business_meaning": "The name of a song performed by the singer."
+        },
+        {
+          "name": "song_release_year",
+          "synonyms": [
+            "release year",
+            "year of release",
+            "song year"
+          ],
+          "aggregations": [
+            "COUNT(song_release_year)",
+            "MAX(song_release_year)"
+          ],
+          "business_name": "Song Release Year",
+          "common_values": [
+            "1992",
+            "2008"
+          ],
+          "typical_filters": [
+            "song_release_year = ?",
+            "song_release_year > ?"
+          ],
+          "business_meaning": "The year the song was released."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "years old",
+            "singer age",
+            "artist age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "MAX(age)",
+            "MIN(age)"
+          ],
+          "business_name": "Age",
+          "common_values": [
+            "52",
+            "32"
+          ],
+          "typical_filters": [
+            "age = ?",
+            "age > ?",
+            "age < ?"
+          ],
+          "business_meaning": "The age of the singer."
+        },
+        {
+          "name": "is_male",
+          "synonyms": [
+            "sex",
+            "male",
+            "gender"
+          ],
+          "aggregations": [],
+          "business_name": "Gender",
+          "common_values": [
+            "T",
+            "F"
+          ],
+          "typical_filters": [
+            "is_male = ?"
+          ],
+          "business_meaning": "Indicates if the singer is male."
+        }
+      ],
+      "purpose": "This table contains information about singers, including their personal details and songs.",
+      "business_name": "Singer",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which singers are from the United States?",
+          "explanation": "Filter the singer table by the country column.",
+          "involves_joins": []
+        },
+        {
+          "question": "What songs were released in 2008?",
+          "explanation": "Filter the singer table by the song_release_year column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "singer_in_concert",
+      "columns": [
+        {
+          "name": "concert_id",
+          "synonyms": [
+            "event ID",
+            "concert number",
+            "concert code"
+          ],
+          "aggregations": [],
+          "business_name": "Concert ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "concert_id = ?"
+          ],
+          "business_meaning": "The identifier of the concert in which the singer performed."
+        },
+        {
+          "name": "singer_id",
+          "synonyms": [
+            "artist ID",
+            "performer ID",
+            "singer number"
+          ],
+          "aggregations": [],
+          "business_name": "Singer ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "singer_id = ?"
+          ],
+          "business_meaning": "The identifier of the singer performing in the concert."
+        }
+      ],
+      "purpose": "This table links singers to the concerts they perform in.",
+      "business_name": "Singer in Concert",
+      "relationships": [
+        {
+          "column": "concert_id",
+          "common_uses": [
+            "To find all singers who performed at a specific concert."
+          ],
+          "business_meaning": "Links a singer to the concert they performed in.",
+          "references_table": "concert"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which singers performed at the 'Auditions' concert?",
+          "explanation": "Join singer_in_concert with concert to filter by concert_name, then join with singer to get singer details.",
+          "involves_joins": [
+            "concert",
+            "singer"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stadium",
+      "columns": [
+        {
+          "name": "stadium_id",
+          "synonyms": [
+            "venue ID",
+            "location ID",
+            "stadium number"
+          ],
+          "aggregations": [],
+          "business_name": "Stadium ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "stadium_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each stadium."
+        },
+        {
+          "name": "location",
+          "synonyms": [
+            "venue location",
+            "stadium place",
+            "site"
+          ],
+          "aggregations": [],
+          "business_name": "Location",
+          "common_values": [
+            "Raith Rovers",
+            "Ayr United"
+          ],
+          "typical_filters": [
+            "location = ?",
+            "location LIKE ?"
+          ],
+          "business_meaning": "The location of the stadium."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "venue name",
+            "stadium title",
+            "arena name"
+          ],
+          "aggregations": [],
+          "business_name": "Stadium Name",
+          "common_values": [
+            "Stark's Park",
+            "Somerset Park"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The name of the stadium."
+        },
+        {
+          "name": "capacity",
+          "synonyms": [
+            "seating capacity",
+            "maximum capacity",
+            "total seats"
+          ],
+          "aggregations": [
+            "AVG(capacity)",
+            "MAX(capacity)",
+            "MIN(capacity)"
+          ],
+          "business_name": "Capacity",
+          "common_values": [
+            "10104",
+            "11998"
+          ],
+          "typical_filters": [
+            "capacity = ?",
+            "capacity > ?",
+            "capacity < ?"
+          ],
+          "business_meaning": "The maximum number of people the stadium can hold."
+        },
+        {
+          "name": "highest",
+          "synonyms": [
+            "peak attendance",
+            "maximum crowd",
+            "highest crowd"
+          ],
+          "aggregations": [
+            "AVG(highest)",
+            "MAX(highest)",
+            "MIN(highest)"
+          ],
+          "business_name": "Highest Attendance",
+          "common_values": [
+            "4812",
+            "2363"
+          ],
+          "typical_filters": [
+            "highest = ?",
+            "highest > ?",
+            "highest < ?"
+          ],
+          "business_meaning": "The highest recorded attendance at the stadium."
+        },
+        {
+          "name": "lowest",
+          "synonyms": [
+            "minimum attendance",
+            "smallest crowd",
+            "lowest crowd"
+          ],
+          "aggregations": [
+            "AVG(lowest)",
+            "MAX(lowest)",
+            "MIN(lowest)"
+          ],
+          "business_name": "Lowest Attendance",
+          "common_values": [
+            "1294",
+            "1057"
+          ],
+          "typical_filters": [
+            "lowest = ?",
+            "lowest > ?",
+            "lowest < ?"
+          ],
+          "business_meaning": "The lowest recorded attendance at the stadium."
+        },
+        {
+          "name": "average",
+          "synonyms": [
+            "mean attendance",
+            "average crowd",
+            "typical attendance"
+          ],
+          "aggregations": [
+            "AVG(average)",
+            "MAX(average)",
+            "MIN(average)"
+          ],
+          "business_name": "Average Attendance",
+          "common_values": [
+            "2106",
+            "1477"
+          ],
+          "typical_filters": [
+            "average = ?",
+            "average > ?",
+            "average < ?"
+          ],
+          "business_meaning": "The average attendance at the stadium."
+        }
+      ],
+      "purpose": "This table contains information about stadiums where concerts are held.",
+      "business_name": "Stadium",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the capacity of Stark's Park?",
+          "explanation": "Filter the stadium table by name to find the capacity.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Entertainment",
+    "purpose": "This database is used to track concerts, singers, and the venues where concerts are held.",
+    "key_entities": [
+      "Concert",
+      "Singer",
+      "Stadium"
+    ],
+    "typical_questions": [
+      "Which singers performed at a specific concert?",
+      "What concerts were held in a particular year?",
+      "Where is a specific concert taking place?",
+      "What is the capacity of the stadium hosting a concert?",
+      "Which singers are from a specific country?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Gender representation in the singer table",
+      "example": "How many male singers are there?",
+      "clarification": "Use the is_male column where 'T' represents true (male) and 'F' represents false (female).",
+      "affected_elements": [
+        "singer.is_male"
+      ]
+    },
+    {
+      "issue": "Year ambiguity between concert and song release",
+      "example": "What happened in 2014?",
+      "clarification": "Specify whether the question refers to concert year or song release year.",
+      "affected_elements": [
+        "concert.year",
+        "singer.song_release_year"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:51:26.726158",
+  "query_guidelines": [
+    "Always specify the table when filtering by columns that exist in multiple tables, such as 'year'.",
+    "Use joins carefully to ensure correct relationships between singers and concerts.",
+    "Consider performance when joining large tables; filter early to reduce data size.",
+    "Be explicit about gender queries using the is_male column.",
+    "When querying for attendance, ensure to specify whether you need highest, lowest, or average values."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "singer concert participation",
+      "tables_involved": [
+        "singer",
+        "concert",
+        "singer_in_concert"
+      ],
+      "example_question": "Which singers performed at the 'Super bootcamp' concert?",
+      "typical_structure": "SELECT singer.name FROM singer JOIN singer_in_concert ON singer.singer_id = singer_in_concert.singer_id JOIN concert ON singer_in_concert.concert_id = concert.concert_id WHERE concert.concert_name = 'Super bootcamp'",
+      "key_considerations": [
+        "Ensure correct joins between singer_in_concert and both singer and concert tables."
+      ]
+    }
+  ]
+}

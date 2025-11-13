@@ -1,0 +1,329 @@
+{
+  "tables": [
+    {
+      "name": "people",
+      "columns": [
+        {
+          "name": "people_id",
+          "synonyms": [
+            "ID",
+            "Identifier",
+            "Person Key"
+          ],
+          "aggregations": [],
+          "business_name": "Person ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "people_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each person."
+        },
+        {
+          "name": "nationality",
+          "synonyms": [
+            "Country",
+            "Citizenship",
+            "Origin"
+          ],
+          "aggregations": [
+            "COUNT(nationality)"
+          ],
+          "business_name": "Nationality",
+          "common_values": [
+            "Russia",
+            "Bulgaria"
+          ],
+          "typical_filters": [
+            "nationality = ?"
+          ],
+          "business_meaning": "The country of origin or citizenship of the person."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Full Name",
+            "Person Name",
+            "Individual Name"
+          ],
+          "aggregations": [],
+          "business_name": "Name",
+          "common_values": [
+            "Aleksey Ostapenko",
+            "Teodor Salparov"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the person."
+        },
+        {
+          "name": "birth_date",
+          "synonyms": [
+            "Date of Birth",
+            "DOB",
+            "Birthdate"
+          ],
+          "aggregations": [],
+          "business_name": "Birth Date",
+          "common_values": [
+            "May 26, 1986",
+            "August 16, 1982"
+          ],
+          "typical_filters": [
+            "birth_date = ?",
+            "birth_date > ?"
+          ],
+          "business_meaning": "The date of birth of the person."
+        },
+        {
+          "name": "height",
+          "synonyms": [
+            "Stature",
+            "Tallness",
+            "Height in cm"
+          ],
+          "aggregations": [
+            "AVG(height)",
+            "MAX(height)"
+          ],
+          "business_name": "Height",
+          "common_values": [
+            "207.0",
+            "182.0"
+          ],
+          "typical_filters": [
+            "height = ?",
+            "height > ?"
+          ],
+          "business_meaning": "The height of the person in centimeters."
+        }
+      ],
+      "purpose": "This table contains personal information about individuals, such as their name, nationality, birth date, and height.",
+      "business_name": "People",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the nationality of a person named Aleksey Ostapenko?",
+          "explanation": "Filter the people table by name to find the nationality.",
+          "involves_joins": []
+        },
+        {
+          "question": "How many people are from Russia?",
+          "explanation": "Count the number of entries in the people table where nationality is Russia.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "poker_player",
+      "columns": [
+        {
+          "name": "poker_player_id",
+          "synonyms": [
+            "Player ID",
+            "Poker ID",
+            "Player Key"
+          ],
+          "aggregations": [],
+          "business_name": "Poker Player ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "poker_player_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each poker player."
+        },
+        {
+          "name": "people_id",
+          "synonyms": [
+            "Person Key",
+            "ID",
+            "Individual ID"
+          ],
+          "aggregations": [],
+          "business_name": "Person ID",
+          "common_values": [
+            "1",
+            "2",
+            "5"
+          ],
+          "typical_filters": [
+            "people_id = ?"
+          ],
+          "business_meaning": "Links the poker player to their personal details in the people table."
+        },
+        {
+          "name": "final_table_made",
+          "synonyms": [
+            "Finals",
+            "Final Table Count",
+            "Table Finals"
+          ],
+          "aggregations": [
+            "SUM(final_table_made)",
+            "AVG(final_table_made)"
+          ],
+          "business_name": "Final Tables Made",
+          "common_values": [
+            "42.0",
+            "10.0"
+          ],
+          "typical_filters": [
+            "final_table_made = ?",
+            "final_table_made > ?"
+          ],
+          "business_meaning": "The number of final tables the poker player has reached."
+        },
+        {
+          "name": "best_finish",
+          "synonyms": [
+            "Top Finish",
+            "Best Position",
+            "Highest Rank"
+          ],
+          "aggregations": [
+            "MIN(best_finish)"
+          ],
+          "business_name": "Best Finish",
+          "common_values": [
+            "1.0",
+            "2.0"
+          ],
+          "typical_filters": [
+            "best_finish = ?",
+            "best_finish < ?"
+          ],
+          "business_meaning": "The best position the poker player has finished in a tournament."
+        },
+        {
+          "name": "money_rank",
+          "synonyms": [
+            "Earnings Rank",
+            "Financial Rank",
+            "Rank by Money"
+          ],
+          "aggregations": [
+            "MIN(money_rank)"
+          ],
+          "business_name": "Money Rank",
+          "common_values": [
+            "68.0",
+            "141.0"
+          ],
+          "typical_filters": [
+            "money_rank = ?",
+            "money_rank < ?"
+          ],
+          "business_meaning": "The rank of the poker player based on their earnings."
+        },
+        {
+          "name": "earnings",
+          "synonyms": [
+            "Total Earnings",
+            "Prize Money",
+            "Winnings"
+          ],
+          "aggregations": [
+            "SUM(earnings)",
+            "MAX(earnings)"
+          ],
+          "business_name": "Earnings",
+          "common_values": [
+            "476090.0",
+            "189233.0"
+          ],
+          "typical_filters": [
+            "earnings = ?",
+            "earnings > ?"
+          ],
+          "business_meaning": "The total earnings of the poker player from tournaments."
+        }
+      ],
+      "purpose": "This table tracks the performance and earnings of poker players.",
+      "business_name": "Poker Players",
+      "relationships": [
+        {
+          "column": "people_id",
+          "common_uses": [
+            "To find personal details of a poker player.",
+            "To match poker performance with personal attributes."
+          ],
+          "business_meaning": "Links poker players to their personal information.",
+          "references_table": "people"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the earnings of the poker player named Yevgeni Sivozhelez?",
+          "explanation": "Join the poker_player table with the people table on people_id and filter by name.",
+          "involves_joins": [
+            "people"
+          ]
+        },
+        {
+          "question": "Which poker player has the highest earnings?",
+          "explanation": "Order the poker_player table by earnings in descending order and select the top entry.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Sports and Entertainment",
+    "purpose": "This database tracks information about poker players and their personal details, including their performance in poker tournaments.",
+    "key_entities": [
+      "People",
+      "Poker Players"
+    ],
+    "typical_questions": [
+      "What are the earnings of a specific poker player?",
+      "Which poker player has the highest money rank?",
+      "What is the nationality of a poker player with a specific name?",
+      "How many final tables has a poker player made?",
+      "What is the best finish position of a poker player?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in identifying players by name",
+      "example": "What are the earnings of the player named Sergey?",
+      "clarification": "Use the full name to ensure accurate identification.",
+      "affected_elements": [
+        "people.name",
+        "poker_player.earnings"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:58:46.946202",
+  "query_guidelines": [
+    "Always use the full name when filtering by name to avoid ambiguity.",
+    "Ensure joins are correctly made using the people_id to access related information.",
+    "Consider performance implications when joining large tables; use filters to limit data early.",
+    "Be cautious of NULL values in foreign keys which might affect join results.",
+    "Use aggregations like SUM and AVG to derive insights from numeric columns."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Player Performance Analysis",
+      "tables_involved": [
+        "people",
+        "poker_player"
+      ],
+      "example_question": "What is the best finish of poker players from Russia?",
+      "typical_structure": "SELECT best_finish FROM poker_player JOIN people ON poker_player.people_id = people.people_id WHERE nationality = 'Russia'",
+      "key_considerations": [
+        "Ensure the join is correctly made on people_id to access nationality."
+      ]
+    }
+  ]
+}

@@ -224,48 +224,105 @@ CRITICAL CONSTRAINTS:
 FOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):
 The schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.
 
+**PHASE 2 STRUCTURED RELATIONSHIP DOCUMENTATION:**
+For each relationship, you MUST provide these fields in this EXACT format:
+
+1. **relationship_type**: Exactly one of: "one-to-many", "many-to-one", "many-to-many"
+2. **is_bridge_table**: boolean - true only if this table serves as a many-to-many bridge
+3. **join_pattern**: EXPLICIT SQL join syntax showing the exact columns to join
+   - Format: "{{source_table}}.{{fk_column}} = {{target_table}}.{{pk_column}}"
+   - Example: "Students.permanent_address_id = Addresses.address_id"
+4. **when_to_use**: LIST of specific question patterns that require this join
+   - Be concrete: "Questions about student's permanent address", "Questions about home location"
+   - NOT vague: "When you need address information" (too generic)
+5. **vs_confusion**: What this relationship should NOT be confused with
+   - Example: "DO NOT confuse with current_address_id (that's temporary address)"
+6. **complete_join_path**: For multi-hop joins, show full path
+   - Example: ["Students → Has_Pet → Pets"]
+
 **RULES FOR RELATIONSHIPS:**
 1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any
-2. Document the EXACT join pattern for each FK
-3. Explain WHEN this join is needed (what questions require it)
-4. Do NOT invent relationships not shown in the schema
-5. Each FK MUST appear in your "relationships" array with complete join_pattern
+2. Use the EXACT field names above - do not deviate from this structure
+3. join_pattern must be actual SQL that can be copy-pasted
+4. when_to_use must list 2-3 specific question patterns
+5. Every relationship MUST have vs_confusion (what NOT to confuse it with)
 
-**Missing a documented foreign key will cause query failures!**
-
-BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):
-Some tables exist solely to connect two other tables in many-to-many relationships.
+**BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):**
+Some tables exist solely to connect two other tables.
 
 **Identifying Bridge Tables:**
 - Typically has 2+ foreign keys and few/no other meaningful columns
 - Often named like "table1_table2", "junction_*", or similar
 - Required for queries that connect the two referenced tables
 
-**Critical Requirements:**
-1. IDENTIFY all bridge tables in your analysis
-2. Document the COMPLETE join path through the bridge
-3. Mark as "is_bridge_table": true in relationships
-4. Explain WHY this table is needed (what M:M relationship it represents)
-5. List common mistakes (e.g., "DO NOT skip this table when joining X to Y")
+**Bridge Table Requirements:**
+1. Mark "is_bridge_table": true
+2. Document BOTH foreign keys as separate relationships
+3. complete_join_path shows full path through bridge (e.g., ["orders → order_items → products"])
+4. when_to_use explains what M:M relationship this enables
+5. vs_confusion warns: "DO NOT skip this bridge table when joining X to Y"
 
 **Example**: If order_items bridges orders to products:
-- orders → order_items → products
-- Purpose: Enables queries connecting orders to product details (many-to-many relationship)
-- Common mistake: Trying to join orders directly to products (will fail or give wrong results)
+```
+Relationship from order_items to orders:
+- relationship_type: "many-to-one"
+- is_bridge_table: true
+- join_pattern: "order_items.order_id = orders.order_id"
+- when_to_use: ["Questions connecting orders to product details", "What products are in an order"]
+- vs_confusion: "DO NOT join orders directly to products - must go through order_items bridge"
+- complete_join_path: ["orders → order_items → products"]
+```
 
 COLUMN NAME DISAMBIGUATION:
-Some column names appear in multiple tables with different meanings.
+Some column names appear in multiple tables with different meanings and purposes.
 
-**When documenting columns:**
-1. Identify all column names that appear in 2+ tables
-2. Explain the semantic difference between each occurrence
-3. Provide usage guidance (when to use table1.column vs table2.column)
-4. Warn about ambiguous references that need table qualification
+**PHASE 2 STRUCTURED COLUMN DISAMBIGUATION:**
+For columns that appear in 2+ tables, you MUST provide:
 
-**Example**: If both "orders" and "customers" have a "status" column:
-- orders.status: Current fulfillment status (pending, shipped, delivered)
-- customers.status: Account status (active, inactive, suspended)
-- Usage: Always qualify which table's status is needed for the query
+1. **primary_location**: Which table "owns" this column (source of truth)
+   - For `student_id`: primary_location is "Students" (the entity itself)
+   - For `status`: identify which table's status is the main entity
+
+2. **foreign_key_locations**: List of OTHER tables where this column appears as a FK
+   - Example: student_id also appears in ["Enrollments", "Has_Pet", "Transcript_Contents"]
+
+3. **directional_guidance**: CRITICAL - explain subject vs relationship usage
+   - **Primary table usage**: "Use {{primary_table}}.{{column}} when question is ABOUT the entity"
+     * Example: "Use Students.student_id when question is ABOUT a student (their name, age, info)"
+   - **Foreign key usage**: "Use {{fk_table}}.{{column}} when question is about what entity IS DOING/HAS"
+     * Example: "Use Enrollments.student_id when question is about courses a student IS TAKING"
+     * Example: "Use Has_Pet.student_id when question is about pets a student OWNS"
+
+4. **subject_vs_relationship**: Make this distinction explicit
+   - "{{primary_table}}.{{column}} = the entity themselves (SUBJECT)"
+   - "{{fk_table}}.{{column}} = things related to/owned by that entity (RELATIONSHIP)"
+
+**Example - student_id disambiguation:**
+```
+Column: student_id
+Primary location: Students (source of truth for student records)
+Foreign key locations: ["Enrollments", "Has_Pet", "Transcript_Contents"]
+Directional guidance:
+  - Use Students.student_id when: Question is ABOUT a student (their name, age, address, demographics)
+  - Use Enrollments.student_id when: Question is about what courses a student IS TAKING or ENROLLED IN
+  - Use Has_Pet.student_id when: Question is about what pets a student OWNS or HAS
+  - Use Transcript_Contents.student_id when: Question is about a student's GRADES or TRANSCRIPT
+Subject vs relationship:
+  - Students.student_id = the student entity itself
+  - FK.student_id = relationships/actions/possessions of that student
+```
+
+**Example - status column (different meanings):**
+```
+Column: status
+Primary location: N/A (different meaning in each table)
+Appears in: ["orders", "customers"]
+Disambiguation:
+  - orders.status: Fulfillment stage (pending, shipped, delivered)
+  - customers.status: Account state (active, inactive, suspended)
+  - NEVER confuse these - they represent completely different business concepts
+  - Always qualify: "customer status" vs "order status" in natural language
+```
 
 ANALYSIS APPROACH:
 Think step-by-step before generating output:
@@ -319,12 +376,11 @@ Generate a JSON object with this structure:
           "aggregations": ["string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'"],
           "common_values": ["string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'"],
           "disambiguation": {{
-            "appears_in_tables": ["string - other tables with this column name (if applicable)"],
-            "this_table_meaning": "string - what this column means in THIS table",
-            "other_table_meanings": {{
-              "table_name": "string - what it means in that table"
-            }},
-            "usage_guidance": "string - when to use which table's version"
+            "appears_in_tables": ["string - ALL tables where this column name appears"],
+            "primary_location": "string - which table 'owns' this column (source of truth), or 'N/A' if different meanings",
+            "foreign_key_locations": ["string - tables where this appears as a FK reference"],
+            "directional_guidance": "string - explain when to use primary vs FK versions with SUBJECT vs RELATIONSHIP pattern",
+            "subject_vs_relationship": "string - explicit explanation: 'primary_table.column = subject, fk_table.column = relationship'"
           }}
         }}
       ],
@@ -333,11 +389,13 @@ Generate a JSON object with this structure:
         {{
           "column": "string - FK column name",
           "references_table": "string - target table name",
-          "relationship_type": "string - 'one-to-many', 'many-to-one', or 'many-to-many'",
+          "relationship_type": "string - exactly one of: 'one-to-many', 'many-to-one', 'many-to-many'",
           "is_bridge_table": "boolean - true if this table bridges a many-to-many relationship",
-          "complete_join_path": ["string - if multi-hop join required, show full path (e.g., 'table1 → bridge → table2')"],
+          "join_pattern": "string - explicit SQL join syntax: 'source_table.fk_column = target_table.pk_column'",
+          "when_to_use": ["string - specific question patterns that need this join (be concrete, not vague)"],
+          "vs_confusion": "string - what this relationship should NOT be confused with",
+          "complete_join_path": ["string - for multi-hop joins, show full path (e.g., 'table1 → bridge → table2')"],
           "business_meaning": "string - what this relationship represents in business terms",
-          "common_uses": ["string - when/why users would query across these tables"],
           "common_mistakes": ["string - typical errors when using this relationship (e.g., 'DO NOT skip bridge_table')"]
         }}
       ],

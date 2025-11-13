@@ -1,0 +1,432 @@
+{
+  "tables": [
+    {
+      "name": "has_pet",
+      "columns": [
+        {
+          "name": "stuid",
+          "synonyms": [
+            "student number",
+            "student identifier",
+            "student key"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1001",
+            "1002",
+            "1003"
+          ],
+          "typical_filters": [
+            "stuid = ?",
+            "stuid IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a student who owns a pet."
+        },
+        {
+          "name": "petid",
+          "synonyms": [
+            "pet number",
+            "pet identifier",
+            "pet key"
+          ],
+          "aggregations": [],
+          "business_name": "Pet ID",
+          "common_values": [
+            "2001",
+            "2002",
+            "2003"
+          ],
+          "typical_filters": [
+            "petid = ?",
+            "petid IN (?)"
+          ],
+          "business_meaning": "The unique identifier for a pet owned by a student."
+        }
+      ],
+      "purpose": "This table represents the relationship between students and the pets they own.",
+      "business_name": "Pet Ownership",
+      "relationships": [
+        {
+          "column": "petid",
+          "common_uses": [
+            "To find out details about the pets owned by students."
+          ],
+          "business_meaning": "Links a pet ownership record to the specific pet details.",
+          "references_table": "pets"
+        },
+        {
+          "column": "stuid",
+          "common_uses": [
+            "To identify which students own pets."
+          ],
+          "business_meaning": "Links a pet ownership record to the specific student.",
+          "references_table": "student"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which students own pets?",
+          "explanation": "Query the has_pet table and join with the student table to get student details.",
+          "involves_joins": [
+            "student"
+          ]
+        },
+        {
+          "question": "What types of pets do students have?",
+          "explanation": "Query the has_pet table and join with the pets table to get pet types.",
+          "involves_joins": [
+            "pets"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pets",
+      "columns": [
+        {
+          "name": "petid",
+          "synonyms": [
+            "pet number",
+            "pet identifier",
+            "pet key"
+          ],
+          "aggregations": [],
+          "business_name": "Pet ID",
+          "common_values": [
+            "2001",
+            "2002",
+            "2003"
+          ],
+          "typical_filters": [
+            "petid = ?",
+            "petid IN (?)"
+          ],
+          "business_meaning": "The unique identifier for each pet."
+        },
+        {
+          "name": "pettype",
+          "synonyms": [
+            "animal type",
+            "species",
+            "breed"
+          ],
+          "aggregations": [
+            "COUNT(pettype)"
+          ],
+          "business_name": "Pet Type",
+          "common_values": [
+            "cat",
+            "dog"
+          ],
+          "typical_filters": [
+            "pettype = ?",
+            "pettype IN (?)"
+          ],
+          "business_meaning": "The type or species of the pet."
+        },
+        {
+          "name": "pet_age",
+          "synonyms": [
+            "animal age",
+            "years old",
+            "age"
+          ],
+          "aggregations": [
+            "AVG(pet_age)",
+            "SUM(pet_age)"
+          ],
+          "business_name": "Pet Age",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "pet_age = ?",
+            "pet_age > ?"
+          ],
+          "business_meaning": "The age of the pet in years."
+        },
+        {
+          "name": "weight",
+          "synonyms": [
+            "animal weight",
+            "mass",
+            "body weight"
+          ],
+          "aggregations": [
+            "AVG(weight)",
+            "SUM(weight)"
+          ],
+          "business_name": "Pet Weight",
+          "common_values": [
+            "12.0",
+            "13.4",
+            "9.3"
+          ],
+          "typical_filters": [
+            "weight = ?",
+            "weight > ?"
+          ],
+          "business_meaning": "The weight of the pet in kilograms."
+        }
+      ],
+      "purpose": "This table contains details about the pets owned by students.",
+      "business_name": "Pets",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "How many students have dogs?",
+          "explanation": "Filter the pets table for 'dog' and join with has_pet to count students.",
+          "involves_joins": [
+            "has_pet"
+          ]
+        },
+        {
+          "question": "What is the average age of pets owned by students?",
+          "explanation": "Calculate the average pet_age from the pets table.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "student",
+      "columns": [
+        {
+          "name": "stuid",
+          "synonyms": [
+            "student number",
+            "student identifier",
+            "student key"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1001",
+            "1002",
+            "1003"
+          ],
+          "typical_filters": [
+            "stuid = ?",
+            "stuid IN (?)"
+          ],
+          "business_meaning": "The unique identifier for each student."
+        },
+        {
+          "name": "lname",
+          "synonyms": [
+            "surname",
+            "family name",
+            "last name"
+          ],
+          "aggregations": [],
+          "business_name": "Last Name",
+          "common_values": [
+            "Smith",
+            "Kim",
+            "Jones"
+          ],
+          "typical_filters": [
+            "lname = ?",
+            "lname LIKE ?"
+          ],
+          "business_meaning": "The family name of the student."
+        },
+        {
+          "name": "fname",
+          "synonyms": [
+            "first name",
+            "given name",
+            "forename"
+          ],
+          "aggregations": [],
+          "business_name": "First Name",
+          "common_values": [
+            "Linda",
+            "Tracy",
+            "Shiela"
+          ],
+          "typical_filters": [
+            "fname = ?",
+            "fname LIKE ?"
+          ],
+          "business_meaning": "The given name of the student."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "years old",
+            "student age",
+            "age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "SUM(age)"
+          ],
+          "business_name": "Age",
+          "common_values": [
+            "18",
+            "19",
+            "21"
+          ],
+          "typical_filters": [
+            "age = ?",
+            "age > ?"
+          ],
+          "business_meaning": "The age of the student in years."
+        },
+        {
+          "name": "sex",
+          "synonyms": [
+            "gender",
+            "sex",
+            "biological sex"
+          ],
+          "aggregations": [
+            "COUNT(sex)"
+          ],
+          "business_name": "Gender",
+          "common_values": [
+            "F",
+            "M"
+          ],
+          "typical_filters": [
+            "sex = ?",
+            "sex IN (?)"
+          ],
+          "business_meaning": "The gender of the student."
+        },
+        {
+          "name": "major",
+          "synonyms": [
+            "field of study",
+            "academic major",
+            "course"
+          ],
+          "aggregations": [
+            "COUNT(major)"
+          ],
+          "business_name": "Major",
+          "common_values": [
+            "600"
+          ],
+          "typical_filters": [
+            "major = ?",
+            "major IN (?)"
+          ],
+          "business_meaning": "The academic major or field of study of the student."
+        },
+        {
+          "name": "advisor",
+          "synonyms": [
+            "advisor number",
+            "advisor identifier",
+            "advisor key"
+          ],
+          "aggregations": [],
+          "business_name": "Advisor ID",
+          "common_values": [
+            "1121",
+            "7712",
+            "7792"
+          ],
+          "typical_filters": [
+            "advisor = ?",
+            "advisor IN (?)"
+          ],
+          "business_meaning": "The unique identifier for the student's academic advisor."
+        },
+        {
+          "name": "city_code",
+          "synonyms": [
+            "city",
+            "location code",
+            "city identifier"
+          ],
+          "aggregations": [],
+          "business_name": "City Code",
+          "common_values": [
+            "BAL",
+            "HKG",
+            "WAS"
+          ],
+          "typical_filters": [
+            "city_code = ?",
+            "city_code IN (?)"
+          ],
+          "business_meaning": "The code representing the city where the student resides."
+        }
+      ],
+      "purpose": "This table contains personal and academic details of students.",
+      "business_name": "Students",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Who are the students with the most pets?",
+          "explanation": "Join student with has_pet and group by student to count pets.",
+          "involves_joins": [
+            "has_pet"
+          ]
+        },
+        {
+          "question": "List all students majoring in a specific field.",
+          "explanation": "Filter the student table by the major column.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Education and Pet Ownership",
+    "purpose": "This database tracks students and their pet ownership details, including types of pets and their characteristics.",
+    "key_entities": [
+      "Student",
+      "Pet",
+      "Pet Ownership"
+    ],
+    "typical_questions": [
+      "Which students own pets?",
+      "What types of pets do students have?",
+      "How many students have dogs?",
+      "What is the average age of pets owned by students?",
+      "Who are the students with the most pets?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in pet ownership details",
+      "example": "Show me all pets owned by students.",
+      "clarification": "Ensure to join has_pet with both student and pets to get complete details.",
+      "affected_elements": [
+        "has_pet.stuid",
+        "has_pet.petid"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:58:25.970124",
+  "query_guidelines": [
+    "Always use the has_pet table to link students with their pets.",
+    "Ensure correct joins between tables to avoid missing data.",
+    "Use aggregations like COUNT and AVG to summarize data effectively.",
+    "Filter by specific columns like pettype or major for targeted queries.",
+    "Consider performance when joining multiple tables, especially with large datasets."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Student Pet Ownership Analysis",
+      "tables_involved": [
+        "student",
+        "has_pet",
+        "pets"
+      ],
+      "example_question": "Which students own pets and what types are they?",
+      "typical_structure": "SELECT student.fname, student.lname, pets.pettype FROM student JOIN has_pet ON student.stuid = has_pet.stuid JOIN pets ON has_pet.petid = pets.petid",
+      "key_considerations": [
+        "Ensure all joins are correctly applied to link students with their pets."
+      ]
+    }
+  ]
+}

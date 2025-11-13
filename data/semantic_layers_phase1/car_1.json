@@ -1,0 +1,620 @@
+{
+  "tables": [
+    {
+      "name": "car_makers",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Manufacturer ID",
+            "Maker ID",
+            "Company ID"
+          ],
+          "aggregations": [],
+          "business_name": "Manufacturer ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each car manufacturer."
+        },
+        {
+          "name": "maker",
+          "synonyms": [
+            "Maker",
+            "Brand",
+            "Company"
+          ],
+          "aggregations": [],
+          "business_name": "Maker Name",
+          "common_values": [
+            "amc",
+            "volkswagen",
+            "bmw"
+          ],
+          "typical_filters": [
+            "maker = ?"
+          ],
+          "business_meaning": "The short name or abbreviation of the car manufacturer."
+        },
+        {
+          "name": "fullname",
+          "synonyms": [
+            "Full Name",
+            "Company Name",
+            "Manufacturer Name"
+          ],
+          "aggregations": [],
+          "business_name": "Full Name",
+          "common_values": [
+            "American Motor Company",
+            "Volkswagen",
+            "BMW"
+          ],
+          "typical_filters": [
+            "fullname LIKE ?"
+          ],
+          "business_meaning": "The full name of the car manufacturer."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "Country ID",
+            "Nation ID",
+            "Country Code"
+          ],
+          "aggregations": [],
+          "business_name": "Country ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "country = ?"
+          ],
+          "business_meaning": "The identifier for the country where the car manufacturer is based."
+        }
+      ],
+      "purpose": "This table represents companies that manufacture cars, including their names and the countries they are based in.",
+      "business_name": "Car Manufacturers",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which car makers are based in a specific country?",
+          "explanation": "Filter the car_makers table by the country column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "car_names",
+      "columns": [
+        {
+          "name": "makeid",
+          "synonyms": [
+            "Model ID",
+            "Car ID",
+            "Vehicle ID"
+          ],
+          "aggregations": [],
+          "business_name": "Model ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "makeid = ?"
+          ],
+          "business_meaning": "A unique identifier for each car model."
+        },
+        {
+          "name": "model",
+          "synonyms": [
+            "Model",
+            "Car Model",
+            "Vehicle Model"
+          ],
+          "aggregations": [],
+          "business_name": "Model Name",
+          "common_values": [
+            "chevrolet",
+            "buick",
+            "plymouth"
+          ],
+          "typical_filters": [
+            "model = ?"
+          ],
+          "business_meaning": "The name of the car model."
+        },
+        {
+          "name": "make",
+          "synonyms": [
+            "Make",
+            "Brand",
+            "Manufacturer"
+          ],
+          "aggregations": [],
+          "business_name": "Make Name",
+          "common_values": [
+            "chevrolet chevelle malibu",
+            "buick skylark 320",
+            "plymouth satellite"
+          ],
+          "typical_filters": [
+            "make LIKE ?"
+          ],
+          "business_meaning": "The full name of the car make, often including the model."
+        }
+      ],
+      "purpose": "This table lists different car models and their associated makes.",
+      "business_name": "Car Models",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the names of all car models?",
+          "explanation": "Select the model column from the car_names table.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "cars_data",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Spec ID",
+            "Data ID",
+            "Entry ID"
+          ],
+          "aggregations": [],
+          "business_name": "Specification ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each car specification entry."
+        },
+        {
+          "name": "mpg",
+          "synonyms": [
+            "MPG",
+            "Fuel Efficiency",
+            "Mileage"
+          ],
+          "aggregations": [
+            "AVG(mpg)",
+            "MAX(mpg)",
+            "MIN(mpg)"
+          ],
+          "business_name": "Miles Per Gallon",
+          "common_values": [
+            "18.0",
+            "15.0",
+            "20.0"
+          ],
+          "typical_filters": [
+            "mpg > ?",
+            "mpg < ?"
+          ],
+          "business_meaning": "The fuel efficiency of the car measured in miles per gallon."
+        },
+        {
+          "name": "cylinders",
+          "synonyms": [
+            "Cylinders",
+            "Engine Cylinders",
+            "Cylinder Count"
+          ],
+          "aggregations": [
+            "AVG(cylinders)",
+            "COUNT(cylinders)"
+          ],
+          "business_name": "Number of Cylinders",
+          "common_values": [
+            "4",
+            "6",
+            "8"
+          ],
+          "typical_filters": [
+            "cylinders = ?"
+          ],
+          "business_meaning": "The number of cylinders in the car's engine."
+        },
+        {
+          "name": "edispl",
+          "synonyms": [
+            "Displacement",
+            "Engine Size",
+            "Engine Volume"
+          ],
+          "aggregations": [
+            "AVG(edispl)",
+            "MAX(edispl)",
+            "MIN(edispl)"
+          ],
+          "business_name": "Engine Displacement",
+          "common_values": [
+            "307.0",
+            "350.0",
+            "318.0"
+          ],
+          "typical_filters": [
+            "edispl > ?",
+            "edispl < ?"
+          ],
+          "business_meaning": "The total volume of all the cylinders in the engine, measured in cubic inches."
+        },
+        {
+          "name": "horsepower",
+          "synonyms": [
+            "HP",
+            "Power",
+            "Engine Power"
+          ],
+          "aggregations": [
+            "AVG(horsepower)",
+            "MAX(horsepower)",
+            "MIN(horsepower)"
+          ],
+          "business_name": "Horsepower",
+          "common_values": [
+            "130.0",
+            "165.0",
+            "150.0"
+          ],
+          "typical_filters": [
+            "horsepower > ?",
+            "horsepower < ?"
+          ],
+          "business_meaning": "The power output of the car's engine."
+        },
+        {
+          "name": "weight",
+          "synonyms": [
+            "Car Weight",
+            "Vehicle Weight",
+            "Mass"
+          ],
+          "aggregations": [
+            "AVG(weight)",
+            "MAX(weight)",
+            "MIN(weight)"
+          ],
+          "business_name": "Weight",
+          "common_values": [
+            "3504",
+            "3693",
+            "3436"
+          ],
+          "typical_filters": [
+            "weight > ?",
+            "weight < ?"
+          ],
+          "business_meaning": "The weight of the car in pounds."
+        },
+        {
+          "name": "accelerate",
+          "synonyms": [
+            "Acceleration",
+            "0-60 Time",
+            "Speed"
+          ],
+          "aggregations": [
+            "AVG(accelerate)",
+            "MIN(accelerate)",
+            "MAX(accelerate)"
+          ],
+          "business_name": "Acceleration",
+          "common_values": [
+            "12.0",
+            "11.5",
+            "10.5"
+          ],
+          "typical_filters": [
+            "accelerate < ?",
+            "accelerate > ?"
+          ],
+          "business_meaning": "The time it takes for the car to accelerate from 0 to 60 mph, measured in seconds."
+        },
+        {
+          "name": "year",
+          "synonyms": [
+            "Model Year",
+            "Year of Manufacture",
+            "Production Year"
+          ],
+          "aggregations": [
+            "COUNT(year)",
+            "MAX(year)",
+            "MIN(year)"
+          ],
+          "business_name": "Year",
+          "common_values": [
+            "1970",
+            "1971",
+            "1972"
+          ],
+          "typical_filters": [
+            "year = ?",
+            "year > ?",
+            "year < ?"
+          ],
+          "business_meaning": "The year the car model was manufactured."
+        }
+      ],
+      "purpose": "This table contains detailed specifications for various car models, such as fuel efficiency and engine power.",
+      "business_name": "Car Specifications",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the specifications of a specific car model?",
+          "explanation": "Filter the cars_data table by the id column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "continents",
+      "columns": [
+        {
+          "name": "contid",
+          "synonyms": [
+            "Continent ID",
+            "Region ID",
+            "Area ID"
+          ],
+          "aggregations": [],
+          "business_name": "Continent ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "contid = ?"
+          ],
+          "business_meaning": "A unique identifier for each continent."
+        },
+        {
+          "name": "continent",
+          "synonyms": [
+            "Continent",
+            "Region",
+            "Area"
+          ],
+          "aggregations": [],
+          "business_name": "Continent Name",
+          "common_values": [
+            "America",
+            "Europe",
+            "Asia"
+          ],
+          "typical_filters": [
+            "continent = ?"
+          ],
+          "business_meaning": "The name of the continent."
+        }
+      ],
+      "purpose": "This table lists continents where countries are located.",
+      "business_name": "Continents",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which continents have the most car manufacturers?",
+          "explanation": "Aggregate data from the car_makers table by joining with the countries and continents tables.",
+          "involves_joins": [
+            "countries",
+            "car_makers"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "countries",
+      "columns": [
+        {
+          "name": "countryid",
+          "synonyms": [
+            "Country ID",
+            "Nation ID",
+            "Country Code"
+          ],
+          "aggregations": [],
+          "business_name": "Country ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "countryid = ?"
+          ],
+          "business_meaning": "A unique identifier for each country."
+        },
+        {
+          "name": "countryname",
+          "synonyms": [
+            "Country",
+            "Nation",
+            "State"
+          ],
+          "aggregations": [],
+          "business_name": "Country Name",
+          "common_values": [
+            "USA",
+            "Germany",
+            "Japan"
+          ],
+          "typical_filters": [
+            "countryname = ?"
+          ],
+          "business_meaning": "The name of the country."
+        },
+        {
+          "name": "continent",
+          "synonyms": [
+            "Continent ID",
+            "Region ID",
+            "Area ID"
+          ],
+          "aggregations": [],
+          "business_name": "Continent ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "continent = ?"
+          ],
+          "business_meaning": "The identifier for the continent where the country is located."
+        }
+      ],
+      "purpose": "This table contains information about countries and their associated continents.",
+      "business_name": "Countries",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which countries are in a specific continent?",
+          "explanation": "Filter the countries table by the continent column.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "model_list",
+      "columns": [
+        {
+          "name": "modelid",
+          "synonyms": [
+            "Model ID",
+            "Car ID",
+            "Vehicle ID"
+          ],
+          "aggregations": [],
+          "business_name": "Model ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "modelid = ?"
+          ],
+          "business_meaning": "A unique identifier for each car model in the list."
+        },
+        {
+          "name": "maker",
+          "synonyms": [
+            "Maker ID",
+            "Manufacturer ID",
+            "Company ID"
+          ],
+          "aggregations": [],
+          "business_name": "Maker ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "maker = ?"
+          ],
+          "business_meaning": "The identifier for the car manufacturer associated with the model."
+        },
+        {
+          "name": "model",
+          "synonyms": [
+            "Model",
+            "Car Model",
+            "Vehicle Model"
+          ],
+          "aggregations": [],
+          "business_name": "Model Name",
+          "common_values": [
+            "amc",
+            "audi",
+            "bmw"
+          ],
+          "typical_filters": [
+            "model = ?"
+          ],
+          "business_meaning": "The name of the car model."
+        }
+      ],
+      "purpose": "This table provides a list of car models and their associated manufacturers.",
+      "business_name": "Model List",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What models are made by a specific manufacturer?",
+          "explanation": "Filter the model_list table by the maker column.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Automotive Industry",
+    "purpose": "This database is used to track information about car manufacturers, car models, and their specifications, as well as geographical data related to car makers.",
+    "key_entities": [
+      "Car Makers",
+      "Car Models",
+      "Car Specifications",
+      "Continents",
+      "Countries"
+    ],
+    "typical_questions": [
+      "What are the specifications of a specific car model?",
+      "Which car makers are based in a particular country?",
+      "What is the average horsepower of cars made by a specific manufacturer?",
+      "Which continents have the most car manufacturers?",
+      "What are the most fuel-efficient car models?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Similar column names across tables",
+      "example": "What is the make of the car?",
+      "clarification": "Specify whether 'make' refers to the car model or the manufacturer.",
+      "affected_elements": [
+        "car_names.make",
+        "car_makers.maker"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:50:57.708742",
+  "query_guidelines": [
+    "Always specify the table when referencing columns to avoid ambiguity.",
+    "Use joins carefully to ensure correct relationships between tables.",
+    "Consider performance when filtering large datasets, especially with non-indexed columns."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Car Manufacturer and Country Analysis",
+      "tables_involved": [
+        "car_makers",
+        "countries",
+        "continents"
+      ],
+      "example_question": "Which car makers are based in Europe?",
+      "typical_structure": "SELECT car_makers.maker FROM car_makers JOIN countries ON car_makers.country = countries.countryid JOIN continents ON countries.continent = continents.contid WHERE continents.continent = 'Europe'",
+      "key_considerations": [
+        "Ensure correct joins between car_makers, countries, and continents."
+      ]
+    }
+  ]
+}

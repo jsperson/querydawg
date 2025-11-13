@@ -1,0 +1,619 @@
+{
+  "tables": [
+    {
+      "name": "other_available_features",
+      "columns": [
+        {
+          "name": "feature_id",
+          "synonyms": [
+            "Feature Identifier",
+            "Feature Key",
+            "Feature Number"
+          ],
+          "aggregations": [],
+          "business_name": "Feature ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "feature_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each feature."
+        },
+        {
+          "name": "feature_type_code",
+          "synonyms": [
+            "Feature Category",
+            "Feature Class",
+            "Feature Group"
+          ],
+          "aggregations": [],
+          "business_name": "Feature Type Code",
+          "common_values": [
+            "Amenity",
+            "Security"
+          ],
+          "typical_filters": [
+            "feature_type_code = ?"
+          ],
+          "business_meaning": "The category or type of the feature."
+        },
+        {
+          "name": "feature_name",
+          "synonyms": [
+            "Feature Title",
+            "Feature Label",
+            "Feature Designation"
+          ],
+          "aggregations": [],
+          "business_name": "Feature Name",
+          "common_values": [
+            "AirCon",
+            "Pool",
+            "BurglarAlarm"
+          ],
+          "typical_filters": [
+            "feature_name = ?"
+          ],
+          "business_meaning": "The name of the feature."
+        },
+        {
+          "name": "feature_description",
+          "synonyms": [
+            "Feature Details",
+            "Feature Info",
+            "Feature Summary"
+          ],
+          "aggregations": [],
+          "business_name": "Feature Description",
+          "common_values": [
+            "Air Conditioning",
+            "Swimming Pool",
+            "Burglar Alarm"
+          ],
+          "typical_filters": [
+            "feature_description LIKE ?"
+          ],
+          "business_meaning": "A detailed description of the feature."
+        }
+      ],
+      "purpose": "This table lists all the features that can be associated with properties.",
+      "business_name": "Available Features",
+      "relationships": [
+        {
+          "column": "feature_type_code",
+          "common_uses": [
+            "To categorize features by type."
+          ],
+          "business_meaning": "Links each feature to its type.",
+          "references_table": "ref_feature_types"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the available features for a specific type?",
+          "explanation": "Filter features by their type code.",
+          "involves_joins": [
+            "ref_feature_types"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "other_property_features",
+      "columns": [
+        {
+          "name": "property_id",
+          "synonyms": [
+            "Property Identifier",
+            "Property Key",
+            "Property Number"
+          ],
+          "aggregations": [],
+          "business_name": "Property ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "property_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each property."
+        },
+        {
+          "name": "feature_id",
+          "synonyms": [
+            "Feature Identifier",
+            "Feature Key",
+            "Feature Number"
+          ],
+          "aggregations": [],
+          "business_name": "Feature ID",
+          "common_values": [
+            "2",
+            "3",
+            "4"
+          ],
+          "typical_filters": [
+            "feature_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each feature associated with a property."
+        },
+        {
+          "name": "property_feature_description",
+          "synonyms": [
+            "Feature Details",
+            "Feature Info",
+            "Feature Summary"
+          ],
+          "aggregations": [],
+          "business_name": "Property Feature Description",
+          "common_values": [
+            "dolorem",
+            "earum",
+            "illo"
+          ],
+          "typical_filters": [
+            "property_feature_description LIKE ?"
+          ],
+          "business_meaning": "A description of the feature as it applies to the property."
+        }
+      ],
+      "purpose": "This table associates features with specific properties.",
+      "business_name": "Property Features",
+      "relationships": [
+        {
+          "column": "feature_id",
+          "common_uses": [
+            "To find out what features a property has."
+          ],
+          "business_meaning": "Links property features to available features.",
+          "references_table": "other_available_features"
+        },
+        {
+          "column": "property_id",
+          "common_uses": [
+            "To list features for a given property."
+          ],
+          "business_meaning": "Associates features with specific properties.",
+          "references_table": "properties"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What features does a specific property have?",
+          "explanation": "Filter by property_id to list all associated features.",
+          "involves_joins": [
+            "other_available_features",
+            "properties"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "properties",
+      "columns": [
+        {
+          "name": "property_id",
+          "synonyms": [
+            "Property Identifier",
+            "Property Key",
+            "Property Number"
+          ],
+          "aggregations": [],
+          "business_name": "Property ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "property_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each property."
+        },
+        {
+          "name": "property_type_code",
+          "synonyms": [
+            "Property Category",
+            "Property Class",
+            "Property Group"
+          ],
+          "aggregations": [],
+          "business_name": "Property Type Code",
+          "common_values": [
+            "House",
+            "Apartment",
+            "Field"
+          ],
+          "typical_filters": [
+            "property_type_code = ?"
+          ],
+          "business_meaning": "The type of the property, such as house or apartment."
+        },
+        {
+          "name": "date_on_market",
+          "synonyms": [
+            "Listing Date",
+            "Market Date",
+            "Available Date"
+          ],
+          "aggregations": [
+            "MIN(date_on_market)",
+            "MAX(date_on_market)"
+          ],
+          "business_name": "Date on Market",
+          "common_values": [
+            "1991-06-21",
+            "1990-05-25",
+            "1986-11-26"
+          ],
+          "typical_filters": [
+            "date_on_market >= ?",
+            "date_on_market <= ?"
+          ],
+          "business_meaning": "The date when the property was listed on the market."
+        },
+        {
+          "name": "date_sold",
+          "synonyms": [
+            "Sale Date",
+            "Sold Date",
+            "Closing Date"
+          ],
+          "aggregations": [
+            "MIN(date_sold)",
+            "MAX(date_sold)"
+          ],
+          "business_name": "Date Sold",
+          "common_values": [
+            "1979-05-13",
+            "1990-11-14",
+            "1981-06-26"
+          ],
+          "typical_filters": [
+            "date_sold >= ?",
+            "date_sold <= ?"
+          ],
+          "business_meaning": "The date when the property was sold."
+        },
+        {
+          "name": "property_name",
+          "synonyms": [
+            "Property Title",
+            "Property Label",
+            "Property Designation"
+          ],
+          "aggregations": [],
+          "business_name": "Property Name",
+          "common_values": [
+            "park",
+            "the cole",
+            "prism"
+          ],
+          "typical_filters": [
+            "property_name = ?"
+          ],
+          "business_meaning": "The name or title of the property."
+        },
+        {
+          "name": "property_address",
+          "synonyms": [
+            "Address",
+            "Location",
+            "Property Location"
+          ],
+          "aggregations": [],
+          "business_name": "Property Address",
+          "common_values": [
+            "4745 Emerson Stravenue",
+            "098 Tremaine Highway",
+            "062 Micaela Court"
+          ],
+          "typical_filters": [
+            "property_address LIKE ?"
+          ],
+          "business_meaning": "The physical address of the property."
+        },
+        {
+          "name": "room_count",
+          "synonyms": [
+            "Number of Rooms",
+            "Room Total",
+            "Rooms"
+          ],
+          "aggregations": [
+            "AVG(room_count)",
+            "SUM(room_count)"
+          ],
+          "business_name": "Room Count",
+          "common_values": [
+            "7",
+            "1",
+            "8"
+          ],
+          "typical_filters": [
+            "room_count = ?",
+            "room_count > ?"
+          ],
+          "business_meaning": "The number of rooms in the property."
+        },
+        {
+          "name": "vendor_requested_price",
+          "synonyms": [
+            "Asking Price",
+            "List Price",
+            "Vendor Price"
+          ],
+          "aggregations": [
+            "AVG(vendor_requested_price)",
+            "SUM(vendor_requested_price)"
+          ],
+          "business_name": "Vendor Requested Price",
+          "common_values": [
+            "372652.2909",
+            "661536468.4429",
+            "1337"
+          ],
+          "typical_filters": [
+            "vendor_requested_price = ?",
+            "vendor_requested_price > ?"
+          ],
+          "business_meaning": "The price the vendor is asking for the property."
+        },
+        {
+          "name": "buyer_offered_price",
+          "synonyms": [
+            "Offer Price",
+            "Bid Price",
+            "Buyer Price"
+          ],
+          "aggregations": [
+            "AVG(buyer_offered_price)",
+            "SUM(buyer_offered_price)"
+          ],
+          "business_name": "Buyer Offered Price",
+          "common_values": [
+            "1.68",
+            "8.7122",
+            "11375259.502"
+          ],
+          "typical_filters": [
+            "buyer_offered_price = ?",
+            "buyer_offered_price > ?"
+          ],
+          "business_meaning": "The price offered by a potential buyer."
+        },
+        {
+          "name": "agreed_selling_price",
+          "synonyms": [
+            "Selling Price",
+            "Final Price",
+            "Sale Price"
+          ],
+          "aggregations": [
+            "AVG(agreed_selling_price)",
+            "SUM(agreed_selling_price)"
+          ],
+          "business_name": "Agreed Selling Price",
+          "common_values": [
+            "4201.8",
+            "21769471.8328",
+            "5"
+          ],
+          "typical_filters": [
+            "agreed_selling_price = ?",
+            "agreed_selling_price > ?"
+          ],
+          "business_meaning": "The final price agreed upon for the sale of the property."
+        }
+      ],
+      "purpose": "This table contains information about each property, including its type and features.",
+      "business_name": "Properties",
+      "relationships": [
+        {
+          "column": "property_type_code",
+          "common_uses": [
+            "To categorize properties by type."
+          ],
+          "business_meaning": "Links each property to its type.",
+          "references_table": "ref_property_types"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the details of a specific property?",
+          "explanation": "Filter by property_id to retrieve all details.",
+          "involves_joins": []
+        },
+        {
+          "question": "What properties are available for a certain type?",
+          "explanation": "Filter by property_type_code to list properties.",
+          "involves_joins": [
+            "ref_property_types"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ref_feature_types",
+      "columns": [
+        {
+          "name": "feature_type_code",
+          "synonyms": [
+            "Feature Category Code",
+            "Feature Class Code",
+            "Feature Group Code"
+          ],
+          "aggregations": [],
+          "business_name": "Feature Type Code",
+          "common_values": [
+            "Amenity",
+            "Security"
+          ],
+          "typical_filters": [
+            "feature_type_code = ?"
+          ],
+          "business_meaning": "A unique code representing the type of feature."
+        },
+        {
+          "name": "feature_type_name",
+          "synonyms": [
+            "Feature Category Name",
+            "Feature Class Name",
+            "Feature Group Name"
+          ],
+          "aggregations": [],
+          "business_name": "Feature Type Name",
+          "common_values": [
+            "Amenity, eg Pool.",
+            "Security, eg Burglar Alarm."
+          ],
+          "typical_filters": [
+            "feature_type_name = ?"
+          ],
+          "business_meaning": "The name of the feature type."
+        }
+      ],
+      "purpose": "This table defines the types of features available for properties.",
+      "business_name": "Feature Types",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the different types of features available?",
+          "explanation": "List all feature types.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "ref_property_types",
+      "columns": [
+        {
+          "name": "property_type_code",
+          "synonyms": [
+            "Property Category Code",
+            "Property Class Code",
+            "Property Group Code"
+          ],
+          "aggregations": [],
+          "business_name": "Property Type Code",
+          "common_values": [
+            "House",
+            "Apartment",
+            "Field"
+          ],
+          "typical_filters": [
+            "property_type_code = ?"
+          ],
+          "business_meaning": "A unique code representing the type of property."
+        },
+        {
+          "name": "property_type_description",
+          "synonyms": [
+            "Property Category Description",
+            "Property Class Description",
+            "Property Group Description"
+          ],
+          "aggregations": [],
+          "business_name": "Property Type Description",
+          "common_values": [
+            "House, Bungalow, etc.",
+            "Apartment, Flat, Condo, etc."
+          ],
+          "typical_filters": [
+            "property_type_description LIKE ?"
+          ],
+          "business_meaning": "A description of the property type."
+        }
+      ],
+      "purpose": "This table defines the types of properties available.",
+      "business_name": "Property Types",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the different types of properties available?",
+          "explanation": "List all property types.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Real Estate",
+    "purpose": "This database is used to manage and track real estate properties, their features, and types.",
+    "key_entities": [
+      "Properties",
+      "Property Features",
+      "Feature Types",
+      "Property Types"
+    ],
+    "typical_questions": [
+      "What features does a specific property have?",
+      "What properties are available for a certain type?",
+      "What are the details of a specific property?",
+      "Which properties have a specific feature?",
+      "What is the selling price of a property?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Feature and property type codes might be confused with names.",
+      "example": "What is the type of feature 'AirCon'?",
+      "clarification": "Ensure to distinguish between type codes and feature names.",
+      "affected_elements": [
+        "other_available_features.feature_type_code",
+        "ref_feature_types.feature_type_code"
+      ]
+    },
+    {
+      "issue": "Date fields might be confused for each other.",
+      "example": "When was the property sold?",
+      "clarification": "Differentiate between 'date_on_market' and 'date_sold'.",
+      "affected_elements": [
+        "properties.date_on_market",
+        "properties.date_sold"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:59:10.086786",
+  "query_guidelines": [
+    "Use joins to connect properties with their features and types.",
+    "Filter by specific codes for accurate results.",
+    "Consider performance when joining multiple tables.",
+    "Be clear about date fields to avoid confusion.",
+    "Use descriptive filters to narrow down results effectively."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Property Feature Listing",
+      "tables_involved": [
+        "properties",
+        "other_property_features",
+        "other_available_features"
+      ],
+      "example_question": "What features does a specific property have?",
+      "typical_structure": "SELECT ... FROM properties JOIN other_property_features ON ... JOIN other_available_features ON ... WHERE properties.property_id = ?",
+      "key_considerations": [
+        "Ensure correct joins to list features for a property."
+      ]
+    },
+    {
+      "pattern_type": "Property Type Filtering",
+      "tables_involved": [
+        "properties",
+        "ref_property_types"
+      ],
+      "example_question": "What properties are available for a certain type?",
+      "typical_structure": "SELECT ... FROM properties JOIN ref_property_types ON ... WHERE ref_property_types.property_type_code = ?",
+      "key_considerations": [
+        "Filter by property type code for accurate results."
+      ]
+    }
+  ]
+}

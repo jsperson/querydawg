@@ -1,0 +1,607 @@
+{
+  "tables": [
+    {
+      "name": "cartoon",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Cartoon Number",
+            "Episode ID",
+            "Cartoon Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Cartoon ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each cartoon episode."
+        },
+        {
+          "name": "title",
+          "synonyms": [
+            "Episode Title",
+            "Cartoon Name",
+            "Show Title"
+          ],
+          "aggregations": [],
+          "business_name": "Title",
+          "common_values": [
+            "The Rise of the Blue Beetle!",
+            "Terror on Dinosaur Island!"
+          ],
+          "typical_filters": [
+            "title = ?",
+            "title LIKE ?"
+          ],
+          "business_meaning": "The name of the cartoon episode."
+        },
+        {
+          "name": "directed_by",
+          "synonyms": [
+            "Director Name",
+            "Directed By",
+            "Episode Director"
+          ],
+          "aggregations": [],
+          "business_name": "Director",
+          "common_values": [
+            "Ben Jones",
+            "Brandon Vietti"
+          ],
+          "typical_filters": [
+            "directed_by = ?"
+          ],
+          "business_meaning": "The person who directed the cartoon episode."
+        },
+        {
+          "name": "written_by",
+          "synonyms": [
+            "Writer Name",
+            "Written By",
+            "Episode Writer"
+          ],
+          "aggregations": [],
+          "business_name": "Writer",
+          "common_values": [
+            "Michael Jelenic",
+            "Steven Melching"
+          ],
+          "typical_filters": [
+            "written_by = ?"
+          ],
+          "business_meaning": "The person who wrote the cartoon episode."
+        },
+        {
+          "name": "original_air_date",
+          "synonyms": [
+            "Air Date",
+            "First Aired",
+            "Broadcast Date"
+          ],
+          "aggregations": [],
+          "business_name": "Original Air Date",
+          "common_values": [
+            "November 14, 2008",
+            "December 5, 2008"
+          ],
+          "typical_filters": [
+            "original_air_date = ?",
+            "original_air_date BETWEEN ? AND ?"
+          ],
+          "business_meaning": "The date when the cartoon episode was first aired."
+        },
+        {
+          "name": "production_code",
+          "synonyms": [
+            "Prod Code",
+            "Episode Code",
+            "Production Number"
+          ],
+          "aggregations": [],
+          "business_name": "Production Code",
+          "common_values": [
+            "101",
+            "102"
+          ],
+          "typical_filters": [
+            "production_code = ?"
+          ],
+          "business_meaning": "A code used to identify the production of the cartoon episode."
+        },
+        {
+          "name": "channel",
+          "synonyms": [
+            "Channel Number",
+            "Broadcast Channel",
+            "Network ID"
+          ],
+          "aggregations": [],
+          "business_name": "Channel ID",
+          "common_values": [
+            "700",
+            "701"
+          ],
+          "typical_filters": [
+            "channel = ?"
+          ],
+          "business_meaning": "The identifier of the TV channel where the cartoon was aired."
+        }
+      ],
+      "purpose": "This table represents individual cartoon episodes, including their titles, creators, and airing details.",
+      "business_name": "Cartoon",
+      "relationships": [
+        {
+          "column": "channel",
+          "common_uses": [
+            "To find out which channel aired a specific cartoon."
+          ],
+          "business_meaning": "Links the cartoon to the TV channel it was aired on.",
+          "references_table": "tv_channel"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What cartoons aired on channel 700?",
+          "explanation": "Filter the cartoon table by channel ID 700.",
+          "involves_joins": [
+            "tv_channel"
+          ]
+        },
+        {
+          "question": "Who directed 'The Rise of the Blue Beetle!'?",
+          "explanation": "Filter the cartoon table by title to find the director.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "tv_channel",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Channel Number",
+            "Network ID",
+            "Channel Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Channel ID",
+          "common_values": [
+            "700",
+            "701"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each TV channel."
+        },
+        {
+          "name": "series_name",
+          "synonyms": [
+            "Show Name",
+            "Program Name",
+            "Broadcast Name"
+          ],
+          "aggregations": [],
+          "business_name": "Series Name",
+          "common_values": [
+            "Sky Radio",
+            "MTV Hits"
+          ],
+          "typical_filters": [
+            "series_name = ?",
+            "series_name LIKE ?"
+          ],
+          "business_meaning": "The name of the series broadcasted on the channel."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "Nation",
+            "Country of Origin",
+            "Broadcast Country"
+          ],
+          "aggregations": [],
+          "business_name": "Country",
+          "common_values": [
+            "Italy"
+          ],
+          "typical_filters": [
+            "country = ?"
+          ],
+          "business_meaning": "The country where the TV channel is based."
+        },
+        {
+          "name": "language",
+          "synonyms": [
+            "Broadcast Language",
+            "Channel Language",
+            "Language of Content"
+          ],
+          "aggregations": [],
+          "business_name": "Language",
+          "common_values": [
+            "Italian"
+          ],
+          "typical_filters": [
+            "language = ?"
+          ],
+          "business_meaning": "The primary language of the TV channel's content."
+        },
+        {
+          "name": "content",
+          "synonyms": [
+            "Content Category",
+            "Program Type",
+            "Broadcast Content"
+          ],
+          "aggregations": [],
+          "business_name": "Content Type",
+          "common_values": [
+            "music"
+          ],
+          "typical_filters": [
+            "content = ?"
+          ],
+          "business_meaning": "The type of content broadcasted by the channel."
+        },
+        {
+          "name": "pixel_aspect_ratio_par",
+          "synonyms": [
+            "Aspect Ratio",
+            "PAR",
+            "Screen Ratio"
+          ],
+          "aggregations": [],
+          "business_name": "Pixel Aspect Ratio",
+          "common_values": [
+            "4:3",
+            "16:9"
+          ],
+          "typical_filters": [
+            "pixel_aspect_ratio_par = ?"
+          ],
+          "business_meaning": "The aspect ratio of the channel's broadcast."
+        },
+        {
+          "name": "hight_definition_tv",
+          "synonyms": [
+            "HDTV",
+            "High Def",
+            "HD Broadcast"
+          ],
+          "aggregations": [],
+          "business_name": "High Definition TV",
+          "common_values": [
+            "no"
+          ],
+          "typical_filters": [
+            "hight_definition_tv = ?"
+          ],
+          "business_meaning": "Indicates if the channel broadcasts in high definition."
+        },
+        {
+          "name": "pay_per_view_ppv",
+          "synonyms": [
+            "PPV",
+            "Pay-Per-View",
+            "On-Demand"
+          ],
+          "aggregations": [],
+          "business_name": "Pay Per View",
+          "common_values": [
+            "no"
+          ],
+          "typical_filters": [
+            "pay_per_view_ppv = ?"
+          ],
+          "business_meaning": "Indicates if the channel offers pay-per-view content."
+        },
+        {
+          "name": "package_option",
+          "synonyms": [
+            "Subscription Package",
+            "Channel Package",
+            "Package Plan"
+          ],
+          "aggregations": [],
+          "business_name": "Package Option",
+          "common_values": [
+            "Sky Famiglia"
+          ],
+          "typical_filters": [
+            "package_option = ?"
+          ],
+          "business_meaning": "The subscription package option for the channel."
+        }
+      ],
+      "purpose": "This table represents TV channels, including their names, countries, and content types.",
+      "business_name": "TV Channel",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What channels are available in Italy?",
+          "explanation": "Filter the tv_channel table by country 'Italy'.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which channels offer music content?",
+          "explanation": "Filter the tv_channel table by content type 'music'.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "tv_series",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "Episode ID",
+            "Series Number",
+            "Show ID"
+          ],
+          "aggregations": [],
+          "business_name": "Series ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each TV series episode."
+        },
+        {
+          "name": "episode",
+          "synonyms": [
+            "Episode Name",
+            "Show Title",
+            "Series Episode"
+          ],
+          "aggregations": [],
+          "business_name": "Episode Title",
+          "common_values": [
+            "A Love of a Lifetime",
+            "Friendly Skies"
+          ],
+          "typical_filters": [
+            "episode = ?",
+            "episode LIKE ?"
+          ],
+          "business_meaning": "The name of the TV series episode."
+        },
+        {
+          "name": "air_date",
+          "synonyms": [
+            "Broadcast Date",
+            "Episode Air Date",
+            "First Aired"
+          ],
+          "aggregations": [],
+          "business_name": "Air Date",
+          "common_values": [
+            "September 24, 2007",
+            "October 1, 2007"
+          ],
+          "typical_filters": [
+            "air_date = ?",
+            "air_date BETWEEN ? AND ?"
+          ],
+          "business_meaning": "The date when the TV series episode was aired."
+        },
+        {
+          "name": "rating",
+          "synonyms": [
+            "Episode Rating",
+            "Show Rating",
+            "Series Rating"
+          ],
+          "aggregations": [
+            "AVG(rating)"
+          ],
+          "business_name": "Rating",
+          "common_values": [
+            "5.8",
+            "4.4"
+          ],
+          "typical_filters": [
+            "rating = ?",
+            "rating > ?"
+          ],
+          "business_meaning": "The rating of the TV series episode."
+        },
+        {
+          "name": "share",
+          "synonyms": [
+            "Audience Share",
+            "Viewership Share",
+            "Market Share"
+          ],
+          "aggregations": [
+            "AVG(share)"
+          ],
+          "business_name": "Share",
+          "common_values": [
+            "9.0",
+            "7.0"
+          ],
+          "typical_filters": [
+            "share = ?",
+            "share > ?"
+          ],
+          "business_meaning": "The share percentage of the TV series episode."
+        },
+        {
+          "name": "18_49_Rating_Share",
+          "synonyms": [
+            "Demographic Rating",
+            "18-49 Share",
+            "Age Group Rating"
+          ],
+          "aggregations": [],
+          "business_name": "18-49 Rating/Share",
+          "common_values": [
+            "3.5/9",
+            "2.9/7"
+          ],
+          "typical_filters": [
+            "18_49_Rating_Share = ?"
+          ],
+          "business_meaning": "The rating and share for the 18-49 age demographic."
+        },
+        {
+          "name": "viewers_m",
+          "synonyms": [
+            "Audience Size",
+            "Viewership",
+            "Viewer Count"
+          ],
+          "aggregations": [
+            "SUM(viewers_m)"
+          ],
+          "business_name": "Viewers (Millions)",
+          "common_values": [
+            "9.16",
+            "6.94"
+          ],
+          "typical_filters": [
+            "viewers_m = ?",
+            "viewers_m > ?"
+          ],
+          "business_meaning": "The number of viewers in millions."
+        },
+        {
+          "name": "weekly_rank",
+          "synonyms": [
+            "Rank",
+            "Weekly Position",
+            "Episode Rank"
+          ],
+          "aggregations": [
+            "MIN(weekly_rank)"
+          ],
+          "business_name": "Weekly Rank",
+          "common_values": [
+            "43",
+            "61"
+          ],
+          "typical_filters": [
+            "weekly_rank = ?",
+            "weekly_rank < ?"
+          ],
+          "business_meaning": "The rank of the episode for the week it aired."
+        },
+        {
+          "name": "channel",
+          "synonyms": [
+            "Channel Number",
+            "Broadcast Channel",
+            "Network ID"
+          ],
+          "aggregations": [],
+          "business_name": "Channel ID",
+          "common_values": [
+            "700",
+            "701"
+          ],
+          "typical_filters": [
+            "channel = ?"
+          ],
+          "business_meaning": "The identifier of the TV channel where the series was aired."
+        }
+      ],
+      "purpose": "This table represents TV series episodes, including their ratings, viewership, and airing details.",
+      "business_name": "TV Series",
+      "relationships": [
+        {
+          "column": "channel",
+          "common_uses": [
+            "To find out which channel aired a specific TV series."
+          ],
+          "business_meaning": "Links the TV series to the TV channel it was aired on.",
+          "references_table": "tv_channel"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which TV series had the highest rating?",
+          "explanation": "Sort the tv_series table by rating in descending order.",
+          "involves_joins": []
+        },
+        {
+          "question": "What is the viewership of 'A Love of a Lifetime'?",
+          "explanation": "Filter the tv_series table by episode title to find viewership.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Entertainment and Media",
+    "purpose": "This database is used to track information about TV channels, cartoons, and TV series, including their airing details and ratings.",
+    "key_entities": [
+      "Cartoon",
+      "TV Channel",
+      "TV Series"
+    ],
+    "typical_questions": [
+      "What cartoons aired on a specific channel?",
+      "Which TV series had the highest ratings?",
+      "What are the details of a specific TV channel?",
+      "When did a particular episode air?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Channel ID confusion",
+      "example": "What aired on channel 700?",
+      "clarification": "Specify whether the query is about cartoons or TV series.",
+      "affected_elements": [
+        "cartoon.channel",
+        "tv_series.channel"
+      ]
+    },
+    {
+      "issue": "Date format inconsistency",
+      "example": "When did 'The Rise of the Blue Beetle!' air?",
+      "clarification": "Ensure date format matches the stored format.",
+      "affected_elements": [
+        "cartoon.original_air_date",
+        "tv_series.air_date"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T21:00:47.830242",
+  "query_guidelines": [
+    "Always specify the table when filtering by channel to avoid ambiguity.",
+    "Use JOINs to connect related tables based on foreign keys.",
+    "Consider performance when using UNION for combining results from cartoons and TV series.",
+    "Be mindful of date formats when filtering by air dates.",
+    "Use appropriate aggregations for numeric fields like ratings and viewership."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Channel Content Analysis",
+      "tables_involved": [
+        "cartoon",
+        "tv_series",
+        "tv_channel"
+      ],
+      "example_question": "What cartoons and TV series aired on channel 700?",
+      "typical_structure": "SELECT ... FROM cartoon JOIN tv_channel ON cartoon.channel = tv_channel.id UNION SELECT ... FROM tv_series JOIN tv_channel ON tv_series.channel = tv_channel.id WHERE tv_channel.id = '700'",
+      "key_considerations": [
+        "Ensure correct channel ID is used for filtering."
+      ]
+    }
+  ]
+}

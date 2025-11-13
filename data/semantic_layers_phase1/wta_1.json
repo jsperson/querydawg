@@ -1,0 +1,447 @@
+{
+  "tables": [
+    {
+      "name": "matches",
+      "columns": [
+        {
+          "name": "best_of",
+          "synonyms": [
+            "maximum sets",
+            "set limit",
+            "match format"
+          ],
+          "aggregations": [
+            "AVG(best_of)",
+            "MAX(best_of)"
+          ],
+          "business_name": "Best of Sets",
+          "common_values": [
+            "3",
+            "5"
+          ],
+          "typical_filters": [
+            "best_of = ?",
+            "best_of > ?"
+          ],
+          "business_meaning": "The maximum number of sets a match can have."
+        },
+        {
+          "name": "draw_size",
+          "synonyms": [
+            "tournament size",
+            "player count",
+            "entry list"
+          ],
+          "aggregations": [
+            "AVG(draw_size)",
+            "SUM(draw_size)"
+          ],
+          "business_name": "Draw Size",
+          "common_values": [
+            "32",
+            "64",
+            "128"
+          ],
+          "typical_filters": [
+            "draw_size = ?",
+            "draw_size > ?"
+          ],
+          "business_meaning": "The number of players in the tournament draw."
+        },
+        {
+          "name": "loser_age",
+          "synonyms": [
+            "age of losing player",
+            "defeated player's age",
+            "loser's birth year"
+          ],
+          "aggregations": [
+            "AVG(loser_age)",
+            "MIN(loser_age)"
+          ],
+          "business_name": "Loser's Age",
+          "common_values": [
+            "24",
+            "30"
+          ],
+          "typical_filters": [
+            "loser_age = ?",
+            "loser_age > ?"
+          ],
+          "business_meaning": "The age of the player who lost the match."
+        },
+        {
+          "name": "loser_name",
+          "synonyms": [
+            "defeated player",
+            "losing player",
+            "runner-up"
+          ],
+          "aggregations": [],
+          "business_name": "Loser's Name",
+          "common_values": [
+            "Agnieszka Radwanska",
+            "Petra Kvitova"
+          ],
+          "typical_filters": [
+            "loser_name = ?",
+            "loser_name LIKE ?"
+          ],
+          "business_meaning": "The full name of the player who lost the match."
+        },
+        {
+          "name": "winner_name",
+          "synonyms": [
+            "victorious player",
+            "winning player",
+            "champion"
+          ],
+          "aggregations": [],
+          "business_name": "Winner's Name",
+          "common_values": [
+            "Serena Williams",
+            "Angelique Kerber"
+          ],
+          "typical_filters": [
+            "winner_name = ?",
+            "winner_name LIKE ?"
+          ],
+          "business_meaning": "The full name of the player who won the match."
+        },
+        {
+          "name": "tourney_name",
+          "synonyms": [
+            "event name",
+            "competition",
+            "championship"
+          ],
+          "aggregations": [],
+          "business_name": "Tournament Name",
+          "common_values": [
+            "WTA Championships",
+            "US Open"
+          ],
+          "typical_filters": [
+            "tourney_name = ?",
+            "tourney_name LIKE ?"
+          ],
+          "business_meaning": "The name of the tournament where the match was played."
+        },
+        {
+          "name": "surface",
+          "synonyms": [
+            "court type",
+            "playing field",
+            "ground"
+          ],
+          "aggregations": [],
+          "business_name": "Playing Surface",
+          "common_values": [
+            "Hard",
+            "Clay",
+            "Grass"
+          ],
+          "typical_filters": [
+            "surface = ?"
+          ],
+          "business_meaning": "The type of surface the match was played on."
+        }
+      ],
+      "purpose": "This table represents individual tennis matches, including details about the players, scores, and tournament information.",
+      "business_name": "Tennis Matches",
+      "relationships": [
+        {
+          "column": "winner_id",
+          "common_uses": [
+            "To find details about the winning player."
+          ],
+          "business_meaning": "Links the match to the player who won.",
+          "references_table": "players"
+        },
+        {
+          "column": "loser_id",
+          "common_uses": [
+            "To find details about the losing player."
+          ],
+          "business_meaning": "Links the match to the player who lost.",
+          "references_table": "players"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Who won the most matches in 2013?",
+          "explanation": "Count the number of matches won by each player in 2013 and find the maximum.",
+          "involves_joins": [
+            "players"
+          ]
+        },
+        {
+          "question": "What are the details of matches played in the WTA Championships?",
+          "explanation": "Filter matches by tourney_name to get details of WTA Championships.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "players",
+      "columns": [
+        {
+          "name": "first_name",
+          "synonyms": [
+            "given name",
+            "forename",
+            "name"
+          ],
+          "aggregations": [],
+          "business_name": "First Name",
+          "common_values": [
+            "Martina",
+            "Serena"
+          ],
+          "typical_filters": [
+            "first_name = ?",
+            "first_name LIKE ?"
+          ],
+          "business_meaning": "The first name of the player."
+        },
+        {
+          "name": "last_name",
+          "synonyms": [
+            "surname",
+            "family name",
+            "name"
+          ],
+          "aggregations": [],
+          "business_name": "Last Name",
+          "common_values": [
+            "Williams",
+            "Hingis"
+          ],
+          "typical_filters": [
+            "last_name = ?",
+            "last_name LIKE ?"
+          ],
+          "business_meaning": "The last name of the player."
+        },
+        {
+          "name": "hand",
+          "synonyms": [
+            "dominant hand",
+            "handedness",
+            "playing style"
+          ],
+          "aggregations": [],
+          "business_name": "Playing Hand",
+          "common_values": [
+            "R",
+            "L"
+          ],
+          "typical_filters": [
+            "hand = ?"
+          ],
+          "business_meaning": "The dominant hand used by the player."
+        },
+        {
+          "name": "country_code",
+          "synonyms": [
+            "nationality",
+            "country",
+            "nation"
+          ],
+          "aggregations": [],
+          "business_name": "Country Code",
+          "common_values": [
+            "USA",
+            "SUI"
+          ],
+          "typical_filters": [
+            "country_code = ?"
+          ],
+          "business_meaning": "The country the player represents."
+        }
+      ],
+      "purpose": "This table contains information about tennis players, including their personal details and country of origin.",
+      "business_name": "Tennis Players",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the birth date of Serena Williams?",
+          "explanation": "Filter players by first_name and last_name to find the birth_date.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which players are from the USA?",
+          "explanation": "Filter players by country_code to find those from the USA.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "rankings",
+      "columns": [
+        {
+          "name": "ranking_date",
+          "synonyms": [
+            "date of ranking",
+            "ranking timestamp",
+            "ranking record date"
+          ],
+          "aggregations": [],
+          "business_name": "Ranking Date",
+          "common_values": [
+            "2023-01-01",
+            "2000-01-01"
+          ],
+          "typical_filters": [
+            "ranking_date = ?",
+            "ranking_date BETWEEN ? AND ?"
+          ],
+          "business_meaning": "The date on which the ranking was recorded."
+        },
+        {
+          "name": "ranking",
+          "synonyms": [
+            "rank",
+            "position",
+            "standing"
+          ],
+          "aggregations": [
+            "AVG(ranking)",
+            "MIN(ranking)"
+          ],
+          "business_name": "Player Ranking",
+          "common_values": [
+            "1",
+            "10",
+            "100"
+          ],
+          "typical_filters": [
+            "ranking = ?",
+            "ranking < ?"
+          ],
+          "business_meaning": "The position of the player in the rankings."
+        },
+        {
+          "name": "ranking_points",
+          "synonyms": [
+            "points",
+            "score",
+            "ranking score"
+          ],
+          "aggregations": [
+            "SUM(ranking_points)",
+            "AVG(ranking_points)"
+          ],
+          "business_name": "Ranking Points",
+          "common_values": [
+            "12040",
+            "4378"
+          ],
+          "typical_filters": [
+            "ranking_points = ?",
+            "ranking_points > ?"
+          ],
+          "business_meaning": "The points a player has earned towards their ranking."
+        }
+      ],
+      "purpose": "This table tracks the rankings of players over time, including their ranking points and tours.",
+      "business_name": "Player Rankings",
+      "relationships": [
+        {
+          "column": "player_id",
+          "common_uses": [
+            "To find player details for a specific ranking."
+          ],
+          "business_meaning": "Links the ranking to the specific player.",
+          "references_table": "players"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What is the ranking of a player on a specific date?",
+          "explanation": "Filter rankings by player_id and ranking_date to find the ranking.",
+          "involves_joins": [
+            "players"
+          ]
+        },
+        {
+          "question": "How many ranking points did Serena Williams have in 2000?",
+          "explanation": "Join rankings with players and filter by player name and ranking_date.",
+          "involves_joins": [
+            "players"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Sports Management",
+    "purpose": "This database is used to track professional tennis matches, player information, and player rankings over time.",
+    "key_entities": [
+      "Matches",
+      "Players",
+      "Rankings"
+    ],
+    "typical_questions": [
+      "Who won the most matches in 2013?",
+      "What is the ranking of Serena Williams on a specific date?",
+      "How many matches did a player win on clay surfaces?",
+      "What are the details of matches played in the WTA Championships?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Player name ambiguity",
+      "example": "What is the ranking of Williams?",
+      "clarification": "Specify full name to avoid confusion between players with the same last name.",
+      "affected_elements": [
+        "players.first_name",
+        "players.last_name"
+      ]
+    },
+    {
+      "issue": "Surface type confusion",
+      "example": "How many matches were played on grass?",
+      "clarification": "Ensure 'surface' column is used to filter by specific surface types.",
+      "affected_elements": [
+        "matches.surface"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T21:02:09.459820",
+  "query_guidelines": [
+    "Always use full player names to avoid ambiguity.",
+    "Filter by specific dates or date ranges for accurate ranking queries.",
+    "Join tables using documented foreign keys to ensure data integrity.",
+    "Consider performance when filtering large datasets, especially in the rankings table.",
+    "Use aggregation functions to summarize data effectively, such as counting matches or averaging rankings."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Player Match Performance",
+      "tables_involved": [
+        "matches",
+        "players"
+      ],
+      "example_question": "How many matches did Serena Williams win in 2013?",
+      "typical_structure": "SELECT COUNT(*) FROM matches JOIN players ON matches.winner_id = players.player_id WHERE players.first_name = 'Serena' AND players.last_name = 'Williams' AND matches.year = 2013",
+      "key_considerations": [
+        "Ensure correct player name matching and year filtering."
+      ]
+    },
+    {
+      "pattern_type": "Player Ranking Over Time",
+      "tables_involved": [
+        "rankings",
+        "players"
+      ],
+      "example_question": "What was the ranking of Serena Williams on January 1, 2000?",
+      "typical_structure": "SELECT ranking FROM rankings JOIN players ON rankings.player_id = players.player_id WHERE players.first_name = 'Serena' AND players.last_name = 'Williams' AND rankings.ranking_date = '2000-01-01'",
+      "key_considerations": [
+        "Date format consistency and player name accuracy."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,389 @@
+{
+  "tables": [
+    {
+      "name": "museum",
+      "columns": [
+        {
+          "name": "museum_id",
+          "synonyms": [
+            "museum identifier",
+            "museum number",
+            "museum code"
+          ],
+          "aggregations": [],
+          "business_name": "Museum ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "museum_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each museum."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "museum title",
+            "museum label",
+            "museum designation"
+          ],
+          "aggregations": [],
+          "business_name": "Museum Name",
+          "common_values": [
+            "Plaza Museum",
+            "Capital Plaza Museum"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The official name of the museum."
+        },
+        {
+          "name": "num_of_staff",
+          "synonyms": [
+            "staff count",
+            "employee number",
+            "staff total"
+          ],
+          "aggregations": [
+            "SUM(num_of_staff)",
+            "AVG(num_of_staff)"
+          ],
+          "business_name": "Number of Staff",
+          "common_values": [
+            "62",
+            "25",
+            "18"
+          ],
+          "typical_filters": [
+            "num_of_staff > ?",
+            "num_of_staff < ?"
+          ],
+          "business_meaning": "The total number of staff members working at the museum."
+        },
+        {
+          "name": "open_year",
+          "synonyms": [
+            "year opened",
+            "establishment year",
+            "inauguration year"
+          ],
+          "aggregations": [
+            "MIN(open_year)",
+            "MAX(open_year)"
+          ],
+          "business_name": "Opening Year",
+          "common_values": [
+            "2000",
+            "2012",
+            "2010"
+          ],
+          "typical_filters": [
+            "open_year = ?",
+            "open_year > ?"
+          ],
+          "business_meaning": "The year the museum was opened to the public."
+        }
+      ],
+      "purpose": "This table represents the museums being tracked, including their names, staff numbers, and the year they opened.",
+      "business_name": "Museum",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the name of the museum with the most staff?",
+          "explanation": "Query the museum table to find the museum with the highest number of staff.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which museums opened after 2010?",
+          "explanation": "Filter the museum table by open_year greater than 2010.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "visit",
+      "columns": [
+        {
+          "name": "museum_id",
+          "synonyms": [
+            "museum identifier",
+            "museum number",
+            "museum code"
+          ],
+          "aggregations": [],
+          "business_name": "Museum ID",
+          "common_values": [
+            "1",
+            "2",
+            "4"
+          ],
+          "typical_filters": [
+            "museum_id = ?"
+          ],
+          "business_meaning": "The identifier of the museum being visited."
+        },
+        {
+          "name": "visitor_id",
+          "synonyms": [
+            "visitor identifier",
+            "visitor number",
+            "visitor code"
+          ],
+          "aggregations": [],
+          "business_name": "Visitor ID",
+          "common_values": [
+            "5",
+            "3",
+            "6"
+          ],
+          "typical_filters": [
+            "visitor_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each visitor."
+        },
+        {
+          "name": "num_of_ticket",
+          "synonyms": [
+            "ticket count",
+            "tickets bought",
+            "ticket quantity"
+          ],
+          "aggregations": [
+            "SUM(num_of_ticket)",
+            "AVG(num_of_ticket)"
+          ],
+          "business_name": "Number of Tickets",
+          "common_values": [
+            "20",
+            "4",
+            "10"
+          ],
+          "typical_filters": [
+            "num_of_ticket > ?",
+            "num_of_ticket < ?"
+          ],
+          "business_meaning": "The number of tickets purchased during the visit."
+        },
+        {
+          "name": "total_spent",
+          "synonyms": [
+            "total expenditure",
+            "amount spent",
+            "spending total"
+          ],
+          "aggregations": [
+            "SUM(total_spent)",
+            "AVG(total_spent)"
+          ],
+          "business_name": "Total Spent",
+          "common_values": [
+            "320.14",
+            "89.98",
+            "320.44"
+          ],
+          "typical_filters": [
+            "total_spent > ?",
+            "total_spent < ?"
+          ],
+          "business_meaning": "The total amount of money spent on tickets during the visit."
+        }
+      ],
+      "purpose": "This table records each visit to a museum, including the number of tickets purchased and the total amount spent.",
+      "business_name": "Visit",
+      "relationships": [
+        {
+          "column": "museum_id",
+          "common_uses": [
+            "To find out which museum a visit was made to and to aggregate data by museum."
+          ],
+          "business_meaning": "Links each visit to the corresponding museum.",
+          "references_table": "museum"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "How much revenue did a specific museum generate?",
+          "explanation": "Sum the total_spent for all visits to that museum.",
+          "involves_joins": [
+            "museum"
+          ]
+        },
+        {
+          "question": "How many tickets were sold by each museum?",
+          "explanation": "Aggregate the num_of_ticket by museum_id.",
+          "involves_joins": [
+            "museum"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "visitor",
+      "columns": [
+        {
+          "name": "id",
+          "synonyms": [
+            "visitor identifier",
+            "visitor number",
+            "visitor code"
+          ],
+          "aggregations": [],
+          "business_name": "Visitor ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "id = ?"
+          ],
+          "business_meaning": "A unique identifier for each visitor."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "visitor full name",
+            "visitor title",
+            "visitor designation"
+          ],
+          "aggregations": [],
+          "business_name": "Visitor Name",
+          "common_values": [
+            "Gonzalo Higuaín",
+            "Guti Midfielder"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the visitor."
+        },
+        {
+          "name": "level_of_membership",
+          "synonyms": [
+            "membership tier",
+            "membership rank",
+            "membership status"
+          ],
+          "aggregations": [
+            "MAX(level_of_membership)",
+            "MIN(level_of_membership)"
+          ],
+          "business_name": "Level of Membership",
+          "common_values": [
+            "8",
+            "5",
+            "1"
+          ],
+          "typical_filters": [
+            "level_of_membership = ?",
+            "level_of_membership > ?"
+          ],
+          "business_meaning": "The membership level of the visitor, indicating their status or privileges."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "visitor age",
+            "years old",
+            "visitor's age"
+          ],
+          "aggregations": [
+            "AVG(age)",
+            "MAX(age)"
+          ],
+          "business_name": "Age",
+          "common_values": [
+            "35",
+            "28",
+            "27"
+          ],
+          "typical_filters": [
+            "age > ?",
+            "age < ?"
+          ],
+          "business_meaning": "The age of the visitor."
+        }
+      ],
+      "purpose": "This table contains information about visitors, including their names, membership levels, and ages.",
+      "business_name": "Visitor",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Who are the visitors with the highest membership level?",
+          "explanation": "Filter the visitor table by the highest level_of_membership.",
+          "involves_joins": []
+        },
+        {
+          "question": "What is the average age of visitors?",
+          "explanation": "Calculate the average of the age column.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Cultural Institutions",
+    "purpose": "This database is used to track museum operations, visitor interactions, and financial transactions related to ticket sales.",
+    "key_entities": [
+      "Museum",
+      "Visitor",
+      "Visit"
+    ],
+    "typical_questions": [
+      "How many visitors does each museum receive?",
+      "What is the total revenue generated by ticket sales for a specific museum?",
+      "Which visitors have the highest level of membership?",
+      "What is the average age of visitors to a particular museum?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Visitor ID in visit table is a text field, while ID in visitor table is bigint.",
+      "example": "How much did visitor 5 spend?",
+      "clarification": "Ensure visitor_id in visit is cast or compared correctly to id in visitor.",
+      "affected_elements": [
+        "visit.visitor_id",
+        "visitor.id"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:54:51.714215",
+  "query_guidelines": [
+    "Always use the correct join pattern for foreign keys to ensure data integrity.",
+    "Be cautious of data type mismatches, especially with IDs across tables.",
+    "Use aggregations wisely to avoid performance issues with large datasets."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "museum visit analysis",
+      "tables_involved": [
+        "museum",
+        "visit"
+      ],
+      "example_question": "What is the total revenue generated by each museum?",
+      "typical_structure": "SELECT museum.name, SUM(visit.total_spent) FROM visit JOIN museum ON visit.museum_id = museum.museum_id GROUP BY museum.name",
+      "key_considerations": [
+        "Ensure the join is correctly set up between visit and museum using museum_id."
+      ]
+    },
+    {
+      "pattern_type": "visitor spending analysis",
+      "tables_involved": [
+        "visit",
+        "visitor"
+      ],
+      "example_question": "Which visitor spent the most money?",
+      "typical_structure": "SELECT visitor.name, SUM(visit.total_spent) FROM visit JOIN visitor ON visit.visitor_id = visitor.id GROUP BY visitor.name ORDER BY SUM(visit.total_spent) DESC",
+      "key_considerations": [
+        "Ensure visitor_id in visit matches id in visitor."
+      ]
+    }
+  ]
+}

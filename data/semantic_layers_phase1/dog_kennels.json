@@ -1,0 +1,1219 @@
+{
+  "tables": [
+    {
+      "name": "breeds",
+      "columns": [
+        {
+          "name": "breed_code",
+          "synonyms": [
+            "Breed ID",
+            "Breed Identifier",
+            "Breed Key"
+          ],
+          "aggregations": [],
+          "business_name": "Breed Code",
+          "common_values": [
+            "ESK",
+            "HUS",
+            "BUL"
+          ],
+          "typical_filters": [
+            "breed_code = ?"
+          ],
+          "business_meaning": "A unique identifier for each dog breed."
+        },
+        {
+          "name": "breed_name",
+          "synonyms": [
+            "Type of Dog",
+            "Dog Breed",
+            "Breed"
+          ],
+          "aggregations": [],
+          "business_name": "Breed Name",
+          "common_values": [
+            "Eskimo",
+            "Husky",
+            "Bulldog"
+          ],
+          "typical_filters": [
+            "breed_name = ?"
+          ],
+          "business_meaning": "The name of the dog breed."
+        }
+      ],
+      "purpose": "This table represents the different breeds of dogs available in the shelter.",
+      "business_name": "Dog Breeds",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the breed name for a specific breed code?",
+          "explanation": "Query the breeds table using the breed_code to find the breed_name.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "charges",
+      "columns": [
+        {
+          "name": "charge_id",
+          "synonyms": [
+            "Charge Identifier",
+            "Charge Key",
+            "Charge Number"
+          ],
+          "aggregations": [],
+          "business_name": "Charge ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "charge_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each type of charge."
+        },
+        {
+          "name": "charge_type",
+          "synonyms": [
+            "Service Type",
+            "Charge Category",
+            "Fee Type"
+          ],
+          "aggregations": [],
+          "business_name": "Charge Type",
+          "common_values": [
+            "Daily Accommodation",
+            "Drugs",
+            "Health Check"
+          ],
+          "typical_filters": [
+            "charge_type = ?"
+          ],
+          "business_meaning": "The type of service for which a charge is applied."
+        },
+        {
+          "name": "charge_amount",
+          "synonyms": [
+            "Fee Amount",
+            "Cost",
+            "Price"
+          ],
+          "aggregations": [
+            "SUM(charge_amount)",
+            "AVG(charge_amount)"
+          ],
+          "business_name": "Charge Amount",
+          "common_values": [
+            "98",
+            "322",
+            "640"
+          ],
+          "typical_filters": [
+            "charge_amount = ?",
+            "charge_amount > ?"
+          ],
+          "business_meaning": "The cost associated with the charge type."
+        }
+      ],
+      "purpose": "This table lists the different types of charges that can be applied for services provided to the dogs.",
+      "business_name": "Service Charges",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the charge amount for a specific charge type?",
+          "explanation": "Query the charges table using the charge_type to find the charge_amount.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "dogs",
+      "columns": [
+        {
+          "name": "dog_id",
+          "synonyms": [
+            "Dog Identifier",
+            "Dog Key",
+            "Dog Number"
+          ],
+          "aggregations": [],
+          "business_name": "Dog ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "dog_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each dog."
+        },
+        {
+          "name": "owner_id",
+          "synonyms": [
+            "Owner Identifier",
+            "Owner Key",
+            "Owner Number"
+          ],
+          "aggregations": [],
+          "business_name": "Owner ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "owner_id = ?"
+          ],
+          "business_meaning": "The identifier for the owner of the dog."
+        },
+        {
+          "name": "abandoned_yn",
+          "synonyms": [
+            "Abandoned",
+            "Left Behind",
+            "Surrendered"
+          ],
+          "aggregations": [],
+          "business_name": "Abandoned Status",
+          "common_values": [
+            "1",
+            "0"
+          ],
+          "typical_filters": [
+            "abandoned_yn = ?"
+          ],
+          "business_meaning": "Indicates whether the dog was abandoned."
+        },
+        {
+          "name": "breed_code",
+          "synonyms": [
+            "Breed ID",
+            "Breed Identifier",
+            "Breed Key"
+          ],
+          "aggregations": [],
+          "business_name": "Breed Code",
+          "common_values": [
+            "ESK",
+            "HUS",
+            "BUL"
+          ],
+          "typical_filters": [
+            "breed_code = ?"
+          ],
+          "business_meaning": "The code representing the breed of the dog."
+        },
+        {
+          "name": "size_code",
+          "synonyms": [
+            "Size ID",
+            "Size Identifier",
+            "Size Key"
+          ],
+          "aggregations": [],
+          "business_name": "Size Code",
+          "common_values": [
+            "SML",
+            "MED",
+            "LGE"
+          ],
+          "typical_filters": [
+            "size_code = ?"
+          ],
+          "business_meaning": "The code representing the size category of the dog."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Pet Name",
+            "Animal Name",
+            "Dog's Name"
+          ],
+          "aggregations": [],
+          "business_name": "Dog Name",
+          "common_values": [
+            "Kacey",
+            "Hipolito",
+            "Mavis"
+          ],
+          "typical_filters": [
+            "name = ?"
+          ],
+          "business_meaning": "The name given to the dog."
+        },
+        {
+          "name": "age",
+          "synonyms": [
+            "Pet Age",
+            "Animal Age",
+            "Dog's Age"
+          ],
+          "aggregations": [
+            "AVG(age)"
+          ],
+          "business_name": "Dog Age",
+          "common_values": [
+            "6",
+            "9",
+            "8"
+          ],
+          "typical_filters": [
+            "age = ?",
+            "age > ?"
+          ],
+          "business_meaning": "The age of the dog."
+        },
+        {
+          "name": "date_of_birth",
+          "synonyms": [
+            "Birth Date",
+            "DOB",
+            "Date Born"
+          ],
+          "aggregations": [],
+          "business_name": "Date of Birth",
+          "common_values": [
+            "2012-01-27",
+            "2013-02-13",
+            "2008-05-19"
+          ],
+          "typical_filters": [
+            "date_of_birth = ?",
+            "date_of_birth > ?"
+          ],
+          "business_meaning": "The birth date of the dog."
+        },
+        {
+          "name": "gender",
+          "synonyms": [
+            "Sex",
+            "Dog's Gender",
+            "Animal Gender"
+          ],
+          "aggregations": [],
+          "business_name": "Dog Gender",
+          "common_values": [
+            "1",
+            "0"
+          ],
+          "typical_filters": [
+            "gender = ?"
+          ],
+          "business_meaning": "The gender of the dog."
+        },
+        {
+          "name": "weight",
+          "synonyms": [
+            "Pet Weight",
+            "Animal Weight",
+            "Dog's Weight"
+          ],
+          "aggregations": [
+            "AVG(weight)",
+            "SUM(weight)"
+          ],
+          "business_name": "Dog Weight",
+          "common_values": [
+            "7.57",
+            "1.72",
+            "8.04"
+          ],
+          "typical_filters": [
+            "weight = ?",
+            "weight > ?"
+          ],
+          "business_meaning": "The weight of the dog."
+        },
+        {
+          "name": "date_arrived",
+          "synonyms": [
+            "Arrival Date",
+            "Date of Arrival",
+            "Check-in Date"
+          ],
+          "aggregations": [],
+          "business_name": "Date Arrived",
+          "common_values": [
+            "2017-09-08",
+            "2017-12-22",
+            "2017-06-25"
+          ],
+          "typical_filters": [
+            "date_arrived = ?",
+            "date_arrived > ?"
+          ],
+          "business_meaning": "The date the dog arrived at the shelter."
+        },
+        {
+          "name": "date_adopted",
+          "synonyms": [
+            "Adoption Date",
+            "Date of Adoption",
+            "Check-out Date"
+          ],
+          "aggregations": [],
+          "business_name": "Date Adopted",
+          "common_values": [
+            "2018-03-06",
+            "2018-03-25",
+            "2018-03-07"
+          ],
+          "typical_filters": [
+            "date_adopted = ?",
+            "date_adopted > ?"
+          ],
+          "business_meaning": "The date the dog was adopted."
+        },
+        {
+          "name": "date_departed",
+          "synonyms": [
+            "Departure Date",
+            "Date of Departure",
+            "Exit Date"
+          ],
+          "aggregations": [],
+          "business_name": "Date Departed",
+          "common_values": [
+            "2018-03-25",
+            "2018-03-25",
+            "2018-03-25"
+          ],
+          "typical_filters": [
+            "date_departed = ?",
+            "date_departed > ?"
+          ],
+          "business_meaning": "The date the dog left the shelter."
+        }
+      ],
+      "purpose": "This table contains information about the dogs in the shelter, including their breed, size, and ownership details.",
+      "business_name": "Dogs",
+      "relationships": [
+        {
+          "column": "breed_code",
+          "common_uses": [
+            "To find the breed name for a specific dog."
+          ],
+          "business_meaning": "Links each dog to its breed information.",
+          "references_table": "breeds"
+        },
+        {
+          "column": "owner_id",
+          "common_uses": [
+            "To find the owner details for a specific dog."
+          ],
+          "business_meaning": "Associates each dog with its owner.",
+          "references_table": "owners"
+        },
+        {
+          "column": "size_code",
+          "common_uses": [
+            "To find the size description for a specific dog."
+          ],
+          "business_meaning": "Links each dog to its size category.",
+          "references_table": "sizes"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Who is the owner of a specific dog?",
+          "explanation": "Join the dogs table with the owners table using owner_id to find owner details.",
+          "involves_joins": [
+            "owners"
+          ]
+        },
+        {
+          "question": "What is the breed of a specific dog?",
+          "explanation": "Join the dogs table with the breeds table using breed_code to find breed details.",
+          "involves_joins": [
+            "breeds"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "owners",
+      "columns": [
+        {
+          "name": "owner_id",
+          "synonyms": [
+            "Owner Identifier",
+            "Owner Key",
+            "Owner Number"
+          ],
+          "aggregations": [],
+          "business_name": "Owner ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "owner_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each dog owner."
+        },
+        {
+          "name": "first_name",
+          "synonyms": [
+            "Given Name",
+            "Owner's First Name",
+            "Forename"
+          ],
+          "aggregations": [],
+          "business_name": "First Name",
+          "common_values": [
+            "Nora",
+            "Melisa",
+            "Jaclyn"
+          ],
+          "typical_filters": [
+            "first_name = ?"
+          ],
+          "business_meaning": "The first name of the dog owner."
+        },
+        {
+          "name": "last_name",
+          "synonyms": [
+            "Surname",
+            "Owner's Last Name",
+            "Family Name"
+          ],
+          "aggregations": [],
+          "business_name": "Last Name",
+          "common_values": [
+            "Haley",
+            "DuBuque",
+            "Stoltenberg"
+          ],
+          "typical_filters": [
+            "last_name = ?"
+          ],
+          "business_meaning": "The last name of the dog owner."
+        },
+        {
+          "name": "street",
+          "synonyms": [
+            "Address",
+            "Street",
+            "Owner's Address"
+          ],
+          "aggregations": [],
+          "business_name": "Street Address",
+          "common_values": [
+            "0647 Hintz Village Apt. 024",
+            "1204 Mae Highway Apt. 107",
+            "2635 Caitlyn Plains"
+          ],
+          "typical_filters": [
+            "street = ?"
+          ],
+          "business_meaning": "The street address of the dog owner."
+        },
+        {
+          "name": "city",
+          "synonyms": [
+            "Town",
+            "Municipality",
+            "Owner's City"
+          ],
+          "aggregations": [],
+          "business_name": "City",
+          "common_values": [
+            "Lake Tia",
+            "Port Reannamouth",
+            "Barrettburgh"
+          ],
+          "typical_filters": [
+            "city = ?"
+          ],
+          "business_meaning": "The city where the dog owner resides."
+        },
+        {
+          "name": "state",
+          "synonyms": [
+            "Province",
+            "Region",
+            "Owner's State"
+          ],
+          "aggregations": [],
+          "business_name": "State",
+          "common_values": [
+            "Wisconsin",
+            "Virginia",
+            "Vermont"
+          ],
+          "typical_filters": [
+            "state = ?"
+          ],
+          "business_meaning": "The state where the dog owner resides."
+        },
+        {
+          "name": "zip_code",
+          "synonyms": [
+            "Postal Code",
+            "ZIP",
+            "Owner's ZIP Code"
+          ],
+          "aggregations": [],
+          "business_name": "ZIP Code",
+          "common_values": [
+            "93165",
+            "45244",
+            "02647"
+          ],
+          "typical_filters": [
+            "zip_code = ?"
+          ],
+          "business_meaning": "The postal code of the dog owner's address."
+        },
+        {
+          "name": "email_address",
+          "synonyms": [
+            "Email",
+            "Owner's Email",
+            "Contact Email"
+          ],
+          "aggregations": [],
+          "business_name": "Email Address",
+          "common_values": [
+            "lynn81@example.org",
+            "ykris@example.com",
+            "hudson.favian@example.com"
+          ],
+          "typical_filters": [
+            "email_address = ?"
+          ],
+          "business_meaning": "The email address of the dog owner."
+        },
+        {
+          "name": "home_phone",
+          "synonyms": [
+            "Landline",
+            "Home Number",
+            "Owner's Home Phone"
+          ],
+          "aggregations": [],
+          "business_name": "Home Phone",
+          "common_values": [
+            "1-682-845-0116x63235",
+            "(799)563-0260x454",
+            "916.976.9480x13851"
+          ],
+          "typical_filters": [
+            "home_phone = ?"
+          ],
+          "business_meaning": "The home phone number of the dog owner."
+        },
+        {
+          "name": "cell_number",
+          "synonyms": [
+            "Mobile",
+            "Cell Phone",
+            "Owner's Cell Number"
+          ],
+          "aggregations": [],
+          "business_name": "Cell Number",
+          "common_values": [
+            "478.978.0729",
+            "(722)768-5439x484",
+            "481-483-9083x37986"
+          ],
+          "typical_filters": [
+            "cell_number = ?"
+          ],
+          "business_meaning": "The mobile phone number of the dog owner."
+        }
+      ],
+      "purpose": "This table contains information about the owners of the dogs.",
+      "business_name": "Dog Owners",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the contact information for a specific dog owner?",
+          "explanation": "Query the owners table using owner_id to find contact details.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "professionals",
+      "columns": [
+        {
+          "name": "professional_id",
+          "synonyms": [
+            "Professional Identifier",
+            "Professional Key",
+            "Professional Number"
+          ],
+          "aggregations": [],
+          "business_name": "Professional ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "professional_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each professional."
+        },
+        {
+          "name": "role_code",
+          "synonyms": [
+            "Position",
+            "Job Title",
+            "Role"
+          ],
+          "aggregations": [],
+          "business_name": "Role Code",
+          "common_values": [
+            "Employee",
+            "Veterenarian"
+          ],
+          "typical_filters": [
+            "role_code = ?"
+          ],
+          "business_meaning": "The role or position of the professional within the shelter."
+        },
+        {
+          "name": "first_name",
+          "synonyms": [
+            "Given Name",
+            "Professional's First Name",
+            "Forename"
+          ],
+          "aggregations": [],
+          "business_name": "First Name",
+          "common_values": [
+            "Taryn",
+            "Jayson",
+            "Olaf"
+          ],
+          "typical_filters": [
+            "first_name = ?"
+          ],
+          "business_meaning": "The first name of the professional."
+        },
+        {
+          "name": "last_name",
+          "synonyms": [
+            "Surname",
+            "Professional's Last Name",
+            "Family Name"
+          ],
+          "aggregations": [],
+          "business_name": "Last Name",
+          "common_values": [
+            "Braun",
+            "Ullrich",
+            "Watsica"
+          ],
+          "typical_filters": [
+            "last_name = ?"
+          ],
+          "business_meaning": "The last name of the professional."
+        },
+        {
+          "name": "street",
+          "synonyms": [
+            "Address",
+            "Street",
+            "Professional's Address"
+          ],
+          "aggregations": [],
+          "business_name": "Street Address",
+          "common_values": [
+            "6915 Oberbrunner Point Suite 491",
+            "88665 Terence Lodge Apt. 904",
+            "68589 Bradly Manor"
+          ],
+          "typical_filters": [
+            "street = ?"
+          ],
+          "business_meaning": "The street address of the professional."
+        },
+        {
+          "name": "city",
+          "synonyms": [
+            "Town",
+            "Municipality",
+            "Professional's City"
+          ],
+          "aggregations": [],
+          "business_name": "City",
+          "common_values": [
+            "West Heidi",
+            "North Odellfurt",
+            "Jaceton"
+          ],
+          "typical_filters": [
+            "city = ?"
+          ],
+          "business_meaning": "The city where the professional resides."
+        },
+        {
+          "name": "state",
+          "synonyms": [
+            "Province",
+            "Region",
+            "Professional's State"
+          ],
+          "aggregations": [],
+          "business_name": "State",
+          "common_values": [
+            "Indiana",
+            "Connecticut",
+            "Wisconsin"
+          ],
+          "typical_filters": [
+            "state = ?"
+          ],
+          "business_meaning": "The state where the professional resides."
+        },
+        {
+          "name": "zip_code",
+          "synonyms": [
+            "Postal Code",
+            "ZIP",
+            "Professional's ZIP Code"
+          ],
+          "aggregations": [],
+          "business_name": "ZIP Code",
+          "common_values": [
+            "06646",
+            "43129",
+            "77129"
+          ],
+          "typical_filters": [
+            "zip_code = ?"
+          ],
+          "business_meaning": "The postal code of the professional's address."
+        },
+        {
+          "name": "email_address",
+          "synonyms": [
+            "Email",
+            "Professional's Email",
+            "Contact Email"
+          ],
+          "aggregations": [],
+          "business_name": "Email Address",
+          "common_values": [
+            "deanna.schuster@example.com",
+            "lucile.shanahan@example.org",
+            "uboehm@example.org"
+          ],
+          "typical_filters": [
+            "email_address = ?"
+          ],
+          "business_meaning": "The email address of the professional."
+        },
+        {
+          "name": "home_phone",
+          "synonyms": [
+            "Landline",
+            "Home Number",
+            "Professional's Home Phone"
+          ],
+          "aggregations": [],
+          "business_name": "Home Phone",
+          "common_values": [
+            "+71(6)2898266914",
+            "+02(1)0259033559",
+            "325-155-0801x7005"
+          ],
+          "typical_filters": [
+            "home_phone = ?"
+          ],
+          "business_meaning": "The home phone number of the professional."
+        },
+        {
+          "name": "cell_number",
+          "synonyms": [
+            "Mobile",
+            "Cell Phone",
+            "Professional's Cell Number"
+          ],
+          "aggregations": [],
+          "business_name": "Cell Number",
+          "common_values": [
+            "(275)939-2435x80863",
+            "889-940-2676",
+            "(369)908-7311x065"
+          ],
+          "typical_filters": [
+            "cell_number = ?"
+          ],
+          "business_meaning": "The mobile phone number of the professional."
+        }
+      ],
+      "purpose": "This table contains information about the professionals working at the shelter, including their roles and contact details.",
+      "business_name": "Shelter Professionals",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the contact information for a specific professional?",
+          "explanation": "Query the professionals table using professional_id to find contact details.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "sizes",
+      "columns": [
+        {
+          "name": "size_code",
+          "synonyms": [
+            "Size ID",
+            "Size Identifier",
+            "Size Key"
+          ],
+          "aggregations": [],
+          "business_name": "Size Code",
+          "common_values": [
+            "SML",
+            "MED",
+            "LGE"
+          ],
+          "typical_filters": [
+            "size_code = ?"
+          ],
+          "business_meaning": "A unique identifier for each size category."
+        },
+        {
+          "name": "size_description",
+          "synonyms": [
+            "Size Type",
+            "Size Category",
+            "Size Label"
+          ],
+          "aggregations": [],
+          "business_name": "Size Description",
+          "common_values": [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "typical_filters": [
+            "size_description = ?"
+          ],
+          "business_meaning": "A description of the size category."
+        }
+      ],
+      "purpose": "This table categorizes dogs by size.",
+      "business_name": "Dog Sizes",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the size description for a specific size code?",
+          "explanation": "Query the sizes table using the size_code to find the size_description.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "treatment_types",
+      "columns": [
+        {
+          "name": "treatment_type_code",
+          "synonyms": [
+            "Treatment ID",
+            "Treatment Identifier",
+            "Treatment Key"
+          ],
+          "aggregations": [],
+          "business_name": "Treatment Type Code",
+          "common_values": [
+            "EXAM",
+            "VAC",
+            "WALK"
+          ],
+          "typical_filters": [
+            "treatment_type_code = ?"
+          ],
+          "business_meaning": "A unique identifier for each type of treatment."
+        },
+        {
+          "name": "treatment_type_description",
+          "synonyms": [
+            "Treatment Description",
+            "Type of Treatment",
+            "Treatment Category"
+          ],
+          "aggregations": [],
+          "business_name": "Treatment Type Description",
+          "common_values": [
+            "Physical examination",
+            "Vaccination",
+            "Take for a Walk"
+          ],
+          "typical_filters": [
+            "treatment_type_description = ?"
+          ],
+          "business_meaning": "A description of the treatment type."
+        }
+      ],
+      "purpose": "This table lists the different types of treatments available for dogs.",
+      "business_name": "Treatment Types",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the description for a specific treatment type code?",
+          "explanation": "Query the treatment_types table using the treatment_type_code to find the treatment_type_description.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "treatments",
+      "columns": [
+        {
+          "name": "treatment_id",
+          "synonyms": [
+            "Treatment Identifier",
+            "Treatment Key",
+            "Treatment Number"
+          ],
+          "aggregations": [],
+          "business_name": "Treatment ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "treatment_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each treatment record."
+        },
+        {
+          "name": "dog_id",
+          "synonyms": [
+            "Dog Identifier",
+            "Dog Key",
+            "Dog Number"
+          ],
+          "aggregations": [],
+          "business_name": "Dog ID",
+          "common_values": [
+            "14",
+            "4",
+            "2"
+          ],
+          "typical_filters": [
+            "dog_id = ?"
+          ],
+          "business_meaning": "The identifier for the dog receiving the treatment."
+        },
+        {
+          "name": "professional_id",
+          "synonyms": [
+            "Professional Identifier",
+            "Professional Key",
+            "Professional Number"
+          ],
+          "aggregations": [],
+          "business_name": "Professional ID",
+          "common_values": [
+            "9",
+            "10",
+            "4"
+          ],
+          "typical_filters": [
+            "professional_id = ?"
+          ],
+          "business_meaning": "The identifier for the professional administering the treatment."
+        },
+        {
+          "name": "treatment_type_code",
+          "synonyms": [
+            "Treatment ID",
+            "Treatment Identifier",
+            "Treatment Key"
+          ],
+          "aggregations": [],
+          "business_name": "Treatment Type Code",
+          "common_values": [
+            "WALK",
+            "VAC",
+            "EXAM"
+          ],
+          "typical_filters": [
+            "treatment_type_code = ?"
+          ],
+          "business_meaning": "The code representing the type of treatment given."
+        },
+        {
+          "name": "date_of_treatment",
+          "synonyms": [
+            "Treatment Date",
+            "Date Administered",
+            "Date of Service"
+          ],
+          "aggregations": [],
+          "business_name": "Date of Treatment",
+          "common_values": [
+            "2018-03-19",
+            "2018-03-15",
+            "2018-03-08"
+          ],
+          "typical_filters": [
+            "date_of_treatment = ?",
+            "date_of_treatment > ?"
+          ],
+          "business_meaning": "The date when the treatment was administered."
+        },
+        {
+          "name": "cost_of_treatment",
+          "synonyms": [
+            "Treatment Cost",
+            "Service Fee",
+            "Treatment Price"
+          ],
+          "aggregations": [
+            "SUM(cost_of_treatment)",
+            "AVG(cost_of_treatment)"
+          ],
+          "business_name": "Cost of Treatment",
+          "common_values": [
+            "567",
+            "147",
+            "429"
+          ],
+          "typical_filters": [
+            "cost_of_treatment = ?",
+            "cost_of_treatment > ?"
+          ],
+          "business_meaning": "The cost incurred for the treatment."
+        }
+      ],
+      "purpose": "This table records the treatments given to dogs, including the professional who administered them and the cost.",
+      "business_name": "Dog Treatments",
+      "relationships": [
+        {
+          "column": "dog_id",
+          "common_uses": [
+            "To find all treatments a specific dog has received."
+          ],
+          "business_meaning": "Links each treatment to the dog that received it.",
+          "references_table": "dogs"
+        },
+        {
+          "column": "professional_id",
+          "common_uses": [
+            "To find which professional administered a specific treatment."
+          ],
+          "business_meaning": "Associates each treatment with the professional who administered it.",
+          "references_table": "professionals"
+        },
+        {
+          "column": "treatment_type_code",
+          "common_uses": [
+            "To find the type of treatment given to a dog."
+          ],
+          "business_meaning": "Links each treatment to its type description.",
+          "references_table": "treatment_types"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What treatments has a specific dog received?",
+          "explanation": "Join the treatments table with the dogs table using dog_id to find treatment details.",
+          "involves_joins": [
+            "dogs"
+          ]
+        },
+        {
+          "question": "Who administered a specific treatment?",
+          "explanation": "Join the treatments table with the professionals table using professional_id to find professional details.",
+          "involves_joins": [
+            "professionals"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Animal Shelter Management",
+    "purpose": "This database is used to manage information about dogs in a shelter, their owners, treatments they receive, and associated charges.",
+    "key_entities": [
+      "Dogs",
+      "Owners",
+      "Breeds",
+      "Sizes",
+      "Treatments",
+      "Professionals",
+      "Charges"
+    ],
+    "typical_questions": [
+      "What treatments has a specific dog received?",
+      "Who is the owner of a particular dog?",
+      "What are the charges associated with a specific treatment?",
+      "How many dogs of a certain breed are in the shelter?",
+      "What is the size description for a specific dog?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in date fields",
+      "example": "When did the dog arrive?",
+      "clarification": "Specify 'date_arrived' to avoid confusion with 'date_adopted' or 'date_departed'.",
+      "affected_elements": [
+        "dogs.date_arrived",
+        "dogs.date_adopted",
+        "dogs.date_departed"
+      ]
+    },
+    {
+      "issue": "Ambiguity in owner contact details",
+      "example": "What is the owner's phone number?",
+      "clarification": "Specify 'home_phone' or 'cell_number' to clarify which number is needed.",
+      "affected_elements": [
+        "owners.home_phone",
+        "owners.cell_number"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:52:52.258483",
+  "query_guidelines": [
+    "Use specific column names to avoid ambiguity, especially with date and contact fields.",
+    "Ensure all necessary joins are included to connect related tables.",
+    "Consider performance when joining multiple tables, especially with large datasets.",
+    "Use filters to narrow down results and improve query efficiency.",
+    "Be mindful of potential null values in optional fields when crafting queries."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Dog Treatment History",
+      "tables_involved": [
+        "treatments",
+        "dogs",
+        "professionals"
+      ],
+      "example_question": "What treatments has a specific dog received and who administered them?",
+      "typical_structure": "SELECT ... FROM treatments JOIN dogs ON treatments.dog_id = dogs.dog_id JOIN professionals ON treatments.professional_id = professionals.professional_id WHERE dogs.dog_id = ?",
+      "key_considerations": [
+        "Ensure correct joins between treatments, dogs, and professionals."
+      ]
+    },
+    {
+      "pattern_type": "Owner and Dog Information",
+      "tables_involved": [
+        "dogs",
+        "owners",
+        "breeds"
+      ],
+      "example_question": "Who is the owner of a specific dog and what is the dog's breed?",
+      "typical_structure": "SELECT ... FROM dogs JOIN owners ON dogs.owner_id = owners.owner_id JOIN breeds ON dogs.breed_code = breeds.breed_code WHERE dogs.dog_id = ?",
+      "key_considerations": [
+        "Ensure correct joins between dogs, owners, and breeds."
+      ]
+    }
+  ]
+}

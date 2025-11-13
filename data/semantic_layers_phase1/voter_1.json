@@ -1,0 +1,293 @@
+{
+  "tables": [
+    {
+      "name": "area_code_state",
+      "columns": [
+        {
+          "name": "area_code",
+          "synonyms": [
+            "dialing code",
+            "phone area code",
+            "telephone code"
+          ],
+          "aggregations": [],
+          "business_name": "Area Code",
+          "common_values": [
+            "201",
+            "202",
+            "203"
+          ],
+          "typical_filters": [
+            "area_code = ?"
+          ],
+          "business_meaning": "The telephone area code associated with a specific state."
+        },
+        {
+          "name": "state",
+          "synonyms": [
+            "region",
+            "province",
+            "territory"
+          ],
+          "aggregations": [],
+          "business_name": "State",
+          "common_values": [
+            "NJ",
+            "DC",
+            "CT"
+          ],
+          "typical_filters": [
+            "state = ?"
+          ],
+          "business_meaning": "The U.S. state associated with a specific area code."
+        }
+      ],
+      "purpose": "This table maps area codes to their corresponding states.",
+      "business_name": "Area Code and State",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What state is associated with a specific area code?",
+          "explanation": "Query the area_code_state table to find the state for a given area code.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "contestants",
+      "columns": [
+        {
+          "name": "contestant_number",
+          "synonyms": [
+            "participant ID",
+            "entry number",
+            "competitor number"
+          ],
+          "aggregations": [],
+          "business_name": "Contestant Number",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "contestant_number = ?"
+          ],
+          "business_meaning": "A unique identifier for each contestant."
+        },
+        {
+          "name": "contestant_name",
+          "synonyms": [
+            "participant name",
+            "competitor name",
+            "entry name"
+          ],
+          "aggregations": [],
+          "business_name": "Contestant Name",
+          "common_values": [
+            "Edwina Burnam",
+            "Tabatha Gehling",
+            "Kelly Clauss"
+          ],
+          "typical_filters": [
+            "contestant_name = ?"
+          ],
+          "business_meaning": "The name of the contestant."
+        }
+      ],
+      "purpose": "This table contains information about the contestants in the competition.",
+      "business_name": "Contestants",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the names of all contestants?",
+          "explanation": "Select all contestant names from the contestants table.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "votes",
+      "columns": [
+        {
+          "name": "vote_id",
+          "synonyms": [
+            "ballot ID",
+            "vote number",
+            "entry ID"
+          ],
+          "aggregations": [],
+          "business_name": "Vote ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "vote_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each vote."
+        },
+        {
+          "name": "phone_number",
+          "synonyms": [
+            "telephone number",
+            "contact number",
+            "mobile number"
+          ],
+          "aggregations": [],
+          "business_name": "Phone Number",
+          "common_values": [
+            "7182887233",
+            "7148407040",
+            "6209222712"
+          ],
+          "typical_filters": [
+            "phone_number = ?"
+          ],
+          "business_meaning": "The phone number from which the vote was cast."
+        },
+        {
+          "name": "state",
+          "synonyms": [
+            "region",
+            "province",
+            "territory"
+          ],
+          "aggregations": [
+            "COUNT(state)"
+          ],
+          "business_name": "State",
+          "common_values": [
+            "NY",
+            "CA",
+            "NJ"
+          ],
+          "typical_filters": [
+            "state = ?"
+          ],
+          "business_meaning": "The state from which the vote was cast."
+        },
+        {
+          "name": "contestant_number",
+          "synonyms": [
+            "participant ID",
+            "entry number",
+            "competitor number"
+          ],
+          "aggregations": [
+            "COUNT(contestant_number)"
+          ],
+          "business_name": "Contestant Number",
+          "common_values": [
+            "2",
+            "3",
+            "5"
+          ],
+          "typical_filters": [
+            "contestant_number = ?"
+          ],
+          "business_meaning": "The contestant number for whom the vote was cast."
+        },
+        {
+          "name": "created",
+          "synonyms": [
+            "vote time",
+            "timestamp",
+            "date of vote"
+          ],
+          "aggregations": [
+            "MIN(created)",
+            "MAX(created)"
+          ],
+          "business_name": "Vote Timestamp",
+          "common_values": [
+            "2018-03-09 19:03:21",
+            "2018-03-09 19:03:36"
+          ],
+          "typical_filters": [
+            "created = ?",
+            "created > ?"
+          ],
+          "business_meaning": "The date and time when the vote was cast."
+        }
+      ],
+      "purpose": "This table records votes cast for contestants, including the state from which the vote was cast.",
+      "business_name": "Votes",
+      "relationships": [
+        {
+          "column": "contestant_number",
+          "common_uses": [
+            "To find out how many votes each contestant received."
+          ],
+          "business_meaning": "Links each vote to the contestant it was cast for.",
+          "references_table": "contestants"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "How many votes did a specific contestant receive?",
+          "explanation": "Count the number of votes for a given contestant_number in the votes table.",
+          "involves_joins": [
+            "contestants"
+          ]
+        },
+        {
+          "question": "Which state cast the most votes?",
+          "explanation": "Group by state and count votes to find the state with the highest number.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Entertainment",
+    "purpose": "This database is used to track votes for contestants in a competition, associating votes with states and contestants.",
+    "key_entities": [
+      "Area Code and State",
+      "Contestants",
+      "Votes"
+    ],
+    "typical_questions": [
+      "How many votes did a specific contestant receive?",
+      "Which state cast the most votes?",
+      "What are the names of all contestants?",
+      "How many votes were cast from a specific state?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "State column in votes table might be confused with area_code_state table",
+      "example": "How many votes were cast from New Jersey?",
+      "clarification": "Ensure the query filters the state column in the votes table, not the area_code_state table.",
+      "affected_elements": [
+        "votes.state",
+        "area_code_state.state"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T21:01:23.766811",
+  "query_guidelines": [
+    "Always use the correct join pattern for foreign keys to ensure accurate results.",
+    "Be cautious of similar column names across tables to avoid confusion.",
+    "Optimize queries by filtering on indexed columns like contestant_number and state.",
+    "Avoid unnecessary joins to improve query performance.",
+    "Use aggregations wisely to summarize data without losing detail."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "contestant vote count",
+      "tables_involved": [
+        "votes",
+        "contestants"
+      ],
+      "example_question": "How many votes did each contestant receive?",
+      "typical_structure": "SELECT contestants.contestant_name, COUNT(votes.vote_id) FROM votes JOIN contestants ON votes.contestant_number = contestants.contestant_number GROUP BY contestants.contestant_name",
+      "key_considerations": [
+        "Ensure the join is correctly set up to match votes to contestants."
+      ]
+    }
+  ]
+}

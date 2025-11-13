@@ -1,0 +1,499 @@
+{
+  "tables": [
+    {
+      "name": "documents",
+      "columns": [
+        {
+          "name": "document_id",
+          "synonyms": [
+            "Doc ID",
+            "Document Number",
+            "ID"
+          ],
+          "aggregations": [],
+          "business_name": "Document ID",
+          "common_values": [
+            "0",
+            "1",
+            "3"
+          ],
+          "typical_filters": [
+            "document_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each document."
+        },
+        {
+          "name": "template_id",
+          "synonyms": [
+            "Template Reference",
+            "Template Number",
+            "Template Key"
+          ],
+          "aggregations": [],
+          "business_name": "Template ID",
+          "common_values": [
+            "7",
+            "25",
+            "6"
+          ],
+          "typical_filters": [
+            "template_id = ?"
+          ],
+          "business_meaning": "The identifier of the template associated with the document."
+        },
+        {
+          "name": "document_name",
+          "synonyms": [
+            "Title",
+            "Name",
+            "Document Title"
+          ],
+          "aggregations": [],
+          "business_name": "Document Name",
+          "common_values": [
+            "Introduction of OS",
+            "Understanding DB"
+          ],
+          "typical_filters": [
+            "document_name LIKE ?"
+          ],
+          "business_meaning": "The name or title of the document."
+        },
+        {
+          "name": "document_description",
+          "synonyms": [
+            "Description",
+            "Summary",
+            "Overview"
+          ],
+          "aggregations": [],
+          "business_name": "Document Description",
+          "common_values": [
+            "n",
+            "y",
+            "u"
+          ],
+          "typical_filters": [
+            "document_description LIKE ?"
+          ],
+          "business_meaning": "A brief description or summary of the document."
+        },
+        {
+          "name": "other_details",
+          "synonyms": [
+            "Additional Info",
+            "Extra Details",
+            "Notes"
+          ],
+          "aggregations": [],
+          "business_name": "Other Details",
+          "common_values": [
+            null
+          ],
+          "typical_filters": [
+            "other_details LIKE ?"
+          ],
+          "business_meaning": "Additional information about the document."
+        }
+      ],
+      "purpose": "This table represents the main documents being managed, including their names and descriptions.",
+      "business_name": "Documents",
+      "relationships": [
+        {
+          "column": "template_id",
+          "common_uses": [
+            "To find which template a document is based on."
+          ],
+          "business_meaning": "Links each document to its template, indicating the format or structure it follows.",
+          "references_table": "templates"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What is the name of the document with ID 1?",
+          "explanation": "Select the document_name from documents where document_id is 1.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which template is used for the document named 'Introduction of OS'?",
+          "explanation": "Join documents with templates to find the template_id for the document with the given name.",
+          "involves_joins": [
+            "templates"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paragraphs",
+      "columns": [
+        {
+          "name": "paragraph_id",
+          "synonyms": [
+            "Para ID",
+            "Paragraph Number",
+            "ID"
+          ],
+          "aggregations": [],
+          "business_name": "Paragraph ID",
+          "common_values": [
+            "7",
+            "9",
+            "65"
+          ],
+          "typical_filters": [
+            "paragraph_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each paragraph."
+        },
+        {
+          "name": "document_id",
+          "synonyms": [
+            "Doc ID",
+            "Document Reference",
+            "Document Key"
+          ],
+          "aggregations": [],
+          "business_name": "Document ID",
+          "common_values": [
+            "2394",
+            "3",
+            "50123"
+          ],
+          "typical_filters": [
+            "document_id = ?"
+          ],
+          "business_meaning": "The identifier of the document to which the paragraph belongs."
+        },
+        {
+          "name": "paragraph_text",
+          "synonyms": [
+            "Text",
+            "Content",
+            "Paragraph Content"
+          ],
+          "aggregations": [],
+          "business_name": "Paragraph Text",
+          "common_values": [
+            "Korea",
+            "Somalia",
+            "Palestinian Territory"
+          ],
+          "typical_filters": [
+            "paragraph_text LIKE ?"
+          ],
+          "business_meaning": "The actual text content of the paragraph."
+        },
+        {
+          "name": "other_details",
+          "synonyms": [
+            "Additional Info",
+            "Extra Details",
+            "Notes"
+          ],
+          "aggregations": [],
+          "business_name": "Other Details",
+          "common_values": [
+            null
+          ],
+          "typical_filters": [
+            "other_details LIKE ?"
+          ],
+          "business_meaning": "Additional information about the paragraph."
+        }
+      ],
+      "purpose": "This table contains the text of paragraphs that are part of documents.",
+      "business_name": "Paragraphs",
+      "relationships": [
+        {
+          "column": "document_id",
+          "common_uses": [
+            "To retrieve all paragraphs belonging to a specific document."
+          ],
+          "business_meaning": "Associates each paragraph with its parent document.",
+          "references_table": "documents"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What paragraphs are in the document with ID 3?",
+          "explanation": "Select paragraph_text from paragraphs where document_id is 3.",
+          "involves_joins": []
+        },
+        {
+          "question": "Find all paragraphs containing the word 'Korea'.",
+          "explanation": "Select paragraph_text from paragraphs where paragraph_text LIKE '%Korea%'.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "ref_template_types",
+      "columns": [
+        {
+          "name": "template_type_code",
+          "synonyms": [
+            "Type Code",
+            "Template Code",
+            "Type Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Template Type Code",
+          "common_values": [
+            "PPT",
+            "CV",
+            "AD"
+          ],
+          "typical_filters": [
+            "template_type_code = ?"
+          ],
+          "business_meaning": "A code representing the type of template."
+        },
+        {
+          "name": "template_type_description",
+          "synonyms": [
+            "Type Description",
+            "Template Description",
+            "Type Info"
+          ],
+          "aggregations": [],
+          "business_name": "Template Type Description",
+          "common_values": [
+            "Presentation",
+            "CV",
+            "Advertisement"
+          ],
+          "typical_filters": [
+            "template_type_description LIKE ?"
+          ],
+          "business_meaning": "A description of what the template type represents."
+        }
+      ],
+      "purpose": "This table defines the different types of templates available.",
+      "business_name": "Template Types",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What are the available template types?",
+          "explanation": "Select template_type_description from ref_template_types.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "templates",
+      "columns": [
+        {
+          "name": "template_id",
+          "synonyms": [
+            "Template Number",
+            "Template Key",
+            "ID"
+          ],
+          "aggregations": [],
+          "business_name": "Template ID",
+          "common_values": [
+            "0",
+            "1",
+            "4"
+          ],
+          "typical_filters": [
+            "template_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each template."
+        },
+        {
+          "name": "version_number",
+          "synonyms": [
+            "Version",
+            "Template Version",
+            "Revision"
+          ],
+          "aggregations": [
+            "MAX(version_number)"
+          ],
+          "business_name": "Version Number",
+          "common_values": [
+            "5",
+            "9",
+            "4"
+          ],
+          "typical_filters": [
+            "version_number = ?"
+          ],
+          "business_meaning": "The version of the template."
+        },
+        {
+          "name": "template_type_code",
+          "synonyms": [
+            "Type Code",
+            "Template Code",
+            "Type Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Template Type Code",
+          "common_values": [
+            "PP",
+            "BK",
+            "PPT"
+          ],
+          "typical_filters": [
+            "template_type_code = ?"
+          ],
+          "business_meaning": "The code indicating the type of template."
+        },
+        {
+          "name": "date_effective_from",
+          "synonyms": [
+            "Start Date",
+            "Effective Start",
+            "Begin Date"
+          ],
+          "aggregations": [
+            "MIN(date_effective_from)"
+          ],
+          "business_name": "Date Effective From",
+          "common_values": [
+            "2005-11-12",
+            "2010-09-24"
+          ],
+          "typical_filters": [
+            "date_effective_from >= ?"
+          ],
+          "business_meaning": "The start date from which the template is effective."
+        },
+        {
+          "name": "date_effective_to",
+          "synonyms": [
+            "End Date",
+            "Effective End",
+            "Finish Date"
+          ],
+          "aggregations": [
+            "MAX(date_effective_to)"
+          ],
+          "business_name": "Date Effective To",
+          "common_values": [
+            "2008-01-05",
+            "1999-07-08"
+          ],
+          "typical_filters": [
+            "date_effective_to <= ?"
+          ],
+          "business_meaning": "The end date until which the template is effective."
+        },
+        {
+          "name": "template_details",
+          "synonyms": [
+            "Details",
+            "Template Info",
+            "Template Description"
+          ],
+          "aggregations": [],
+          "business_name": "Template Details",
+          "common_values": [
+            ""
+          ],
+          "typical_filters": [
+            "template_details LIKE ?"
+          ],
+          "business_meaning": "Additional details about the template."
+        }
+      ],
+      "purpose": "This table contains information about document templates, including their version and effective dates.",
+      "business_name": "Templates",
+      "relationships": [
+        {
+          "column": "template_type_code",
+          "common_uses": [
+            "To categorize templates by type."
+          ],
+          "business_meaning": "Associates each template with its type, defining its category.",
+          "references_table": "ref_template_types"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What is the latest version of the template with ID 1?",
+          "explanation": "Select the maximum version_number for template_id 1.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which templates are effective as of a certain date?",
+          "explanation": "Select templates where the current date is between date_effective_from and date_effective_to.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Document Management",
+    "purpose": "This database is used to manage documents and their associated templates and paragraphs, allowing users to organize and retrieve document content efficiently.",
+    "key_entities": [
+      "Documents",
+      "Paragraphs",
+      "Templates",
+      "Template Types"
+    ],
+    "typical_questions": [
+      "What are the details of a specific document?",
+      "Which paragraphs belong to a particular document?",
+      "What templates are available for a specific type?",
+      "What is the effective date range for a template?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in document and template association",
+      "example": "What is the template for 'Introduction of OS'?",
+      "clarification": "Specify whether you need the template ID or details.",
+      "affected_elements": [
+        "documents.template_id",
+        "templates.template_details"
+      ]
+    },
+    {
+      "issue": "Date format inconsistency",
+      "example": "Find templates effective from 2005-11-12.",
+      "clarification": "Ensure date format matches the stored format.",
+      "affected_elements": [
+        "templates.date_effective_from"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:52:19.725406",
+  "query_guidelines": [
+    "Always verify the existence of IDs in their respective tables before querying.",
+    "Use LIKE for partial matches in text fields to improve search flexibility.",
+    "Consider date range queries for templates to ensure accurate results.",
+    "Avoid using null values in filters unless specifically checking for them.",
+    "Join tables based on documented foreign key relationships to ensure data integrity."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Document and Template Association",
+      "tables_involved": [
+        "documents",
+        "templates"
+      ],
+      "example_question": "Which template is used for the document named 'Introduction of OS'?",
+      "typical_structure": "SELECT templates.template_details FROM documents JOIN templates ON documents.template_id = templates.template_id WHERE documents.document_name = 'Introduction of OS';",
+      "key_considerations": [
+        "Ensure the document name is correctly specified."
+      ]
+    },
+    {
+      "pattern_type": "Paragraph Retrieval by Document",
+      "tables_involved": [
+        "paragraphs",
+        "documents"
+      ],
+      "example_question": "What paragraphs are in the document with ID 3?",
+      "typical_structure": "SELECT paragraph_text FROM paragraphs WHERE document_id = 3;",
+      "key_considerations": [
+        "Verify the document ID exists in the documents table."
+      ]
+    }
+  ]
+}

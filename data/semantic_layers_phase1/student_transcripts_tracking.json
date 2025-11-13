@@ -1,0 +1,796 @@
+{
+  "tables": [
+    {
+      "name": "addresses",
+      "columns": [
+        {
+          "name": "address_id",
+          "synonyms": [
+            "Address Number",
+            "Location ID",
+            "Residence ID"
+          ],
+          "aggregations": [],
+          "business_name": "Address ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "address_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each address."
+        },
+        {
+          "name": "line_1",
+          "synonyms": [
+            "Street",
+            "Address",
+            "Location"
+          ],
+          "aggregations": [],
+          "business_name": "Address Line 1",
+          "common_values": [
+            "123 Main St",
+            "456 Elm St"
+          ],
+          "typical_filters": [
+            "line_1 LIKE ?"
+          ],
+          "business_meaning": "Primary address line, typically the street address."
+        },
+        {
+          "name": "city",
+          "synonyms": [
+            "Town",
+            "Municipality",
+            "Urban Area"
+          ],
+          "aggregations": [],
+          "business_name": "City",
+          "common_values": [
+            "New York",
+            "Los Angeles",
+            "Chicago"
+          ],
+          "typical_filters": [
+            "city = ?"
+          ],
+          "business_meaning": "City where the address is located."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "Nation",
+            "State",
+            "Region"
+          ],
+          "aggregations": [],
+          "business_name": "Country",
+          "common_values": [
+            "USA",
+            "Canada",
+            "UK"
+          ],
+          "typical_filters": [
+            "country = ?"
+          ],
+          "business_meaning": "Country where the address is located."
+        }
+      ],
+      "purpose": "Stores address details for students, including both current and permanent addresses.",
+      "business_name": "Addresses",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the current address of a student?",
+          "explanation": "Query the students table and join with addresses using current_address_id.",
+          "involves_joins": [
+            "students"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "courses",
+      "columns": [
+        {
+          "name": "course_id",
+          "synonyms": [
+            "Course Number",
+            "Class ID",
+            "Subject ID"
+          ],
+          "aggregations": [],
+          "business_name": "Course ID",
+          "common_values": [
+            "101",
+            "202",
+            "303"
+          ],
+          "typical_filters": [
+            "course_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each course."
+        },
+        {
+          "name": "course_name",
+          "synonyms": [
+            "Class Name",
+            "Subject",
+            "Course Title"
+          ],
+          "aggregations": [],
+          "business_name": "Course Name",
+          "common_values": [
+            "Mathematics",
+            "History",
+            "Biology"
+          ],
+          "typical_filters": [
+            "course_name LIKE ?"
+          ],
+          "business_meaning": "Name of the course."
+        }
+      ],
+      "purpose": "Contains information about the courses offered by the institution.",
+      "business_name": "Courses",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What courses are available in the current semester?",
+          "explanation": "Query the courses table and join with sections and semesters.",
+          "involves_joins": [
+            "sections",
+            "semesters"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "degree_programs",
+      "columns": [
+        {
+          "name": "degree_program_id",
+          "synonyms": [
+            "Program ID",
+            "Degree ID",
+            "Course ID"
+          ],
+          "aggregations": [],
+          "business_name": "Degree Program ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "degree_program_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each degree program."
+        },
+        {
+          "name": "degree_summary_name",
+          "synonyms": [
+            "Program Name",
+            "Degree Title",
+            "Course Name"
+          ],
+          "aggregations": [],
+          "business_name": "Degree Name",
+          "common_values": [
+            "Bachelor of Science",
+            "Master of Arts"
+          ],
+          "typical_filters": [
+            "degree_summary_name LIKE ?"
+          ],
+          "business_meaning": "Name of the degree program."
+        }
+      ],
+      "purpose": "Tracks the various degree programs offered by the institution.",
+      "business_name": "Degree Programs",
+      "relationships": [
+        {
+          "column": "department_id",
+          "common_uses": [
+            "To find which department offers a specific degree program."
+          ],
+          "business_meaning": "Links degree programs to the departments that offer them.",
+          "references_table": "departments"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which degree programs are offered by the Computer Science department?",
+          "explanation": "Query the degree_programs table and join with departments.",
+          "involves_joins": [
+            "departments"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "departments",
+      "columns": [
+        {
+          "name": "department_id",
+          "synonyms": [
+            "Dept ID",
+            "Division ID",
+            "Faculty ID"
+          ],
+          "aggregations": [],
+          "business_name": "Department ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "department_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each department."
+        },
+        {
+          "name": "department_name",
+          "synonyms": [
+            "Dept Name",
+            "Division Name",
+            "Faculty Name"
+          ],
+          "aggregations": [],
+          "business_name": "Department Name",
+          "common_values": [
+            "Computer Science",
+            "History",
+            "Art"
+          ],
+          "typical_filters": [
+            "department_name LIKE ?"
+          ],
+          "business_meaning": "Name of the department."
+        }
+      ],
+      "purpose": "Contains information about the various departments within the institution.",
+      "business_name": "Departments",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What departments are available in the institution?",
+          "explanation": "Query the departments table to list all departments.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "sections",
+      "columns": [
+        {
+          "name": "section_id",
+          "synonyms": [
+            "Section Number",
+            "Class Section",
+            "Course Section"
+          ],
+          "aggregations": [],
+          "business_name": "Section ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "section_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each section."
+        },
+        {
+          "name": "section_name",
+          "synonyms": [
+            "Class Name",
+            "Section Title",
+            "Course Section"
+          ],
+          "aggregations": [],
+          "business_name": "Section Name",
+          "common_values": [
+            "A",
+            "B",
+            "C"
+          ],
+          "typical_filters": [
+            "section_name LIKE ?"
+          ],
+          "business_meaning": "Name or identifier of the section."
+        }
+      ],
+      "purpose": "Represents different sections of courses offered in various semesters.",
+      "business_name": "Sections",
+      "relationships": [
+        {
+          "column": "course_id",
+          "common_uses": [
+            "To find all sections of a specific course."
+          ],
+          "business_meaning": "Links sections to the courses they belong to.",
+          "references_table": "courses"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What sections are available for the Mathematics course?",
+          "explanation": "Query the sections table and join with courses.",
+          "involves_joins": [
+            "courses"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "semesters",
+      "columns": [
+        {
+          "name": "semester_id",
+          "synonyms": [
+            "Term ID",
+            "Session ID",
+            "Period ID"
+          ],
+          "aggregations": [],
+          "business_name": "Semester ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "semester_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each semester."
+        },
+        {
+          "name": "semester_name",
+          "synonyms": [
+            "Term Name",
+            "Session Name",
+            "Period Name"
+          ],
+          "aggregations": [],
+          "business_name": "Semester Name",
+          "common_values": [
+            "Spring 2023",
+            "Fall 2023"
+          ],
+          "typical_filters": [
+            "semester_name LIKE ?"
+          ],
+          "business_meaning": "Name of the semester."
+        }
+      ],
+      "purpose": "Tracks the different semesters during which courses are offered.",
+      "business_name": "Semesters",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What semesters are available for the academic year?",
+          "explanation": "Query the semesters table to list all semesters.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "student_enrolment",
+      "columns": [
+        {
+          "name": "student_enrolment_id",
+          "synonyms": [
+            "Enrolment ID",
+            "Registration ID",
+            "Student Enrolment Number"
+          ],
+          "aggregations": [],
+          "business_name": "Student Enrolment ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "student_enrolment_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each student enrolment record."
+        }
+      ],
+      "purpose": "Tracks the enrolment of students in degree programs and semesters.",
+      "business_name": "Student Enrolment",
+      "relationships": [
+        {
+          "column": "degree_program_id",
+          "common_uses": [
+            "To find which degree program a student is enrolled in."
+          ],
+          "business_meaning": "Links student enrolments to the degree programs they are enrolled in.",
+          "references_table": "degree_programs"
+        },
+        {
+          "column": "semester_id",
+          "common_uses": [
+            "To find which semester a student is enrolled in."
+          ],
+          "business_meaning": "Links student enrolments to the semesters they are enrolled in.",
+          "references_table": "semesters"
+        },
+        {
+          "column": "student_id",
+          "common_uses": [
+            "To find enrolment details for a specific student."
+          ],
+          "business_meaning": "Links enrolments to the students who are enrolled.",
+          "references_table": "students"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "Which students are enrolled in the Spring 2023 semester?",
+          "explanation": "Query the student_enrolment table and join with semesters.",
+          "involves_joins": [
+            "semesters"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "student_enrolment_courses",
+      "columns": [
+        {
+          "name": "student_course_id",
+          "synonyms": [
+            "Course Enrolment ID",
+            "Student Course Number",
+            "Enrolment Course ID"
+          ],
+          "aggregations": [],
+          "business_name": "Student Course ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "student_course_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each student course enrolment."
+        }
+      ],
+      "purpose": "Tracks the courses that students are enrolled in as part of their enrolment.",
+      "business_name": "Student Enrolment Courses",
+      "relationships": [
+        {
+          "column": "course_id",
+          "common_uses": [
+            "To find which courses a student is enrolled in."
+          ],
+          "business_meaning": "Links student course enrolments to the courses they are enrolled in.",
+          "references_table": "courses"
+        },
+        {
+          "column": "student_enrolment_id",
+          "common_uses": [
+            "To find all courses a student is enrolled in for a specific enrolment."
+          ],
+          "business_meaning": "Links course enrolments to the student enrolment records.",
+          "references_table": "student_enrolment"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What courses is a student enrolled in for the current semester?",
+          "explanation": "Query the student_enrolment_courses table and join with student_enrolment and courses.",
+          "involves_joins": [
+            "student_enrolment",
+            "courses"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "students",
+      "columns": [
+        {
+          "name": "student_id",
+          "synonyms": [
+            "Student Number",
+            "ID",
+            "Student Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Student ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "student_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each student."
+        },
+        {
+          "name": "first_name",
+          "synonyms": [
+            "Given Name",
+            "Forename",
+            "Name"
+          ],
+          "aggregations": [],
+          "business_name": "First Name",
+          "common_values": [
+            "John",
+            "Jane",
+            "Alex"
+          ],
+          "typical_filters": [
+            "first_name LIKE ?"
+          ],
+          "business_meaning": "First name of the student."
+        },
+        {
+          "name": "last_name",
+          "synonyms": [
+            "Surname",
+            "Family Name",
+            "Name"
+          ],
+          "aggregations": [],
+          "business_name": "Last Name",
+          "common_values": [
+            "Smith",
+            "Doe",
+            "Johnson"
+          ],
+          "typical_filters": [
+            "last_name LIKE ?"
+          ],
+          "business_meaning": "Last name of the student."
+        },
+        {
+          "name": "email_address",
+          "synonyms": [
+            "Email",
+            "Email ID",
+            "Contact Email"
+          ],
+          "aggregations": [],
+          "business_name": "Email Address",
+          "common_values": [
+            "example@example.com",
+            "student@university.edu"
+          ],
+          "typical_filters": [
+            "email_address LIKE ?"
+          ],
+          "business_meaning": "Email contact for the student."
+        }
+      ],
+      "purpose": "Contains personal and contact information about students.",
+      "business_name": "Students",
+      "relationships": [
+        {
+          "column": "permanent_address_id",
+          "common_uses": [
+            "To find the permanent address of a student."
+          ],
+          "business_meaning": "Links students to their permanent address.",
+          "references_table": "addresses"
+        },
+        {
+          "column": "current_address_id",
+          "common_uses": [
+            "To find the current address of a student."
+          ],
+          "business_meaning": "Links students to their current address.",
+          "references_table": "addresses"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What is the email address of a student named John Doe?",
+          "explanation": "Query the students table filtering by first and last name.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "transcript_contents",
+      "columns": [
+        {
+          "name": "student_course_id",
+          "synonyms": [
+            "Course Enrolment ID",
+            "Student Course Number",
+            "Enrolment Course ID"
+          ],
+          "aggregations": [],
+          "business_name": "Student Course ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "student_course_id = ?"
+          ],
+          "business_meaning": "Identifier for the student's course enrolment linked to a transcript."
+        }
+      ],
+      "purpose": "Links student course enrolments to their transcripts.",
+      "business_name": "Transcript Contents",
+      "relationships": [
+        {
+          "column": "student_course_id",
+          "common_uses": [
+            "To find which courses are included in a student's transcript."
+          ],
+          "business_meaning": "Links transcript contents to the specific courses a student is enrolled in.",
+          "references_table": "student_enrolment_courses"
+        },
+        {
+          "column": "transcript_id",
+          "common_uses": [
+            "To find the transcript details for a specific course enrolment."
+          ],
+          "business_meaning": "Links transcript contents to the transcript records.",
+          "references_table": "transcripts"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What courses are listed on a student's transcript?",
+          "explanation": "Query the transcript_contents table and join with student_enrolment_courses.",
+          "involves_joins": [
+            "student_enrolment_courses"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "transcripts",
+      "columns": [
+        {
+          "name": "transcript_id",
+          "synonyms": [
+            "Transcript Number",
+            "Record ID",
+            "Transcript Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Transcript ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "transcript_id = ?"
+          ],
+          "business_meaning": "Unique identifier for each transcript."
+        },
+        {
+          "name": "transcript_date",
+          "synonyms": [
+            "Date Issued",
+            "Record Date",
+            "Transcript Issued Date"
+          ],
+          "aggregations": [
+            "MAX(transcript_date)",
+            "MIN(transcript_date)"
+          ],
+          "business_name": "Transcript Date",
+          "common_values": [
+            "2023-01-01",
+            "2022-12-31"
+          ],
+          "typical_filters": [
+            "transcript_date = ?",
+            "transcript_date > ?"
+          ],
+          "business_meaning": "Date when the transcript was issued."
+        }
+      ],
+      "purpose": "Stores information about student transcripts, including the date issued.",
+      "business_name": "Transcripts",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "When was a student's transcript issued?",
+          "explanation": "Query the transcripts table filtering by student ID.",
+          "involves_joins": [
+            "transcript_contents",
+            "student_enrolment_courses"
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Education",
+    "purpose": "This database is used to manage and track information related to students, courses, degree programs, and their enrolments in an educational institution.",
+    "key_entities": [
+      "Students",
+      "Courses",
+      "Degree Programs",
+      "Departments",
+      "Semesters",
+      "Transcripts"
+    ],
+    "typical_questions": [
+      "What courses is a student enrolled in?",
+      "Which students are in a specific degree program?",
+      "What are the details of a student's transcript?",
+      "Which courses are offered by a specific department?",
+      "What is the address of a student?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Ambiguity in address type",
+      "example": "What is the address of a student?",
+      "clarification": "Specify whether the current or permanent address is needed.",
+      "affected_elements": [
+        "students.current_address_id",
+        "students.permanent_address_id"
+      ]
+    },
+    {
+      "issue": "Ambiguity in course enrolment",
+      "example": "What courses is a student enrolled in?",
+      "clarification": "Specify the semester or degree program if needed.",
+      "affected_elements": [
+        "student_enrolment_courses.course_id",
+        "student_enrolment.semester_id"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T21:00:01.467114",
+  "query_guidelines": [
+    "Always specify the type of address (current or permanent) when querying student addresses.",
+    "Use joins to connect related tables, such as linking students to their enrolments and courses.",
+    "Filter by specific semesters or degree programs to narrow down results.",
+    "Be clear about whether you need current or historical data, especially for enrolments and transcripts.",
+    "Consider performance when joining multiple tables, especially with large datasets."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "student course enrolment",
+      "tables_involved": [
+        "student_enrolment",
+        "student_enrolment_courses",
+        "courses",
+        "semesters"
+      ],
+      "example_question": "What courses is a student enrolled in for the current semester?",
+      "typical_structure": "SELECT courses.course_name FROM student_enrolment_courses JOIN student_enrolment ON student_enrolment_courses.student_enrolment_id = student_enrolment.student_enrolment_id JOIN courses ON student_enrolment_courses.course_id = courses.course_id JOIN semesters ON student_enrolment.semester_id = semesters.semester_id WHERE student_enrolment.student_id = ? AND semesters.semester_name = ?",
+      "key_considerations": [
+        "Ensure the correct semester is specified.",
+        "Join with the correct student ID."
+      ]
+    },
+    {
+      "pattern_type": "department degree programs",
+      "tables_involved": [
+        "degree_programs",
+        "departments"
+      ],
+      "example_question": "Which degree programs are offered by the Computer Science department?",
+      "typical_structure": "SELECT degree_programs.degree_summary_name FROM degree_programs JOIN departments ON degree_programs.department_id = departments.department_id WHERE departments.department_name = ?",
+      "key_considerations": [
+        "Ensure department names are correctly matched."
+      ]
+    }
+  ]
+}

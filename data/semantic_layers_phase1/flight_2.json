@@ -1,0 +1,339 @@
+{
+  "tables": [
+    {
+      "name": "airlines",
+      "columns": [
+        {
+          "name": "uid",
+          "synonyms": [
+            "Airline Number",
+            "Carrier ID",
+            "Airline Code"
+          ],
+          "aggregations": [],
+          "business_name": "Airline ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "uid = ?"
+          ],
+          "business_meaning": "A unique identifier for each airline."
+        },
+        {
+          "name": "airline",
+          "synonyms": [
+            "Carrier Name",
+            "Airline Company",
+            "Flight Operator"
+          ],
+          "aggregations": [],
+          "business_name": "Airline Name",
+          "common_values": [
+            "United Airlines",
+            "Delta Airlines"
+          ],
+          "typical_filters": [
+            "airline = ?",
+            "airline LIKE ?"
+          ],
+          "business_meaning": "The full name of the airline."
+        },
+        {
+          "name": "abbreviation",
+          "synonyms": [
+            "Airline Code",
+            "Carrier Abbreviation",
+            "Airline Short Name"
+          ],
+          "aggregations": [],
+          "business_name": "Airline Abbreviation",
+          "common_values": [
+            "UAL",
+            "Delta"
+          ],
+          "typical_filters": [
+            "abbreviation = ?"
+          ],
+          "business_meaning": "The short form or code used to represent the airline."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "Nation",
+            "Country of Origin",
+            "Home Country"
+          ],
+          "aggregations": [],
+          "business_name": "Country",
+          "common_values": [
+            "USA",
+            "Canada"
+          ],
+          "typical_filters": [
+            "country = ?",
+            "country LIKE ?"
+          ],
+          "business_meaning": "The country where the airline is based."
+        }
+      ],
+      "purpose": "This table contains information about different airlines, including their names, abbreviations, and the countries they operate in.",
+      "business_name": "Airlines",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Which airlines operate in the USA?",
+          "explanation": "Filter the airlines table by country = 'USA'.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "airports",
+      "columns": [
+        {
+          "name": "city",
+          "synonyms": [
+            "Municipality",
+            "Town",
+            "Urban Area"
+          ],
+          "aggregations": [],
+          "business_name": "City",
+          "common_values": [
+            "Aberdeen",
+            "Abilene"
+          ],
+          "typical_filters": [
+            "city = ?",
+            "city LIKE ?"
+          ],
+          "business_meaning": "The city where the airport is located."
+        },
+        {
+          "name": "airportcode",
+          "synonyms": [
+            "IATA Code",
+            "Airport Identifier",
+            "Airport Abbreviation"
+          ],
+          "aggregations": [],
+          "business_name": "Airport Code",
+          "common_values": [
+            "APG",
+            "ABR"
+          ],
+          "typical_filters": [
+            "airportcode = ?"
+          ],
+          "business_meaning": "A unique code assigned to each airport."
+        },
+        {
+          "name": "airportname",
+          "synonyms": [
+            "Airport Title",
+            "Airfield Name",
+            "Aerodrome Name"
+          ],
+          "aggregations": [],
+          "business_name": "Airport Name",
+          "common_values": [
+            "Phillips AAF",
+            "Municipal"
+          ],
+          "typical_filters": [
+            "airportname = ?",
+            "airportname LIKE ?"
+          ],
+          "business_meaning": "The full name of the airport."
+        },
+        {
+          "name": "country",
+          "synonyms": [
+            "Nation",
+            "Country of Location",
+            "Host Country"
+          ],
+          "aggregations": [],
+          "business_name": "Country",
+          "common_values": [
+            "United States",
+            "Canada"
+          ],
+          "typical_filters": [
+            "country = ?",
+            "country LIKE ?"
+          ],
+          "business_meaning": "The country where the airport is located."
+        },
+        {
+          "name": "countryabbrev",
+          "synonyms": [
+            "Country Code",
+            "Nation Abbreviation",
+            "Country Short Form"
+          ],
+          "aggregations": [],
+          "business_name": "Country Abbreviation",
+          "common_values": [
+            "US",
+            "CA"
+          ],
+          "typical_filters": [
+            "countryabbrev = ?"
+          ],
+          "business_meaning": "The abbreviated form of the country name."
+        }
+      ],
+      "purpose": "This table provides details about various airports, including their codes, names, and locations.",
+      "business_name": "Airports",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What is the name of the airport with code 'APG'?",
+          "explanation": "Filter the airports table by airportcode = 'APG'.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "flights",
+      "columns": [
+        {
+          "name": "airline",
+          "synonyms": [
+            "Carrier ID",
+            "Airline Number",
+            "Flight Operator ID"
+          ],
+          "aggregations": [],
+          "business_name": "Airline ID",
+          "common_values": [
+            "1",
+            "2"
+          ],
+          "typical_filters": [
+            "airline = ?"
+          ],
+          "business_meaning": "The identifier for the airline operating the flight."
+        },
+        {
+          "name": "flightno",
+          "synonyms": [
+            "Flight ID",
+            "Flight Code",
+            "Flight Identifier"
+          ],
+          "aggregations": [],
+          "business_name": "Flight Number",
+          "common_values": [
+            "28",
+            "29"
+          ],
+          "typical_filters": [
+            "flightno = ?"
+          ],
+          "business_meaning": "The unique number assigned to a flight."
+        },
+        {
+          "name": "sourceairport",
+          "synonyms": [
+            "Departure Airport",
+            "Origin Airport",
+            "Starting Airport"
+          ],
+          "aggregations": [],
+          "business_name": "Source Airport Code",
+          "common_values": [
+            "APG",
+            "ASY"
+          ],
+          "typical_filters": [
+            "sourceairport = ?"
+          ],
+          "business_meaning": "The code of the airport where the flight originates."
+        },
+        {
+          "name": "destairport",
+          "synonyms": [
+            "Arrival Airport",
+            "Target Airport",
+            "Ending Airport"
+          ],
+          "aggregations": [],
+          "business_name": "Destination Airport Code",
+          "common_values": [
+            "ASY",
+            "APG"
+          ],
+          "typical_filters": [
+            "destairport = ?"
+          ],
+          "business_meaning": "The code of the airport where the flight is headed."
+        }
+      ],
+      "purpose": "This table records flight details, including the airline, flight number, and source and destination airports.",
+      "business_name": "Flights",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "What flights are available from 'APG' to 'ASY'?",
+          "explanation": "Filter the flights table by sourceairport = 'APG' and destairport = 'ASY'.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Aviation",
+    "purpose": "This database is used to track information about airlines, airports, and flights, facilitating queries about flight schedules, airline operations, and airport details.",
+    "key_entities": [
+      "Airlines",
+      "Airports",
+      "Flights"
+    ],
+    "typical_questions": [
+      "What flights are available from a specific airport?",
+      "Which airlines operate in a particular country?",
+      "What is the destination of a specific flight number?",
+      "What are the details of a specific airport?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Airline and airport abbreviations might be confused.",
+      "example": "What is the abbreviation for 'United Airlines'?",
+      "clarification": "Ensure the context specifies whether it's an airline or airport abbreviation.",
+      "affected_elements": [
+        "airlines.abbreviation",
+        "airports.airportcode"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:54:30.498928",
+  "query_guidelines": [
+    "Always verify the airline ID when querying flights to ensure correct airline association.",
+    "Use airport codes for precise airport identification to avoid confusion with similar city names.",
+    "Consider using LIKE for partial matches when filtering by names or cities.",
+    "Be aware of potential leading or trailing spaces in text fields when filtering.",
+    "Optimize queries by filtering on indexed columns like primary keys or unique identifiers."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "flight details by airline",
+      "tables_involved": [
+        "airlines",
+        "flights"
+      ],
+      "example_question": "What are the flight numbers and destinations for United Airlines?",
+      "typical_structure": "SELECT flights.flightno, flights.destairport FROM flights JOIN airlines ON flights.airline = airlines.uid WHERE airlines.airline = 'United Airlines';",
+      "key_considerations": [
+        "Ensure the airline name is correctly matched with the airline ID in the flights table."
+      ]
+    }
+  ]
+}

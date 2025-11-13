@@ -1,0 +1,332 @@
+{
+  "tables": [
+    {
+      "name": "singer",
+      "columns": [
+        {
+          "name": "singer_id",
+          "synonyms": [
+            "Artist ID",
+            "Performer ID",
+            "Musician ID"
+          ],
+          "aggregations": [],
+          "business_name": "Singer ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "singer_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each singer."
+        },
+        {
+          "name": "name",
+          "synonyms": [
+            "Artist Name",
+            "Performer Name",
+            "Musician Name"
+          ],
+          "aggregations": [],
+          "business_name": "Name",
+          "common_values": [
+            "Liliane Bettencourt",
+            "Christy Walton"
+          ],
+          "typical_filters": [
+            "name = ?",
+            "name LIKE ?"
+          ],
+          "business_meaning": "The full name of the singer."
+        },
+        {
+          "name": "birth_year",
+          "synonyms": [
+            "Year of Birth",
+            "DOB Year",
+            "Birthdate Year"
+          ],
+          "aggregations": [
+            "AVG(birth_year)",
+            "MIN(birth_year)",
+            "MAX(birth_year)"
+          ],
+          "business_name": "Birth Year",
+          "common_values": [
+            "1944",
+            "1948",
+            "1949"
+          ],
+          "typical_filters": [
+            "birth_year = ?",
+            "birth_year > ?"
+          ],
+          "business_meaning": "The year the singer was born."
+        },
+        {
+          "name": "net_worth_millions",
+          "synonyms": [
+            "Wealth",
+            "Fortune",
+            "Assets"
+          ],
+          "aggregations": [
+            "SUM(net_worth_millions)",
+            "AVG(net_worth_millions)"
+          ],
+          "business_name": "Net Worth (Millions)",
+          "common_values": [
+            "30.0",
+            "28.8",
+            "26.3"
+          ],
+          "typical_filters": [
+            "net_worth_millions > ?",
+            "net_worth_millions = ?"
+          ],
+          "business_meaning": "The singer's net worth in millions of dollars."
+        },
+        {
+          "name": "citizenship",
+          "synonyms": [
+            "Nationality",
+            "Country",
+            "Origin"
+          ],
+          "aggregations": [],
+          "business_name": "Citizenship",
+          "common_values": [
+            "France",
+            "United States",
+            "Chile"
+          ],
+          "typical_filters": [
+            "citizenship = ?",
+            "citizenship LIKE ?"
+          ],
+          "business_meaning": "The country of citizenship of the singer."
+        }
+      ],
+      "purpose": "This table represents individual singers, including their personal and financial information.",
+      "business_name": "Singer",
+      "relationships": [],
+      "common_query_patterns": [
+        {
+          "question": "Who are the singers from the United States?",
+          "explanation": "Filter the singer table by citizenship.",
+          "involves_joins": []
+        },
+        {
+          "question": "Which singer has the highest net worth?",
+          "explanation": "Order the singer table by net worth in descending order.",
+          "involves_joins": []
+        }
+      ]
+    },
+    {
+      "name": "song",
+      "columns": [
+        {
+          "name": "song_id",
+          "synonyms": [
+            "Track ID",
+            "Music ID",
+            "Record ID"
+          ],
+          "aggregations": [],
+          "business_name": "Song ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "song_id = ?"
+          ],
+          "business_meaning": "A unique identifier for each song."
+        },
+        {
+          "name": "title",
+          "synonyms": [
+            "Song Name",
+            "Track Title",
+            "Music Title"
+          ],
+          "aggregations": [],
+          "business_name": "Title",
+          "common_values": [
+            "Do They Know It's Christmas",
+            "Cha Cha Slide"
+          ],
+          "typical_filters": [
+            "title = ?",
+            "title LIKE ?"
+          ],
+          "business_meaning": "The title of the song."
+        },
+        {
+          "name": "singer_id",
+          "synonyms": [
+            "Artist ID",
+            "Performer ID",
+            "Musician ID"
+          ],
+          "aggregations": [],
+          "business_name": "Singer ID",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "singer_id = ?"
+          ],
+          "business_meaning": "The identifier of the singer who performed the song."
+        },
+        {
+          "name": "sales",
+          "synonyms": [
+            "Units Sold",
+            "Sales Volume",
+            "Copies Sold"
+          ],
+          "aggregations": [
+            "SUM(sales)",
+            "AVG(sales)"
+          ],
+          "business_name": "Sales",
+          "common_values": [
+            "1094000",
+            "552407",
+            "351421"
+          ],
+          "typical_filters": [
+            "sales > ?",
+            "sales = ?"
+          ],
+          "business_meaning": "The number of copies sold for the song."
+        },
+        {
+          "name": "highest_position",
+          "synonyms": [
+            "Peak Position",
+            "Top Rank",
+            "Best Chart Position"
+          ],
+          "aggregations": [
+            "MIN(highest_position)"
+          ],
+          "business_name": "Highest Position",
+          "common_values": [
+            "1",
+            "2",
+            "3"
+          ],
+          "typical_filters": [
+            "highest_position = ?",
+            "highest_position < ?"
+          ],
+          "business_meaning": "The highest chart position achieved by the song."
+        }
+      ],
+      "purpose": "This table represents songs, including their sales figures and chart performance.",
+      "business_name": "Song",
+      "relationships": [
+        {
+          "column": "singer_id",
+          "common_uses": [
+            "To find all songs by a particular singer.",
+            "To aggregate sales data for a singer's songs."
+          ],
+          "business_meaning": "Links each song to the singer who performed it.",
+          "references_table": "singer"
+        }
+      ],
+      "common_query_patterns": [
+        {
+          "question": "What are the total sales for songs by a specific singer?",
+          "explanation": "Join the song table with the singer table and sum the sales for the specified singer.",
+          "involves_joins": [
+            "singer"
+          ]
+        },
+        {
+          "question": "Which songs reached the number one position?",
+          "explanation": "Filter the song table by highest_position equal to 1.",
+          "involves_joins": []
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "database": "database_unknown",
+  "overview": {
+    "domain": "Music Industry",
+    "purpose": "This database is used to track singers and their songs, including sales and chart performance.",
+    "key_entities": [
+      "Singer",
+      "Song"
+    ],
+    "typical_questions": [
+      "What are the top-selling songs by a particular singer?",
+      "Which singers have the highest net worth?",
+      "What is the highest chart position achieved by a song?",
+      "How many songs has a singer released?",
+      "What are the total sales for a singer's songs?"
+    ]
+  },
+  "ambiguities": [
+    {
+      "issue": "Multiple singers with similar names",
+      "example": "Show songs by Walton.",
+      "clarification": "Specify the full name of the singer to avoid confusion.",
+      "affected_elements": [
+        "singer.name"
+      ]
+    },
+    {
+      "issue": "Sales figures interpretation",
+      "example": "What are the sales for 'Yeah'?",
+      "clarification": "Ensure the question specifies whether total sales or sales for a specific period are needed.",
+      "affected_elements": [
+        "song.sales"
+      ]
+    }
+  ],
+  "generated_at": "2025-11-02T20:59:36.400312",
+  "query_guidelines": [
+    "Always join the song table with the singer table using the singer_id for questions involving both entities.",
+    "Use aggregate functions like SUM and AVG for sales and net worth to get meaningful insights.",
+    "Filter by specific columns like name or title to narrow down results.",
+    "Be cautious of similar names and ensure full names are used for clarity.",
+    "Consider performance implications when joining large datasets or using complex filters."
+  ],
+  "cross_table_patterns": [
+    {
+      "pattern_type": "Singer's Total Song Sales",
+      "tables_involved": [
+        "singer",
+        "song"
+      ],
+      "example_question": "What are the total sales for songs by Liliane Bettencourt?",
+      "typical_structure": "SELECT SUM(song.sales) FROM song JOIN singer ON song.singer_id = singer.singer_id WHERE singer.name = ?",
+      "key_considerations": [
+        "Ensure the singer's name is correctly matched."
+      ]
+    },
+    {
+      "pattern_type": "Singer's Song List",
+      "tables_involved": [
+        "singer",
+        "song"
+      ],
+      "example_question": "List all songs by Christy Walton.",
+      "typical_structure": "SELECT song.title FROM song JOIN singer ON song.singer_id = singer.singer_id WHERE singer.name = ?",
+      "key_considerations": [
+        "Check for correct singer-song association."
+      ]
+    }
+  ]
+}

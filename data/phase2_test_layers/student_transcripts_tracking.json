@@ -1,0 +1,963 @@
+{
+  "database": "student_transcripts_tracking",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-13T04:05:48.468486",
+    "overview": {
+      "domain": "Education",
+      "purpose": "This database is used to manage student enrollments, courses, degree programs, and related academic information.",
+      "key_entities": [
+        "Students",
+        "Courses",
+        "Degree Programs",
+        "Departments",
+        "Semesters"
+      ],
+      "typical_questions": [
+        "What courses is a student enrolled in?",
+        "Which degree programs are offered by a department?",
+        "What is the transcript history for a student?",
+        "What sections are available for a specific course?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "Addresses",
+        "business_name": "Addresses",
+        "purpose": "This table stores the addresses of students, including both current and permanent addresses.",
+        "columns": [
+          {
+            "name": "address_id",
+            "business_name": "Address Identifier",
+            "business_meaning": "A unique identifier for each address record.",
+            "synonyms": [
+              "Address Code",
+              "Location ID",
+              "Address Reference"
+            ],
+            "typical_filters": [
+              "address_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Students"
+              ],
+              "primary_location": "Addresses",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Addresses.address_id when referring to the address itself.",
+              "subject_vs_relationship": "Addresses.address_id = the address entity itself"
+            }
+          },
+          {
+            "name": "line_1",
+            "business_name": "Address Line 1",
+            "business_meaning": "The primary line of the address, typically the street address.",
+            "synonyms": [
+              "Street Address",
+              "Primary Address Line",
+              "Main Address"
+            ],
+            "typical_filters": [
+              "line_1 LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Addresses",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Addresses.line_1 when asking about the main part of an address.",
+              "subject_vs_relationship": "Addresses.line_1 = the main part of the address"
+            }
+          },
+          {
+            "name": "city",
+            "business_name": "City",
+            "business_meaning": "The city where the address is located.",
+            "synonyms": [
+              "Town",
+              "City Name",
+              "Municipality"
+            ],
+            "typical_filters": [
+              "city = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "New York",
+              "Los Angeles",
+              "Chicago"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Addresses",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Addresses.city when referring to the city of an address.",
+              "subject_vs_relationship": "Addresses.city = the city of the address"
+            }
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What is the permanent address of a student?",
+            "explanation": "Query the Addresses table to find the address linked to the student's permanent_address_id.",
+            "involves_joins": [
+              "Students"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Courses",
+        "business_name": "Courses",
+        "purpose": "This table contains information about the courses offered, including their descriptions.",
+        "columns": [
+          {
+            "name": "course_id",
+            "business_name": "Course Identifier",
+            "business_meaning": "A unique identifier for each course.",
+            "synonyms": [
+              "Course Code",
+              "Course Reference",
+              "Course Number"
+            ],
+            "typical_filters": [
+              "course_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student_Enrolment_Courses"
+              ],
+              "primary_location": "Courses",
+              "foreign_key_locations": [
+                "Student_Enrolment_Courses"
+              ],
+              "directional_guidance": "Use Courses.course_id when asking about course details.",
+              "subject_vs_relationship": "Courses.course_id = the course entity itself"
+            }
+          },
+          {
+            "name": "course_name",
+            "business_name": "Course Name",
+            "business_meaning": "The name of the course.",
+            "synonyms": [
+              "Course Title",
+              "Subject Name",
+              "Course Label"
+            ],
+            "typical_filters": [
+              "course_name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Mathematics",
+              "Computer Science",
+              "History"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Courses",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Courses.course_name when referring to the title of a course.",
+              "subject_vs_relationship": "Courses.course_name = the name of the course"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "course_id",
+            "references_table": "Sections",
+            "relationship_type": "one-to-many",
+            "is_bridge_table": false,
+            "join_pattern": "Sections.course_id = Courses.course_id",
+            "when_to_use": [
+              "Questions about sections of a course",
+              "What sections are available for a specific course"
+            ],
+            "vs_confusion": "DO NOT confuse with course_id in Student_Enrolment_Courses - that relates to student enrollments.",
+            "complete_join_path": [
+              "Courses → Sections"
+            ],
+            "business_meaning": "Links courses to their respective sections.",
+            "common_mistakes": [
+              "DO NOT skip the Sections table when looking for course sections."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What courses are offered this semester?",
+            "explanation": "Query the Courses table to list all courses available in the current semester.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "Degree_Programs",
+        "business_name": "Degree Programs",
+        "purpose": "This table holds information about various degree programs offered by departments.",
+        "columns": [
+          {
+            "name": "degree_program_id",
+            "business_name": "Degree Program Identifier",
+            "business_meaning": "A unique identifier for each degree program.",
+            "synonyms": [
+              "Program Code",
+              "Degree Reference",
+              "Program ID"
+            ],
+            "typical_filters": [
+              "degree_program_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student_Enrolment"
+              ],
+              "primary_location": "Degree_Programs",
+              "foreign_key_locations": [
+                "Student_Enrolment"
+              ],
+              "directional_guidance": "Use Degree_Programs.degree_program_id when asking about degree program details.",
+              "subject_vs_relationship": "Degree_Programs.degree_program_id = the degree program entity itself"
+            }
+          },
+          {
+            "name": "degree_summary_name",
+            "business_name": "Degree Summary Name",
+            "business_meaning": "The name of the degree program, such as Bachelor or Master.",
+            "synonyms": [
+              "Degree Title",
+              "Program Name",
+              "Degree Type"
+            ],
+            "typical_filters": [
+              "degree_summary_name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Bachelor of Arts",
+              "Master of Science"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Degree_Programs",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Degree_Programs.degree_summary_name when referring to the name of the degree.",
+              "subject_vs_relationship": "Degree_Programs.degree_summary_name = the name of the degree program"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "department_id",
+            "references_table": "Departments",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Degree_Programs.department_id = Departments.department_id",
+            "when_to_use": [
+              "Questions about which department offers a degree program",
+              "What degrees are available in a specific department"
+            ],
+            "vs_confusion": "DO NOT confuse with department_id in other contexts - this is specific to degree programs.",
+            "complete_join_path": [
+              "Degree_Programs → Departments"
+            ],
+            "business_meaning": "Links degree programs to their respective departments.",
+            "common_mistakes": [
+              "DO NOT skip the Departments table when looking for degree program details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What degree programs are offered by the Computer Science department?",
+            "explanation": "Query the Degree_Programs table and join with Departments to filter by department.",
+            "involves_joins": [
+              "Departments"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Departments",
+        "business_name": "Departments",
+        "purpose": "This table contains information about academic departments within the institution.",
+        "columns": [
+          {
+            "name": "department_id",
+            "business_name": "Department Identifier",
+            "business_meaning": "A unique identifier for each department.",
+            "synonyms": [
+              "Department Code",
+              "Department Reference",
+              "Department ID"
+            ],
+            "typical_filters": [
+              "department_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Degree_Programs"
+              ],
+              "primary_location": "Departments",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Departments.department_id when asking about department details.",
+              "subject_vs_relationship": "Departments.department_id = the department entity itself"
+            }
+          },
+          {
+            "name": "department_name",
+            "business_name": "Department Name",
+            "business_meaning": "The name of the academic department.",
+            "synonyms": [
+              "Department Title",
+              "Department Label",
+              "Department Designation"
+            ],
+            "typical_filters": [
+              "department_name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Computer Science",
+              "History",
+              "Mathematics"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Departments",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Departments.department_name when referring to the name of the department.",
+              "subject_vs_relationship": "Departments.department_name = the name of the department"
+            }
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What departments are available at the institution?",
+            "explanation": "Query the Departments table to list all departments.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "Sections",
+        "business_name": "Sections",
+        "purpose": "This table contains information about different sections of courses offered in various semesters.",
+        "columns": [
+          {
+            "name": "section_id",
+            "business_name": "Section Identifier",
+            "business_meaning": "A unique identifier for each section of a course.",
+            "synonyms": [
+              "Section Code",
+              "Section Reference",
+              "Section ID"
+            ],
+            "typical_filters": [
+              "section_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Sections",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Sections.section_id when asking about specific sections of courses.",
+              "subject_vs_relationship": "Sections.section_id = the section entity itself"
+            }
+          },
+          {
+            "name": "section_name",
+            "business_name": "Section Name",
+            "business_meaning": "The name or identifier for a specific section of a course.",
+            "synonyms": [
+              "Section Title",
+              "Section Label",
+              "Section Designation"
+            ],
+            "typical_filters": [
+              "section_name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Section A",
+              "Section B",
+              "Section 1"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Sections",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Sections.section_name when referring to the name of a section.",
+              "subject_vs_relationship": "Sections.section_name = the name of the section"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "course_id",
+            "references_table": "Courses",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Sections.course_id = Courses.course_id",
+            "when_to_use": [
+              "Questions about which sections belong to a specific course",
+              "What sections are available for a course"
+            ],
+            "vs_confusion": "DO NOT confuse with course_id in Student_Enrolment_Courses - this is specific to sections.",
+            "complete_join_path": [
+              "Sections → Courses"
+            ],
+            "business_meaning": "Links sections to their respective courses.",
+            "common_mistakes": [
+              "DO NOT skip the Courses table when looking for section details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What sections are available for the Mathematics course?",
+            "explanation": "Query the Sections table and join with Courses to filter by course.",
+            "involves_joins": [
+              "Courses"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Semesters",
+        "business_name": "Semesters",
+        "purpose": "This table contains information about the academic semesters during which courses are offered.",
+        "columns": [
+          {
+            "name": "semester_id",
+            "business_name": "Semester Identifier",
+            "business_meaning": "A unique identifier for each semester.",
+            "synonyms": [
+              "Semester Code",
+              "Semester Reference",
+              "Semester ID"
+            ],
+            "typical_filters": [
+              "semester_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student_Enrolment"
+              ],
+              "primary_location": "Semesters",
+              "foreign_key_locations": [
+                "Student_Enrolment"
+              ],
+              "directional_guidance": "Use Semesters.semester_id when asking about semester details.",
+              "subject_vs_relationship": "Semesters.semester_id = the semester entity itself"
+            }
+          },
+          {
+            "name": "semester_name",
+            "business_name": "Semester Name",
+            "business_meaning": "The name of the semester, such as 'Spring 2021'.",
+            "synonyms": [
+              "Term Name",
+              "Academic Term",
+              "Semester Title"
+            ],
+            "typical_filters": [
+              "semester_name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Spring 2021",
+              "Fall 2020",
+              "Summer 2022"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Semesters",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Semesters.semester_name when referring to the name of the semester.",
+              "subject_vs_relationship": "Semesters.semester_name = the name of the semester"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "semester_id",
+            "references_table": "Student_Enrolment",
+            "relationship_type": "one-to-many",
+            "is_bridge_table": false,
+            "join_pattern": "Student_Enrolment.semester_id = Semesters.semester_id",
+            "when_to_use": [
+              "Questions about student enrollments in a specific semester",
+              "What courses are offered this semester"
+            ],
+            "vs_confusion": "DO NOT confuse with semester_id in other contexts - this is specific to student enrollments.",
+            "complete_join_path": [
+              "Semesters → Student_Enrolment"
+            ],
+            "business_meaning": "Links semesters to student enrollments.",
+            "common_mistakes": [
+              "DO NOT skip the Student_Enrolment table when looking for enrollments in a semester."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What enrollments are there for the Spring 2021 semester?",
+            "explanation": "Query the Semesters table and join with Student_Enrolment to filter by semester.",
+            "involves_joins": [
+              "Student_Enrolment"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Student_Enrolment",
+        "business_name": "Student Enrolment",
+        "purpose": "This table tracks the enrollment of students in degree programs for specific semesters.",
+        "columns": [
+          {
+            "name": "student_enrolment_id",
+            "business_name": "Enrollment Identifier",
+            "business_meaning": "A unique identifier for each student enrollment record.",
+            "synonyms": [
+              "Enrollment Code",
+              "Enrollment Reference",
+              "Enrollment ID"
+            ],
+            "typical_filters": [
+              "student_enrolment_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Transcript_Contents"
+              ],
+              "primary_location": "Student_Enrolment",
+              "foreign_key_locations": [
+                "Transcript_Contents"
+              ],
+              "directional_guidance": "Use Student_Enrolment.student_enrolment_id when asking about specific enrollments.",
+              "subject_vs_relationship": "Student_Enrolment.student_enrolment_id = the enrollment entity itself"
+            }
+          },
+          {
+            "name": "student_id",
+            "business_name": "Student Identifier",
+            "business_meaning": "The unique identifier for the student enrolled.",
+            "synonyms": [
+              "Learner ID",
+              "Student Code",
+              "Student Reference"
+            ],
+            "typical_filters": [
+              "student_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Transcript_Contents"
+              ],
+              "primary_location": "Students",
+              "foreign_key_locations": [
+                "Transcript_Contents"
+              ],
+              "directional_guidance": "Use Student_Enrolment.student_id when asking about which student is enrolled.",
+              "subject_vs_relationship": "Students.student_id = the student entity itself"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "degree_program_id",
+            "references_table": "Degree_Programs",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Student_Enrolment.degree_program_id = Degree_Programs.degree_program_id",
+            "when_to_use": [
+              "Questions about which degree program a student is enrolled in",
+              "What students are in a specific degree program"
+            ],
+            "vs_confusion": "DO NOT confuse with degree_program_id in other contexts - this is specific to student enrollments.",
+            "complete_join_path": [
+              "Student_Enrolment → Degree_Programs"
+            ],
+            "business_meaning": "Links student enrollments to their respective degree programs.",
+            "common_mistakes": [
+              "DO NOT skip the Degree_Programs table when looking for degree program details."
+            ]
+          },
+          {
+            "column": "semester_id",
+            "references_table": "Semesters",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Student_Enrolment.semester_id = Semesters.semester_id",
+            "when_to_use": [
+              "Questions about enrollments in a specific semester",
+              "What students are enrolled this semester"
+            ],
+            "vs_confusion": "DO NOT confuse with semester_id in other contexts - this is specific to student enrollments.",
+            "complete_join_path": [
+              "Student_Enrolment → Semesters"
+            ],
+            "business_meaning": "Links student enrollments to the semesters they are in.",
+            "common_mistakes": [
+              "DO NOT skip the Semesters table when looking for semester details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which students are enrolled in the Master of Science program?",
+            "explanation": "Query the Student_Enrolment table and join with Degree_Programs to filter by program.",
+            "involves_joins": [
+              "Degree_Programs"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Student_Enrolment_Courses",
+        "business_name": "Student Enrollment Courses",
+        "purpose": "This table tracks the courses that students are enrolled in for specific enrollments.",
+        "columns": [
+          {
+            "name": "student_course_id",
+            "business_name": "Student Course Identifier",
+            "business_meaning": "A unique identifier for each student course enrollment record.",
+            "synonyms": [
+              "Course Enrollment ID",
+              "Course Reference",
+              "Enrollment Code"
+            ],
+            "typical_filters": [
+              "student_course_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Transcript_Contents"
+              ],
+              "primary_location": "Student_Enrolment_Courses",
+              "foreign_key_locations": [
+                "Transcript_Contents"
+              ],
+              "directional_guidance": "Use Student_Enrolment_Courses.student_course_id when asking about specific course enrollments.",
+              "subject_vs_relationship": "Student_Enrolment_Courses.student_course_id = the course enrollment entity itself"
+            }
+          },
+          {
+            "name": "course_id",
+            "business_name": "Course Identifier",
+            "business_meaning": "The unique identifier for the course being taken.",
+            "synonyms": [
+              "Course Code",
+              "Course Reference",
+              "Course ID"
+            ],
+            "typical_filters": [
+              "course_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Courses"
+              ],
+              "primary_location": "Courses",
+              "foreign_key_locations": [
+                "Student_Enrolment_Courses"
+              ],
+              "directional_guidance": "Use Student_Enrolment_Courses.course_id when asking about which course a student is taking.",
+              "subject_vs_relationship": "Courses.course_id = the course entity itself"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "student_enrolment_id",
+            "references_table": "Student_Enrolment",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": true,
+            "join_pattern": "Student_Enrolment_Courses.student_enrolment_id = Student_Enrolment.student_enrolment_id",
+            "when_to_use": [
+              "Questions about which courses a student is taking",
+              "What courses are linked to a specific enrollment"
+            ],
+            "vs_confusion": "DO NOT skip this bridge table when joining Student_Enrolment to Courses.",
+            "complete_join_path": [
+              "Student_Enrolment → Student_Enrolment_Courses → Courses"
+            ],
+            "business_meaning": "Links student enrollments to the courses they are taking.",
+            "common_mistakes": [
+              "DO NOT join Student_Enrolment directly to Courses - must go through Student_Enrolment_Courses."
+            ]
+          },
+          {
+            "column": "course_id",
+            "references_table": "Courses",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": true,
+            "join_pattern": "Student_Enrolment_Courses.course_id = Courses.course_id",
+            "when_to_use": [
+              "Questions about course details for a student's enrollment",
+              "What courses are associated with a specific enrollment"
+            ],
+            "vs_confusion": "DO NOT confuse with course_id in Sections - this is specific to student enrollments.",
+            "complete_join_path": [
+              "Student_Enrolment_Courses → Courses"
+            ],
+            "business_meaning": "Links course enrollments to their respective courses.",
+            "common_mistakes": [
+              "DO NOT skip the Courses table when looking for course details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What courses is a student enrolled in for the Spring 2021 semester?",
+            "explanation": "Query the Student_Enrolment_Courses table and join with Student_Enrolment and Courses to filter by semester and student.",
+            "involves_joins": [
+              "Student_Enrolment",
+              "Courses"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Transcripts",
+        "business_name": "Transcripts",
+        "purpose": "This table contains the official academic records for students, including their grades.",
+        "columns": [
+          {
+            "name": "transcript_id",
+            "business_name": "Transcript Identifier",
+            "business_meaning": "A unique identifier for each transcript record.",
+            "synonyms": [
+              "Transcript Code",
+              "Transcript Reference",
+              "Transcript ID"
+            ],
+            "typical_filters": [
+              "transcript_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Transcript_Contents"
+              ],
+              "primary_location": "Transcripts",
+              "foreign_key_locations": [
+                "Transcript_Contents"
+              ],
+              "directional_guidance": "Use Transcripts.transcript_id when asking about specific transcripts.",
+              "subject_vs_relationship": "Transcripts.transcript_id = the transcript entity itself"
+            }
+          },
+          {
+            "name": "transcript_date",
+            "business_name": "Transcript Date",
+            "business_meaning": "The date when the transcript was issued.",
+            "synonyms": [
+              "Issue Date",
+              "Date of Record",
+              "Transcript Issuance Date"
+            ],
+            "typical_filters": [
+              "transcript_date = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "2023-01-01",
+              "2022-05-15"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [],
+              "primary_location": "Transcripts",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Transcripts.transcript_date when referring to the date of the transcript.",
+              "subject_vs_relationship": "Transcripts.transcript_date = the date of the transcript"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "transcript_id",
+            "references_table": "Transcript_Contents",
+            "relationship_type": "one-to-many",
+            "is_bridge_table": false,
+            "join_pattern": "Transcript_Contents.transcript_id = Transcripts.transcript_id",
+            "when_to_use": [
+              "Questions about the contents of a specific transcript",
+              "What courses are included in a student's transcript"
+            ],
+            "vs_confusion": "DO NOT confuse with transcript_id in other contexts - this is specific to transcript contents.",
+            "complete_join_path": [
+              "Transcripts → Transcript_Contents"
+            ],
+            "business_meaning": "Links transcripts to their respective contents.",
+            "common_mistakes": [
+              "DO NOT skip the Transcript_Contents table when looking for transcript details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What courses are listed on a student's transcript?",
+            "explanation": "Query the Transcripts table and join with Transcript_Contents to find courses associated with the transcript.",
+            "involves_joins": [
+              "Transcript_Contents"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Transcript_Contents",
+        "business_name": "Transcript Contents",
+        "purpose": "This table tracks the specific courses and grades included in each transcript.",
+        "columns": [
+          {
+            "name": "student_course_id",
+            "business_name": "Student Course Identifier",
+            "business_meaning": "The unique identifier for the course enrollment linked to the transcript.",
+            "synonyms": [
+              "Course Enrollment ID",
+              "Course Reference",
+              "Enrollment Code"
+            ],
+            "typical_filters": [
+              "student_course_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Student_Enrolment_Courses"
+              ],
+              "primary_location": "Transcript_Contents",
+              "foreign_key_locations": [
+                "Student_Enrolment_Courses"
+              ],
+              "directional_guidance": "Use Transcript_Contents.student_course_id when asking about specific course enrollments on a transcript.",
+              "subject_vs_relationship": "Transcript_Contents.student_course_id = the course enrollment entity itself"
+            }
+          },
+          {
+            "name": "transcript_id",
+            "business_name": "Transcript Identifier",
+            "business_meaning": "The unique identifier for the transcript that includes this course.",
+            "synonyms": [
+              "Transcript Code",
+              "Transcript Reference",
+              "Transcript ID"
+            ],
+            "typical_filters": [
+              "transcript_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Transcripts"
+              ],
+              "primary_location": "Transcripts",
+              "foreign_key_locations": [
+                "Transcript_Contents"
+              ],
+              "directional_guidance": "Use Transcript_Contents.transcript_id when asking about which transcript a course belongs to.",
+              "subject_vs_relationship": "Transcripts.transcript_id = the transcript entity itself"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "student_course_id",
+            "references_table": "Student_Enrolment_Courses",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Transcript_Contents.student_course_id = Student_Enrolment_Courses.student_course_id",
+            "when_to_use": [
+              "Questions about which courses are included in a transcript",
+              "What grades are associated with a specific course enrollment"
+            ],
+            "vs_confusion": "DO NOT confuse with student_course_id in other contexts - this is specific to transcript contents.",
+            "complete_join_path": [
+              "Transcript_Contents → Student_Enrolment_Courses"
+            ],
+            "business_meaning": "Links transcript contents to their respective course enrollments.",
+            "common_mistakes": [
+              "DO NOT skip the Student_Enrolment_Courses table when looking for course details on a transcript."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "What grades did a student receive in their courses?",
+            "explanation": "Query the Transcript_Contents table and join with Student_Enrolment_Courses to find grades associated with course enrollments.",
+            "involves_joins": [
+              "Student_Enrolment_Courses"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "Student Enrollment and Course Details",
+        "example_question": "What courses is a student enrolled in for the Spring 2021 semester?",
+        "tables_involved": [
+          "Student_Enrolment",
+          "Student_Enrolment_Courses",
+          "Courses"
+        ],
+        "typical_structure": "SELECT Courses.course_name FROM Student_Enrolment JOIN Student_Enrolment_Courses ON Student_Enrolment.student_enrolment_id = Student_Enrolment_Courses.student_enrolment_id JOIN Courses ON Student_Enrolment_Courses.course_id = Courses.course_id WHERE Student_Enrolment.semester_id = ?",
+        "key_considerations": [
+          "Ensure to join through Student_Enrolment_Courses to get course details."
+        ]
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Confusion between course_id in different contexts.",
+        "example": "What courses is a student enrolled in?",
+        "clarification": "Specify whether you mean courses in the context of Student_Enrolment_Courses or Sections.",
+        "affected_elements": [
+          "Student_Enrolment_Courses.course_id",
+          "Sections.course_id"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-13T04:08:33.616782",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 13591,
+    "cost_usd": 0.005052299999999999,
+    "generation_time_ms": 165146,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**PHASE 2 STRUCTURED RELATIONSHIP DOCUMENTATION:**\nFor each relationship, you MUST provide these fields in this EXACT format:\n\n1. **relationship_type**: Exactly one of: \"one-to-many\", \"many-to-one\", \"many-to-many\"\n2. **is_bridge_table**: boolean - true only if this table serves as a many-to-many bridge\n3. **join_pattern**: EXPLICIT SQL join syntax showing the exact columns to join\n   - Format: \"{source_table}.{fk_column} = {target_table}.{pk_column}\"\n   - Example: \"Students.permanent_address_id = Addresses.address_id\"\n4. **when_to_use**: LIST of specific question patterns that require this join\n   - Be concrete: \"Questions about student's permanent address\", \"Questions about home location\"\n   - NOT vague: \"When you need address information\" (too generic)\n5. **vs_confusion**: What this relationship should NOT be confused with\n   - Example: \"DO NOT confuse with current_address_id (that's temporary address)\"\n6. **complete_join_path**: For multi-hop joins, show full path\n   - Example: [\"Students → Has_Pet → Pets\"]\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Use the EXACT field names above - do not deviate from this structure\n3. join_pattern must be actual SQL that can be copy-pasted\n4. when_to_use must list 2-3 specific question patterns\n5. Every relationship MUST have vs_confusion (what NOT to confuse it with)\n\n**BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):**\nSome tables exist solely to connect two other tables.\n\n**Identifying Bridge Tables:**\n- Typically has 2+ foreign keys and few/no other meaningful columns\n- Often named like \"table1_table2\", \"junction_*\", or similar\n- Required for queries that connect the two referenced tables\n\n**Bridge Table Requirements:**\n1. Mark \"is_bridge_table\": true\n2. Document BOTH foreign keys as separate relationships\n3. complete_join_path shows full path through bridge (e.g., [\"orders → order_items → products\"])\n4. when_to_use explains what M:M relationship this enables\n5. vs_confusion warns: \"DO NOT skip this bridge table when joining X to Y\"\n\n**Example**: If order_items bridges orders to products:\n```\nRelationship from order_items to orders:\n- relationship_type: \"many-to-one\"\n- is_bridge_table: true\n- join_pattern: \"order_items.order_id = orders.order_id\"\n- when_to_use: [\"Questions connecting orders to product details\", \"What products are in an order\"]\n- vs_confusion: \"DO NOT join orders directly to products - must go through order_items bridge\"\n- complete_join_path: [\"orders → order_items → products\"]\n```\n\nCOLUMN NAME DISAMBIGUATION:\nSome column names appear in multiple tables with different meanings and purposes.\n\n**PHASE 2 STRUCTURED COLUMN DISAMBIGUATION:**\nFor columns that appear in 2+ tables, you MUST provide:\n\n1. **primary_location**: Which table \"owns\" this column (source of truth)\n   - For `student_id`: primary_location is \"Students\" (the entity itself)\n   - For `status`: identify which table's status is the main entity\n\n2. **foreign_key_locations**: List of OTHER tables where this column appears as a FK\n   - Example: student_id also appears in [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\n\n3. **directional_guidance**: CRITICAL - explain subject vs relationship usage\n   - **Primary table usage**: \"Use {primary_table}.{column} when question is ABOUT the entity\"\n     * Example: \"Use Students.student_id when question is ABOUT a student (their name, age, info)\"\n   - **Foreign key usage**: \"Use {fk_table}.{column} when question is about what entity IS DOING/HAS\"\n     * Example: \"Use Enrollments.student_id when question is about courses a student IS TAKING\"\n     * Example: \"Use Has_Pet.student_id when question is about pets a student OWNS\"\n\n4. **subject_vs_relationship**: Make this distinction explicit\n   - \"{primary_table}.{column} = the entity themselves (SUBJECT)\"\n   - \"{fk_table}.{column} = things related to/owned by that entity (RELATIONSHIP)\"\n\n**Example - student_id disambiguation:**\n```\nColumn: student_id\nPrimary location: Students (source of truth for student records)\nForeign key locations: [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\nDirectional guidance:\n  - Use Students.student_id when: Question is ABOUT a student (their name, age, address, demographics)\n  - Use Enrollments.student_id when: Question is about what courses a student IS TAKING or ENROLLED IN\n  - Use Has_Pet.student_id when: Question is about what pets a student OWNS or HAS\n  - Use Transcript_Contents.student_id when: Question is about a student's GRADES or TRANSCRIPT\nSubject vs relationship:\n  - Students.student_id = the student entity itself\n  - FK.student_id = relationships/actions/possessions of that student\n```\n\n**Example - status column (different meanings):**\n```\nColumn: status\nPrimary location: N/A (different meaning in each table)\nAppears in: [\"orders\", \"customers\"]\nDisambiguation:\n  - orders.status: Fulfillment stage (pending, shipped, delivered)\n  - customers.status: Account state (active, inactive, suspended)\n  - NEVER confuse these - they represent completely different business concepts\n  - Always qualify: \"customer status\" vs \"order status\" in natural language\n```\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. **Bridge table identification: Which tables serve as many-to-many bridges?**\n5. Column semantics: What business concept does each column represent?\n6. **Column disambiguation: Which column names appear in multiple tables?**\n7. Query patterns: What questions would users typically ask?\n8. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: Addresses =====\nRow count: 15\nPrimary key: address_id\n\nColumns:\n  • address_id: INTEGER [PRIMARY KEY] NULL\n  • line_1: VARCHAR(255) NULL\n  • line_2: VARCHAR(255) NULL\n  • line_3: VARCHAR(255) NULL\n  • city: VARCHAR(255) NULL\n  • zip_postcode: VARCHAR(20) NULL\n  • state_province_county: VARCHAR(255) NULL\n  • country: VARCHAR(255) NULL\n  • other_address_details: VARCHAR(255) NULL\n\n(No foreign keys)\n\n===== Table: Courses =====\nRow count: 15\nPrimary key: course_id\n\nColumns:\n  • course_id: INTEGER [PRIMARY KEY] NULL\n  • course_name: VARCHAR(255) NULL\n  • course_description: VARCHAR(255) NULL\n  • other_details: VARCHAR(255) NULL\n\n(No foreign keys)\n\n===== Table: Degree_Programs =====\nRow count: 15\nPrimary key: degree_program_id\n\nColumns:\n  • degree_program_id: INTEGER [PRIMARY KEY] NULL\n  • department_id: INTEGER NOT NULL\n  • degree_summary_name: VARCHAR(255) NULL\n  • degree_summary_description: VARCHAR(255) NULL\n  • other_details: VARCHAR(255) NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → department_id REFERENCES Departments.department_id\n     JOIN: JOIN Departments ON Degree_Programs.department_id = Departments.department_id\n     Source: turso_schema\n\n===== Table: Departments =====\nRow count: 15\nPrimary key: department_id\n\nColumns:\n  • department_id: INTEGER [PRIMARY KEY] NULL\n  • department_name: VARCHAR(255) NULL\n  • department_description: VARCHAR(255) NULL\n  • other_details: VARCHAR(255) NULL\n\n(No foreign keys)\n\n===== Table: Sections =====\nRow count: 15\nPrimary key: section_id\n\nColumns:\n  • section_id: INTEGER [PRIMARY KEY] NULL\n  • course_id: INTEGER NOT NULL\n  • section_name: VARCHAR(255) NULL\n  • section_description: VARCHAR(255) NULL\n  • other_details: VARCHAR(255) NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → course_id REFERENCES Courses.course_id\n     JOIN: JOIN Courses ON Sections.course_id = Courses.course_id\n     Source: turso_schema\n\n===== Table: Semesters =====\nRow count: 15\nPrimary key: semester_id\n\nColumns:\n  • semester_id: INTEGER [PRIMARY KEY] NULL\n  • semester_name: VARCHAR(255) NULL\n  • semester_description: VARCHAR(255) NULL\n  • other_details: VARCHAR(255) NULL\n\n(No foreign keys)\n\n===== Table: Student_Enrolment =====\nRow count: 15\nPrimary key: student_enrolment_id\n\nColumns:\n  • student_enrolment_id: INTEGER [PRIMARY KEY] NULL\n  • degree_program_id: INTEGER NOT NULL\n  • semester_id: INTEGER NOT NULL\n  • student_id: INTEGER NOT NULL\n  • other_details: VARCHAR(255) NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → student_id REFERENCES Students.student_id\n     JOIN: JOIN Students ON Student_Enrolment.student_id = Students.student_id\n     Source: turso_schema\n  → semester_id REFERENCES Semesters.semester_id\n     JOIN: JOIN Semesters ON Student_Enrolment.semester_id = Semesters.semester_id\n     Source: turso_schema\n  → degree_program_id REFERENCES Degree_Programs.degree_program_id\n     JOIN: JOIN Degree_Programs ON Student_Enrolment.degree_program_id = Degree_Programs.degree_program_id\n     Source: turso_schema\n\n===== Table: Student_Enrolment_Courses =====\nRow count: 15\nPrimary key: student_course_id\n\nColumns:\n  • student_course_id: INTEGER [PRIMARY KEY] NULL\n  • course_id: INTEGER NOT NULL\n  • student_enrolment_id: INTEGER NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → student_enrolment_id REFERENCES Student_Enrolment.student_enrolment_id\n     JOIN: JOIN Student_Enrolment ON Student_Enrolment_Courses.student_enrolment_id = Student_Enrolment.student_enrolment_id\n     Source: turso_schema\n  → course_id REFERENCES Courses.course_id\n     JOIN: JOIN Courses ON Student_Enrolment_Courses.course_id = Courses.course_id\n     Source: turso_schema\n\n===== Table: Students =====\nRow count: 15\nPrimary key: student_id\n\nColumns:\n  • student_id: INTEGER [PRIMARY KEY] NULL\n  • current_address_id: INTEGER NOT NULL\n  • permanent_address_id: INTEGER NOT NULL\n  • first_name: VARCHAR(80) NULL\n  • middle_name: VARCHAR(40) NULL\n  • last_name: VARCHAR(40) NULL\n  • cell_mobile_number: VARCHAR(40) NULL\n  • email_address: VARCHAR(40) NULL\n  • ssn: VARCHAR(40) NULL\n  • date_first_registered: DATETIME NULL\n  • date_left: DATETIME NULL\n  • other_student_details: VARCHAR(255) NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → permanent_address_id REFERENCES Addresses.address_id\n     JOIN: JOIN Addresses ON Students.permanent_address_id = Addresses.address_id\n     Source: turso_schema\n  → current_address_id REFERENCES Addresses.address_id\n     JOIN: JOIN Addresses ON Students.current_address_id = Addresses.address_id\n     Source: turso_schema\n\n===== Table: Transcript_Contents =====\nRow count: 15\nPrimary key: unknown\n\nColumns:\n  • student_course_id: INTEGER NOT NULL\n  • transcript_id: INTEGER NOT NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → transcript_id REFERENCES Transcripts.transcript_id\n     JOIN: JOIN Transcripts ON Transcript_Contents.transcript_id = Transcripts.transcript_id\n     Source: turso_schema\n  → student_course_id REFERENCES Student_Enrolment_Courses.student_course_id\n     JOIN: JOIN Student_Enrolment_Courses ON Transcript_Contents.student_course_id = Student_Enrolment_Courses.student_course_id\n     Source: turso_schema\n\n===== Table: Transcripts =====\nRow count: 15\nPrimary key: transcript_id\n\nColumns:\n  • transcript_id: INTEGER [PRIMARY KEY] NULL\n  • transcript_date: DATETIME NULL\n  • other_details: VARCHAR(255) NULL\n\n(No foreign keys)\n\nSAMPLE DATA:\n\nTable: semesters\n  Sample rows (10):\n    1. {\"semester_id\": 1, \"semester_name\": \"spring 2010\", \"semester_description\": \"x\", \"other_details\": null}\n    2. {\"semester_id\": 2, \"semester_name\": \"summer 2010\", \"semester_description\": \"g\", \"other_details\": null}\n    3. {\"semester_id\": 3, \"semester_name\": \"fall 2010\", \"semester_description\": \"w\", \"other_details\": null}\n    4. {\"semester_id\": 4, \"semester_name\": \"winter 2010\", \"semester_description\": \"c\", \"other_details\": null}\n    5. {\"semester_id\": 5, \"semester_name\": \"spring 2018\", \"semester_description\": \"c\", \"other_details\": null}\n\nTable: student_enrolment_courses\n  Sample rows (10):\n    1. {\"student_course_id\": 0, \"course_id\": 6, \"student_enrolment_id\": 2}\n    2. {\"student_course_id\": 1, \"course_id\": 6, \"student_enrolment_id\": 8}\n    3. {\"student_course_id\": 2, \"course_id\": 14, \"student_enrolment_id\": 5}\n    4. {\"student_course_id\": 7, \"course_id\": 11, \"student_enrolment_id\": 5}\n    5. {\"student_course_id\": 8, \"course_id\": 2, \"student_enrolment_id\": 5}\n\nTable: transcripts\n  Sample rows (10):\n    1. {\"transcript_id\": 1, \"transcript_date\": \"1988-04-30 01:19:47\", \"other_details\": null}\n    2. {\"transcript_id\": 2, \"transcript_date\": \"1975-10-28 15:16:51\", \"other_details\": null}\n    3. {\"transcript_id\": 3, \"transcript_date\": \"1984-12-19 00:37:21\", \"other_details\": null}\n    4. {\"transcript_id\": 4, \"transcript_date\": \"1999-01-06 20:06:46\", \"other_details\": null}\n    5. {\"transcript_id\": 5, \"transcript_date\": \"2013-06-30 13:01:40\", \"other_details\": null}\n\nTable: transcript_contents\n  Sample rows (10):\n    1. {\"student_course_id\": 0, \"transcript_id\": 2}\n    2. {\"student_course_id\": 96, \"transcript_id\": 8}\n    3. {\"student_course_id\": 76, \"transcript_id\": 9}\n    4. {\"student_course_id\": 7, \"transcript_id\": 4}\n    5. {\"student_course_id\": 0, \"transcript_id\": 15}\n\nTable: students\n  Sample rows (10):\n    1. {\"student_id\": 1, \"current_address_id\": 10, \"permanent_address_id\": 15, \"first_name\": \"Timmothy\", \"middle_name\": \"Anna\", \"last_name\": \"Ward\", \"cell_mobile_number\": \"(096)889-8954x524\", \"email_address\": \"erwin.zboncak@example.com\", \"ssn\": \"965\", \"date_first_registered\": \"1971-02-05 07:28:23\", \"date_left\": \"1971-05-17 19:28:49\", \"other_student_details\": \"quia\"}\n    2. {\"student_id\": 2, \"current_address_id\": 12, \"permanent_address_id\": 5, \"first_name\": \"Hobart\", \"middle_name\": \"Lorenz\", \"last_name\": \"Balistreri\", \"cell_mobile_number\": \"1-009-710-5151\", \"email_address\": \"swift.kolby@example.com\", \"ssn\": \"304246\", \"date_first_registered\": \"1976-10-26 02:33:06\", \"date_left\": \"2013-10-05 17:41:28\", \"other_student_details\": \"autem\"}\n    3. {\"student_id\": 3, \"current_address_id\": 9, \"permanent_address_id\": 5, \"first_name\": \"Warren\", \"middle_name\": \"Violet\", \"last_name\": \"Gleichner\", \"cell_mobile_number\": \"07661787471\", \"email_address\": \"johns.unique@example.net\", \"ssn\": \"3\", \"date_first_registered\": \"2007-08-29 23:25:41\", \"date_left\": \"2007-03-31 09:53:19\", \"other_student_details\": \"facilis\"}\n    4. {\"student_id\": 4, \"current_address_id\": 7, \"permanent_address_id\": 11, \"first_name\": \"Jarvis\", \"middle_name\": \"Aaliyah\", \"last_name\": \"Carroll\", \"cell_mobile_number\": \"09700166582\", \"email_address\": \"jillian26@example.net\", \"ssn\": \"141072406\", \"date_first_registered\": \"2014-03-28 05:48:23\", \"date_left\": \"2007-08-02 04:12:58\", \"other_student_details\": \"atque\"}\n    5. {\"student_id\": 5, \"current_address_id\": 9, \"permanent_address_id\": 9, \"first_name\": \"Milton\", \"middle_name\": \"Vaughn\", \"last_name\": \"Christiansen\", \"cell_mobile_number\": \"171-642-5684\", \"email_address\": \"lhartmann@example.org\", \"ssn\": \"\", \"date_first_registered\": \"1973-05-19 19:12:46\", \"date_left\": \"2007-11-28 12:50:21\", \"other_student_details\": \"laborum\"}\n\nTable: addresses\n  Sample rows (10):\n    1. {\"address_id\": 1, \"line_1\": \"2294 Grant Square Apt. 235\", \"line_2\": \"Apt. 370\", \"line_3\": null, \"city\": \"Port Chelsea\", \"zip_postcode\": \"148\", \"state_province_county\": \"Virginia\", \"country\": \"Iceland\", \"other_address_details\": null}\n    2. {\"address_id\": 2, \"line_1\": \"3999 Aufderhar Ways Suite 593\", \"line_2\": \"Apt. 388\", \"line_3\": null, \"city\": \"Lake Laishafurt\", \"zip_postcode\": \"943\", \"state_province_county\": \"Kentucky\", \"country\": \"Burundi\", \"other_address_details\": null}\n    3. {\"address_id\": 3, \"line_1\": \"67942 Carlotta Ferry Apt. 686\", \"line_2\": \"Apt. 583\", \"line_3\": null, \"city\": \"Goodwinhaven\", \"zip_postcode\": \"541\", \"state_province_county\": \"Kansas\", \"country\": \"Saudi Arabia\", \"other_address_details\": null}\n    4. {\"address_id\": 4, \"line_1\": \"0144 Lamar Plaza Apt. 346\", \"line_2\": \"Suite 703\", \"line_3\": null, \"city\": \"Port Evanston\", \"zip_postcode\": \"847\", \"state_province_county\": \"Washington\", \"country\": \"Angola\", \"other_address_details\": null}\n    5. {\"address_id\": 5, \"line_1\": \"858 Peggie Bypass Suite 212\", \"line_2\": \"Apt. 335\", \"line_3\": null, \"city\": \"Michelleburgh\", \"zip_postcode\": \"446\", \"state_province_county\": \"Hawaii\", \"country\": \"Haiti\", \"other_address_details\": null}\n\nTable: courses\n  Sample rows (10):\n    1. {\"course_id\": 1, \"course_name\": \"ds\", \"course_description\": \"p\", \"other_details\": null}\n    2. {\"course_id\": 2, \"course_name\": \"math\", \"course_description\": \"q\", \"other_details\": null}\n    3. {\"course_id\": 3, \"course_name\": \"os\", \"course_description\": \"v\", \"other_details\": null}\n    4. {\"course_id\": 4, \"course_name\": \"en\", \"course_description\": \"k\", \"other_details\": null}\n    5. {\"course_id\": 5, \"course_name\": \"fr\", \"course_description\": \"c\", \"other_details\": null}\n\nTable: departments\n  Sample rows (10):\n    1. {\"department_id\": 1, \"department_name\": \"computer science\", \"department_description\": \"error\", \"other_details\": null}\n    2. {\"department_id\": 2, \"department_name\": \"history\", \"department_description\": \"nostrum\", \"other_details\": null}\n    3. {\"department_id\": 3, \"department_name\": \"art\", \"department_description\": \"aliquam\", \"other_details\": null}\n    4. {\"department_id\": 4, \"department_name\": \"linguistic\", \"department_description\": \"natus\", \"other_details\": null}\n    5. {\"department_id\": 5, \"department_name\": \"management\", \"department_description\": \"nihil\", \"other_details\": null}\n\nTable: degree_programs\n  Sample rows (10):\n    1. {\"degree_program_id\": 1, \"department_id\": 13, \"degree_summary_name\": \"Master\", \"degree_summary_description\": \"architecto\", \"other_details\": null}\n    2. {\"degree_program_id\": 2, \"department_id\": 2, \"degree_summary_name\": \"Master\", \"degree_summary_description\": \"cumque\", \"other_details\": null}\n    3. {\"degree_program_id\": 3, \"department_id\": 13, \"degree_summary_name\": \"Master\", \"degree_summary_description\": \"placeat\", \"other_details\": null}\n    4. {\"degree_program_id\": 4, \"department_id\": 8, \"degree_summary_name\": \"Bachelor\", \"degree_summary_description\": \"unde\", \"other_details\": null}\n    5. {\"degree_program_id\": 5, \"department_id\": 11, \"degree_summary_name\": \"Master\", \"degree_summary_description\": \"officiis\", \"other_details\": null}\n\nTable: sections\n  Sample rows (10):\n    1. {\"section_id\": 1, \"course_id\": 9, \"section_name\": \"a\", \"section_description\": \"non\", \"other_details\": null}\n    2. {\"section_id\": 2, \"course_id\": 2, \"section_name\": \"b\", \"section_description\": \"voluptatem\", \"other_details\": null}\n    3. {\"section_id\": 3, \"course_id\": 8, \"section_name\": \"c\", \"section_description\": \"qui\", \"other_details\": null}\n    4. {\"section_id\": 4, \"course_id\": 1, \"section_name\": \"d\", \"section_description\": \"voluptas\", \"other_details\": null}\n    5. {\"section_id\": 5, \"course_id\": 5, \"section_name\": \"e\", \"section_description\": \"ex\", \"other_details\": null}\n\nTable: student_enrolment\n  Sample rows (10):\n    1. {\"student_enrolment_id\": 1, \"degree_program_id\": 12, \"semester_id\": 13, \"student_id\": 14, \"other_details\": null}\n    2. {\"student_enrolment_id\": 2, \"degree_program_id\": 4, \"semester_id\": 2, \"student_id\": 9, \"other_details\": null}\n    3. {\"student_enrolment_id\": 3, \"degree_program_id\": 10, \"semester_id\": 2, \"student_id\": 7, \"other_details\": null}\n    4. {\"student_enrolment_id\": 4, \"degree_program_id\": 4, \"semester_id\": 15, \"student_id\": 9, \"other_details\": null}\n    5. {\"student_enrolment_id\": 5, \"degree_program_id\": 5, \"semester_id\": 1, \"student_id\": 14, \"other_details\": null}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-13T04:05:48.468486\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns like 'column = ?' or 'column > ?'\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'\"],\n          \"common_values\": [\"string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'\"],\n          \"disambiguation\": {\n            \"appears_in_tables\": [\"string - ALL tables where this column name appears\"],\n            \"primary_location\": \"string - which table 'owns' this column (source of truth), or 'N/A' if different meanings\",\n            \"foreign_key_locations\": [\"string - tables where this appears as a FK reference\"],\n            \"directional_guidance\": \"string - explain when to use primary vs FK versions with SUBJECT vs RELATIONSHIP pattern\",\n            \"subject_vs_relationship\": \"string - explicit explanation: 'primary_table.column = subject, fk_table.column = relationship'\"\n          }\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"column\": \"string - FK column name\",\n          \"references_table\": \"string - target table name\",\n          \"relationship_type\": \"string - exactly one of: 'one-to-many', 'many-to-one', 'many-to-many'\",\n          \"is_bridge_table\": \"boolean - true if this table bridges a many-to-many relationship\",\n          \"join_pattern\": \"string - explicit SQL join syntax: 'source_table.fk_column = target_table.pk_column'\",\n          \"when_to_use\": [\"string - specific question patterns that need this join (be concrete, not vague)\"],\n          \"vs_confusion\": \"string - what this relationship should NOT be confused with\",\n          \"complete_join_path\": [\"string - for multi-hop joins, show full path (e.g., 'table1 → bridge → table2')\"],\n          \"business_meaning\": \"string - what this relationship represents in business terms\",\n          \"common_mistakes\": [\"string - typical errors when using this relationship (e.g., 'DO NOT skip bridge_table')\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users, focus on WHAT data means, not HOW it's stored\n- NO technical schema details: Do NOT include data types, row counts, primary keys, nullability, or FK references - these will be provided separately from the live database schema\n- Completeness: Cover all tables and meaningful columns with business context\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms users might use for each concept\n  * CRITICAL: Synonyms must be UNAMBIGUOUS and NOT match partial words from the column name\n  * DO NOT use synonyms that contain fragments of the actual column name\n  * BAD examples: \"Degree ID\" for degree_program_id, \"Course ID\" for course_id, \"Student Name\" for student_name_id\n  * GOOD examples: \"Program Identifier\" for degree_program_id, \"Enrollment Code\" for course_id, \"Learner Full Name Identifier\" for student_name_id\n  * Filter out any synonym that could be confused with the actual business concept vs the ID column\n- Query context: Explain how users typically filter/aggregate each field\n- Clear relationships: State the BUSINESS MEANING of each relationship (e.g., \"links orders to customers\")\n- Common values: Provide realistic example values users might reference (e.g., 'Active', 'Pending', 'USA')\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

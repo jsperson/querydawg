@@ -1,0 +1,415 @@
+{
+  "database": "network_1",
+  "semantic_layer": {
+    "database": "database_unknown",
+    "version": "1.0.0",
+    "generated_at": "2025-11-13T04:08:36.585911",
+    "overview": {
+      "domain": "Social Networking",
+      "purpose": "This database tracks relationships and preferences among high school students.",
+      "key_entities": [
+        "Highschooler",
+        "Friendship",
+        "Likes"
+      ],
+      "typical_questions": [
+        "Who are the friends of a specific student?",
+        "Which students does a particular student like?",
+        "What is the friendship network of a student?"
+      ]
+    },
+    "tables": [
+      {
+        "name": "Highschooler",
+        "business_name": "High School Student",
+        "purpose": "Represents individual students in the high school.",
+        "columns": [
+          {
+            "name": "ID",
+            "business_name": "Student ID",
+            "business_meaning": "A unique identifier for each student.",
+            "synonyms": [
+              "Student Identifier",
+              "Learner ID",
+              "Pupil Number"
+            ],
+            "typical_filters": [
+              "ID = ?",
+              "ID > ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1510",
+              "1689",
+              "1709"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Friend",
+                "Likes"
+              ],
+              "primary_location": "Highschooler",
+              "foreign_key_locations": [
+                "Friend",
+                "Likes"
+              ],
+              "directional_guidance": "Use Highschooler.ID when question is ABOUT a student (their name, grade). Use Friend.student_id or Likes.student_id when question is about relationships or preferences of that student.",
+              "subject_vs_relationship": "Highschooler.ID = the student entity themselves; FK.ID = relationships/preferences of that student."
+            }
+          },
+          {
+            "name": "name",
+            "business_name": "Student Name",
+            "business_meaning": "The full name of the student.",
+            "synonyms": [
+              "Learner Name",
+              "Pupil Name",
+              "Student Full Name"
+            ],
+            "typical_filters": [
+              "name = ?",
+              "name LIKE ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "Jordan",
+              "Gabriel",
+              "Cassandra"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Highschooler"
+              ],
+              "primary_location": "Highschooler",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Highschooler.name when question is ABOUT the student's identity.",
+              "subject_vs_relationship": "Highschooler.name = the name of the student entity."
+            }
+          },
+          {
+            "name": "grade",
+            "business_name": "Grade Level",
+            "business_meaning": "The current grade level of the student in school.",
+            "synonyms": [
+              "Year Level",
+              "Academic Year",
+              "Class Level"
+            ],
+            "typical_filters": [
+              "grade = ?",
+              "grade > ?"
+            ],
+            "aggregations": [
+              "AVG(grade)",
+              "COUNT(grade)"
+            ],
+            "common_values": [
+              "9",
+              "10"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Highschooler"
+              ],
+              "primary_location": "Highschooler",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Highschooler.grade when question is ABOUT the student's academic standing.",
+              "subject_vs_relationship": "Highschooler.grade = the grade level of the student entity."
+            }
+          }
+        ],
+        "relationships": [],
+        "common_query_patterns": [
+          {
+            "question": "What is the name of the student with ID 1689?",
+            "explanation": "Query the Highschooler table to find the name based on the student ID.",
+            "involves_joins": []
+          },
+          {
+            "question": "Which students are in grade 9?",
+            "explanation": "Filter the Highschooler table where grade equals 9.",
+            "involves_joins": []
+          }
+        ]
+      },
+      {
+        "name": "Friend",
+        "business_name": "Friendship Connections",
+        "purpose": "Tracks friendships between students.",
+        "columns": [
+          {
+            "name": "student_id",
+            "business_name": "Student ID",
+            "business_meaning": "The ID of the student who has a friend.",
+            "synonyms": [
+              "Friend Owner ID",
+              "Student Identifier"
+            ],
+            "typical_filters": [
+              "student_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1510",
+              "1689"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Friend"
+              ],
+              "primary_location": "Friend",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Friend.student_id when question is ABOUT the friendships of a specific student.",
+              "subject_vs_relationship": "Friend.student_id = the student entity who owns the friendship."
+            }
+          },
+          {
+            "name": "friend_id",
+            "business_name": "Friend ID",
+            "business_meaning": "The ID of the student who is a friend.",
+            "synonyms": [
+              "Friend Identifier",
+              "Companion ID"
+            ],
+            "typical_filters": [
+              "friend_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1381",
+              "1709"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Friend"
+              ],
+              "primary_location": "Friend",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Friend.friend_id when question is ABOUT the identity of a student's friend.",
+              "subject_vs_relationship": "Friend.friend_id = the student entity who is a friend."
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "friend_id",
+            "references_table": "Highschooler",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Friend.friend_id = Highschooler.ID",
+            "when_to_use": [
+              "Questions about a student's friends",
+              "Questions about who a specific student is friends with"
+            ],
+            "vs_confusion": "DO NOT confuse with student_id - this is the ID of the friend, not the student.",
+            "complete_join_path": [
+              "Friend → Highschooler"
+            ],
+            "business_meaning": "Links friendships to the details of the friend student.",
+            "common_mistakes": [
+              "DO NOT forget to join with Highschooler to get friend details."
+            ]
+          },
+          {
+            "column": "student_id",
+            "references_table": "Highschooler",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Friend.student_id = Highschooler.ID",
+            "when_to_use": [
+              "Questions about the student who has friends",
+              "Questions about which students have a specific friend"
+            ],
+            "vs_confusion": "DO NOT confuse with friend_id - this is the ID of the student, not the friend.",
+            "complete_join_path": [
+              "Friend → Highschooler"
+            ],
+            "business_meaning": "Links friendships to the details of the student who owns the friendship.",
+            "common_mistakes": [
+              "DO NOT forget to join with Highschooler to get student details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Who are the friends of student ID 1510?",
+            "explanation": "Query the Friend table to find all friend_ids for the given student_id and join with Highschooler to get names.",
+            "involves_joins": [
+              "Highschooler"
+            ]
+          },
+          {
+            "question": "Which students are friends with Cassandra?",
+            "explanation": "Find the student_id for Cassandra, then query the Friend table for friend_ids and join with Highschooler.",
+            "involves_joins": [
+              "Highschooler"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Likes",
+        "business_name": "Likes Connections",
+        "purpose": "Tracks which students like which other students.",
+        "columns": [
+          {
+            "name": "student_id",
+            "business_name": "Student ID",
+            "business_meaning": "The ID of the student who likes another student.",
+            "synonyms": [
+              "Liker ID",
+              "Student Identifier"
+            ],
+            "typical_filters": [
+              "student_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1689",
+              "1709"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Likes"
+              ],
+              "primary_location": "Likes",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Likes.student_id when question is ABOUT which students like others.",
+              "subject_vs_relationship": "Likes.student_id = the student entity who likes another student."
+            }
+          },
+          {
+            "name": "liked_id",
+            "business_name": "Liked Student ID",
+            "business_meaning": "The ID of the student who is liked.",
+            "synonyms": [
+              "Liked Student Identifier",
+              "Adored Student ID"
+            ],
+            "typical_filters": [
+              "liked_id = ?"
+            ],
+            "aggregations": [],
+            "common_values": [
+              "1709",
+              "1247"
+            ],
+            "disambiguation": {
+              "appears_in_tables": [
+                "Likes"
+              ],
+              "primary_location": "Likes",
+              "foreign_key_locations": [],
+              "directional_guidance": "Use Likes.liked_id when question is ABOUT the identity of the student being liked.",
+              "subject_vs_relationship": "Likes.liked_id = the student entity who is liked."
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "column": "liked_id",
+            "references_table": "Highschooler",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Likes.liked_id = Highschooler.ID",
+            "when_to_use": [
+              "Questions about which students are liked by others",
+              "Questions about the details of a student who is liked"
+            ],
+            "vs_confusion": "DO NOT confuse with student_id - this is the ID of the student who likes, not the one being liked.",
+            "complete_join_path": [
+              "Likes → Highschooler"
+            ],
+            "business_meaning": "Links likes to the details of the student who is liked.",
+            "common_mistakes": [
+              "DO NOT forget to join with Highschooler to get liked student details."
+            ]
+          },
+          {
+            "column": "student_id",
+            "references_table": "Highschooler",
+            "relationship_type": "many-to-one",
+            "is_bridge_table": false,
+            "join_pattern": "Likes.student_id = Highschooler.ID",
+            "when_to_use": [
+              "Questions about which students like a specific student",
+              "Questions about the details of the student who likes"
+            ],
+            "vs_confusion": "DO NOT confuse with liked_id - this is the ID of the student who likes, not the one being liked.",
+            "complete_join_path": [
+              "Likes → Highschooler"
+            ],
+            "business_meaning": "Links likes to the details of the student who likes.",
+            "common_mistakes": [
+              "DO NOT forget to join with Highschooler to get liking student details."
+            ]
+          }
+        ],
+        "common_query_patterns": [
+          {
+            "question": "Which students does student ID 1709 like?",
+            "explanation": "Query the Likes table to find liked_ids for the given student_id and join with Highschooler to get names.",
+            "involves_joins": [
+              "Highschooler"
+            ]
+          },
+          {
+            "question": "Who likes student ID 1689?",
+            "explanation": "Query the Likes table to find student_ids that like the given liked_id and join with Highschooler to get names.",
+            "involves_joins": [
+              "Highschooler"
+            ]
+          }
+        ]
+      }
+    ],
+    "cross_table_patterns": [
+      {
+        "pattern_type": "friendship network analysis",
+        "example_question": "Who are the friends of students who like Cassandra?",
+        "tables_involved": [
+          "Friend",
+          "Likes",
+          "Highschooler"
+        ],
+        "typical_structure": "SELECT Highschooler.name FROM Friend JOIN Highschooler ON Friend.friend_id = Highschooler.ID JOIN Likes ON Likes.liked_id = Highschooler.ID WHERE Likes.student_id = ?",
+        "key_considerations": [
+          "Ensure to join correctly to get both friends and liked students."
+        ]
+      }
+    ],
+    "ambiguities": [
+      {
+        "issue": "Confusion between student_id and friend_id in the Friend table.",
+        "example": "Who are the friends of student ID 1689?",
+        "clarification": "Specify whether you are asking about the student or their friends to avoid confusion.",
+        "affected_elements": [
+          "Friend.student_id",
+          "Friend.friend_id"
+        ]
+      },
+      {
+        "issue": "Confusion between student_id and liked_id in the Likes table.",
+        "example": "Which students does student ID 1709 like?",
+        "clarification": "Clarify whether you are asking about the student who likes or the one being liked.",
+        "affected_elements": [
+          "Likes.student_id",
+          "Likes.liked_id"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-11-13T04:09:47.561707",
+    "generator_version": "1.0.0",
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "tokens_used": 6212,
+    "cost_usd": 0.0021882,
+    "generation_time_ms": 70974,
+    "anonymized": true,
+    "sample_rows_per_table": 10,
+    "custom_instructions_used": false
+  },
+  "prompt_used": "You are a database documentation expert specializing in creating semantic layers for text-to-SQL systems.\n\nYOUR TASK:\nGenerate comprehensive, natural language semantic documentation for this database that will help an LLM accurately translate user questions into SQL queries.\n\nCRITICAL CONSTRAINTS:\n- Base your analysis ONLY on the provided schema structure and sample data below\n- DO NOT research or reference external information about this specific database\n- Use your general domain knowledge to infer meaning (e.g., what \"population\" typically means in databases)\n- Reason about business patterns from the schema structure itself\n\nFOREIGN KEY RELATIONSHIPS (CRITICAL FOR QUERY SUCCESS):\nThe schema below includes documented foreign key relationships. These are MANDATORY for correct query generation.\n\n**PHASE 2 STRUCTURED RELATIONSHIP DOCUMENTATION:**\nFor each relationship, you MUST provide these fields in this EXACT format:\n\n1. **relationship_type**: Exactly one of: \"one-to-many\", \"many-to-one\", \"many-to-many\"\n2. **is_bridge_table**: boolean - true only if this table serves as a many-to-many bridge\n3. **join_pattern**: EXPLICIT SQL join syntax showing the exact columns to join\n   - Format: \"{source_table}.{fk_column} = {target_table}.{pk_column}\"\n   - Example: \"Students.permanent_address_id = Addresses.address_id\"\n4. **when_to_use**: LIST of specific question patterns that require this join\n   - Be concrete: \"Questions about student's permanent address\", \"Questions about home location\"\n   - NOT vague: \"When you need address information\" (too generic)\n5. **vs_confusion**: What this relationship should NOT be confused with\n   - Example: \"DO NOT confuse with current_address_id (that's temporary address)\"\n6. **complete_join_path**: For multi-hop joins, show full path\n   - Example: [\"Students → Has_Pet → Pets\"]\n\n**RULES FOR RELATIONSHIPS:**\n1. INCLUDE ALL foreign keys shown in the schema - do NOT skip any\n2. Use the EXACT field names above - do not deviate from this structure\n3. join_pattern must be actual SQL that can be copy-pasted\n4. when_to_use must list 2-3 specific question patterns\n5. Every relationship MUST have vs_confusion (what NOT to confuse it with)\n\n**BRIDGE TABLES (MANY-TO-MANY RELATIONSHIPS):**\nSome tables exist solely to connect two other tables.\n\n**Identifying Bridge Tables:**\n- Typically has 2+ foreign keys and few/no other meaningful columns\n- Often named like \"table1_table2\", \"junction_*\", or similar\n- Required for queries that connect the two referenced tables\n\n**Bridge Table Requirements:**\n1. Mark \"is_bridge_table\": true\n2. Document BOTH foreign keys as separate relationships\n3. complete_join_path shows full path through bridge (e.g., [\"orders → order_items → products\"])\n4. when_to_use explains what M:M relationship this enables\n5. vs_confusion warns: \"DO NOT skip this bridge table when joining X to Y\"\n\n**Example**: If order_items bridges orders to products:\n```\nRelationship from order_items to orders:\n- relationship_type: \"many-to-one\"\n- is_bridge_table: true\n- join_pattern: \"order_items.order_id = orders.order_id\"\n- when_to_use: [\"Questions connecting orders to product details\", \"What products are in an order\"]\n- vs_confusion: \"DO NOT join orders directly to products - must go through order_items bridge\"\n- complete_join_path: [\"orders → order_items → products\"]\n```\n\nCOLUMN NAME DISAMBIGUATION:\nSome column names appear in multiple tables with different meanings and purposes.\n\n**PHASE 2 STRUCTURED COLUMN DISAMBIGUATION:**\nFor columns that appear in 2+ tables, you MUST provide:\n\n1. **primary_location**: Which table \"owns\" this column (source of truth)\n   - For `student_id`: primary_location is \"Students\" (the entity itself)\n   - For `status`: identify which table's status is the main entity\n\n2. **foreign_key_locations**: List of OTHER tables where this column appears as a FK\n   - Example: student_id also appears in [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\n\n3. **directional_guidance**: CRITICAL - explain subject vs relationship usage\n   - **Primary table usage**: \"Use {primary_table}.{column} when question is ABOUT the entity\"\n     * Example: \"Use Students.student_id when question is ABOUT a student (their name, age, info)\"\n   - **Foreign key usage**: \"Use {fk_table}.{column} when question is about what entity IS DOING/HAS\"\n     * Example: \"Use Enrollments.student_id when question is about courses a student IS TAKING\"\n     * Example: \"Use Has_Pet.student_id when question is about pets a student OWNS\"\n\n4. **subject_vs_relationship**: Make this distinction explicit\n   - \"{primary_table}.{column} = the entity themselves (SUBJECT)\"\n   - \"{fk_table}.{column} = things related to/owned by that entity (RELATIONSHIP)\"\n\n**Example - student_id disambiguation:**\n```\nColumn: student_id\nPrimary location: Students (source of truth for student records)\nForeign key locations: [\"Enrollments\", \"Has_Pet\", \"Transcript_Contents\"]\nDirectional guidance:\n  - Use Students.student_id when: Question is ABOUT a student (their name, age, address, demographics)\n  - Use Enrollments.student_id when: Question is about what courses a student IS TAKING or ENROLLED IN\n  - Use Has_Pet.student_id when: Question is about what pets a student OWNS or HAS\n  - Use Transcript_Contents.student_id when: Question is about a student's GRADES or TRANSCRIPT\nSubject vs relationship:\n  - Students.student_id = the student entity itself\n  - FK.student_id = relationships/actions/possessions of that student\n```\n\n**Example - status column (different meanings):**\n```\nColumn: status\nPrimary location: N/A (different meaning in each table)\nAppears in: [\"orders\", \"customers\"]\nDisambiguation:\n  - orders.status: Fulfillment stage (pending, shipped, delivered)\n  - customers.status: Account state (active, inactive, suspended)\n  - NEVER confuse these - they represent completely different business concepts\n  - Always qualify: \"customer status\" vs \"order status\" in natural language\n```\n\nANALYSIS APPROACH:\nThink step-by-step before generating output:\n1. Domain identification: What business domain does this database serve?\n2. Entity analysis: What are the main business objects being tracked?\n3. **Relationship mapping: Document EVERY foreign key shown in schema below**\n4. **Bridge table identification: Which tables serve as many-to-many bridges?**\n5. Column semantics: What business concept does each column represent?\n6. **Column disambiguation: Which column names appear in multiple tables?**\n7. Query patterns: What questions would users typically ask?\n8. Ambiguities: What might confuse an LLM during text-to-SQL translation?\n\n\n\nDATABASE: database_unknown\n\nSCHEMA STRUCTURE:\n\n===== Table: Friend =====\nRow count: 20\nPrimary key: student_id, friend_id\n\nColumns:\n  • student_id: INT [PRIMARY KEY] NULL\n  • friend_id: INT [PRIMARY KEY] NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → friend_id REFERENCES Highschooler.ID\n     JOIN: JOIN Highschooler ON Friend.friend_id = Highschooler.ID\n     Source: turso_schema\n  → student_id REFERENCES Highschooler.ID\n     JOIN: JOIN Highschooler ON Friend.student_id = Highschooler.ID\n     Source: turso_schema\n\n===== Table: Highschooler =====\nRow count: 16\nPrimary key: ID\n\nColumns:\n  • ID: INT [PRIMARY KEY] NULL\n  • name: TEXT NULL\n  • grade: INT NULL\n\n(No foreign keys)\n\n===== Table: Likes =====\nRow count: 10\nPrimary key: student_id, liked_id\n\nColumns:\n  • student_id: INT [PRIMARY KEY] NULL\n  • liked_id: INT [PRIMARY KEY] NULL\n\n🔗 FOREIGN KEYS (MANDATORY - INCLUDE ALL IN YOUR OUTPUT):\n  → student_id REFERENCES Highschooler.ID\n     JOIN: JOIN Highschooler ON Likes.student_id = Highschooler.ID\n     Source: turso_schema\n  → liked_id REFERENCES Highschooler.ID\n     JOIN: JOIN Highschooler ON Likes.liked_id = Highschooler.ID\n     Source: turso_schema\n\nSAMPLE DATA:\n\nTable: likes\n  Sample rows (10):\n    1. {\"student_id\": 1689, \"liked_id\": 1709}\n    2. {\"student_id\": 1709, \"liked_id\": 1689}\n    3. {\"student_id\": 1782, \"liked_id\": 1709}\n    4. {\"student_id\": 1911, \"liked_id\": 1247}\n    5. {\"student_id\": 1247, \"liked_id\": 1468}\n\nTable: highschooler\n  Sample rows (10):\n    1. {\"id\": 1510, \"name\": \"Jordan\", \"grade\": 9}\n    2. {\"id\": 1689, \"name\": \"Gabriel\", \"grade\": 9}\n    3. {\"id\": 1381, \"name\": \"Tiffany\", \"grade\": 9}\n    4. {\"id\": 1709, \"name\": \"Cassandra\", \"grade\": 9}\n    5. {\"id\": 1101, \"name\": \"Haley\", \"grade\": 10}\n\nTable: friend\n  Sample rows (10):\n    1. {\"student_id\": 1510, \"friend_id\": 1381}\n    2. {\"student_id\": 1510, \"friend_id\": 1689}\n    3. {\"student_id\": 1689, \"friend_id\": 1709}\n    4. {\"student_id\": 1381, \"friend_id\": 1247}\n    5. {\"student_id\": 1709, \"friend_id\": 1247}\n\nOUTPUT FORMAT:\nGenerate a JSON object with this structure:\n\n{\n  \"database\": \"database_unknown\",\n  \"version\": \"1.0.0\",\n  \"generated_at\": \"2025-11-13T04:08:36.585911\",\n\n  \"overview\": {\n    \"domain\": \"string - inferred business domain (e.g., E-commerce, Healthcare)\",\n    \"purpose\": \"string - what this database is used for in plain English\",\n    \"key_entities\": [\"string - main business objects tracked\"],\n    \"typical_questions\": [\"string - common questions users ask about this data\"]\n  },\n\n  \"tables\": [\n    {\n      \"name\": \"string - technical table name\",\n      \"business_name\": \"string - human-friendly name\",\n      \"purpose\": \"string - what this table represents in business terms\",\n\n      \"columns\": [\n        {\n          \"name\": \"string - technical column name\",\n          \"business_name\": \"string - human-friendly name\",\n          \"business_meaning\": \"string - what this represents in plain English\",\n          \"synonyms\": [\"string - 3-5 alternate terms users might use\"],\n          \"typical_filters\": [\"string - common WHERE clause patterns like 'column = ?' or 'column > ?'\"],\n          \"aggregations\": [\"string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'\"],\n          \"common_values\": [\"string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'\"],\n          \"disambiguation\": {\n            \"appears_in_tables\": [\"string - ALL tables where this column name appears\"],\n            \"primary_location\": \"string - which table 'owns' this column (source of truth), or 'N/A' if different meanings\",\n            \"foreign_key_locations\": [\"string - tables where this appears as a FK reference\"],\n            \"directional_guidance\": \"string - explain when to use primary vs FK versions with SUBJECT vs RELATIONSHIP pattern\",\n            \"subject_vs_relationship\": \"string - explicit explanation: 'primary_table.column = subject, fk_table.column = relationship'\"\n          }\n        }\n      ],\n\n      \"relationships\": [\n        {\n          \"column\": \"string - FK column name\",\n          \"references_table\": \"string - target table name\",\n          \"relationship_type\": \"string - exactly one of: 'one-to-many', 'many-to-one', 'many-to-many'\",\n          \"is_bridge_table\": \"boolean - true if this table bridges a many-to-many relationship\",\n          \"join_pattern\": \"string - explicit SQL join syntax: 'source_table.fk_column = target_table.pk_column'\",\n          \"when_to_use\": [\"string - specific question patterns that need this join (be concrete, not vague)\"],\n          \"vs_confusion\": \"string - what this relationship should NOT be confused with\",\n          \"complete_join_path\": [\"string - for multi-hop joins, show full path (e.g., 'table1 → bridge → table2')\"],\n          \"business_meaning\": \"string - what this relationship represents in business terms\",\n          \"common_mistakes\": [\"string - typical errors when using this relationship (e.g., 'DO NOT skip bridge_table')\"]\n        }\n      ],\n\n      \"common_query_patterns\": [\n        {\n          \"question\": \"string - natural language question users ask\",\n          \"explanation\": \"string - how to query this table to answer it\",\n          \"involves_joins\": [\"string - other tables typically joined\"]\n        }\n      ]\n    }\n  ],\n\n  \"cross_table_patterns\": [\n    {\n      \"pattern_type\": \"string - e.g., 'monthly revenue aggregation'\",\n      \"example_question\": \"string - natural language question\",\n      \"tables_involved\": [\"string\"],\n      \"typical_structure\": \"string - general SQL pattern\",\n      \"key_considerations\": [\"string - gotchas or important details\"]\n    }\n  ],\n\n  \"ambiguities\": [\n    {\n      \"issue\": \"string - potential confusion for text-to-SQL\",\n      \"example\": \"string - ambiguous user question\",\n      \"clarification\": \"string - how to resolve it\",\n      \"affected_elements\": [\"string - table.column references\"]\n    }\n  ]\n}\n\nQUALITY REQUIREMENTS:\n- Business language: Write for non-technical users, focus on WHAT data means, not HOW it's stored\n- NO technical schema details: Do NOT include data types, row counts, primary keys, nullability, or FK references - these will be provided separately from the live database schema\n- Completeness: Cover all tables and meaningful columns with business context\n- Specificity: Be concrete (e.g., \"customer's shipping address\" not just \"address\")\n- Rich synonyms: Include 3-5 alternate terms users might use for each concept\n  * CRITICAL: Synonyms must be UNAMBIGUOUS and NOT match partial words from the column name\n  * DO NOT use synonyms that contain fragments of the actual column name\n  * BAD examples: \"Degree ID\" for degree_program_id, \"Course ID\" for course_id, \"Student Name\" for student_name_id\n  * GOOD examples: \"Program Identifier\" for degree_program_id, \"Enrollment Code\" for course_id, \"Learner Full Name Identifier\" for student_name_id\n  * Filter out any synonym that could be confused with the actual business concept vs the ID column\n- Query context: Explain how users typically filter/aggregate each field\n- Clear relationships: State the BUSINESS MEANING of each relationship (e.g., \"links orders to customers\")\n- Common values: Provide realistic example values users might reference (e.g., 'Active', 'Pending', 'USA')\n- Pattern variety: Identify 5-10 common query patterns for this domain\n\nGenerate ONLY the JSON object, no additional text or markdown formatting.\n"
+}

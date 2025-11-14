@@ -276,11 +276,8 @@ Relationship from order_items to orders:
 COLUMN NAME DISAMBIGUATION:
 Some column names appear in multiple tables with different meanings and purposes.
 
-**PHASE 2.1 STRUCTURED COLUMN DISAMBIGUATION:**
-
-IMPORTANT: First, count how many tables each column appears in.
-
-**For columns that appear in 2+ tables ONLY**, you MUST provide these disambiguation fields:
+**PHASE 2 STRUCTURED COLUMN DISAMBIGUATION:**
+For columns that appear in 2+ tables, you MUST provide:
 
 1. **primary_location**: Which table "owns" this column (source of truth)
    - For `student_id`: primary_location is "Students" (the entity itself)
@@ -299,11 +296,6 @@ IMPORTANT: First, count how many tables each column appears in.
 4. **subject_vs_relationship**: Make this distinction explicit
    - "{{primary_table}}.{{column}} = the entity themselves (SUBJECT)"
    - "{{fk_table}}.{{column}} = things related to/owned by that entity (RELATIONSHIP)"
-
-**For columns that ONLY appear in ONE table:**
-- DO NOT provide any "disambiguation" field at all
-- Omit the entire disambiguation block from the JSON
-- The column's business_meaning and typical_filters are sufficient
 
 **Example - student_id disambiguation:**
 ```
@@ -330,47 +322,6 @@ Disambiguation:
   - customers.status: Account state (active, inactive, suspended)
   - NEVER confuse these - they represent completely different business concepts
   - Always qualify: "customer status" vs "order status" in natural language
-```
-
-**✅ CORRECT Examples (FOLLOW THESE):**
-
-Multi-table column (CountryCode appears in city AND countrylanguage):
-```json
-{{
-  "name": "CountryCode",
-  "business_meaning": "The code representing the country...",
-  "disambiguation": {{
-    "primary_location": "country",
-    "appears_in_tables": ["city", "countrylanguage"],
-    "foreign_key_locations": ["city", "countrylanguage"],
-    "directional_guidance": "Use city.CountryCode when identifying the country a city belongs to.",
-    "subject_vs_relationship": "country.Code = the country entity itself, city.CountryCode = relationship to the country"
-  }}
-}}
-```
-
-Single-table column (Population ONLY appears in city):
-```json
-{{
-  "name": "Population",
-  "business_meaning": "The number of people living in the city.",
-  "typical_filters": ["Population > ?", "Population < ?"]
-  // NO disambiguation field - column only appears in 1 table
-}}
-```
-
-**❌ INCORRECT Examples (DO NOT DO THIS):**
-
-Single-table column with unnecessary disambiguation:
-```json
-{{
-  "name": "Population",
-  "disambiguation": {{
-    "primary_location": "city",
-    "appears_in_tables": ["city"],  // ❌ Only 1 table!
-    "directional_guidance": "Use city.Population when..."  // ❌ Unnecessary!
-  }}
-}}
 ```
 
 ANALYSIS APPROACH:
@@ -425,7 +376,6 @@ Generate a JSON object with this structure:
           "aggregations": ["string - common aggregation patterns if numeric/date, e.g., 'AVG(column)', 'SUM(column)'"],
           "common_values": ["string - example values users might reference, e.g., 'USA', 'Active', '2023-01-01'"],
           "disambiguation": {{
-            // OPTIONAL - Only include if column appears in 2+ tables. Omit entirely for single-table columns.
             "appears_in_tables": ["string - ALL tables where this column name appears"],
             "primary_location": "string - which table 'owns' this column (source of truth), or 'N/A' if different meanings",
             "foreign_key_locations": ["string - tables where this appears as a FK reference"],

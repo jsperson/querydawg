@@ -19,11 +19,12 @@ class EmbeddingService:
 
     # Chunk type weights for re-ranking search results
     # Higher weight = more relevant, will rank higher in results
+    # Optimized via hyperparameter tuning (Run 23, Phase 2)
     CHUNK_TYPE_WEIGHTS = {
-        'table': 1.2,              # BOOST: Table-specific docs are most valuable
-        'cross_table_patterns': 1.1,  # BOOST: Multi-table patterns are helpful
-        'overview': 0.7,           # PENALIZE: Generic overviews less specific
-        'ambiguities': 0.6,        # PENALIZE: Ambiguities add noise
+        'table': 1.5,              # BOOST: Table-specific docs are most valuable
+        'cross_table_patterns': 1.3,  # BOOST: Multi-table patterns are helpful
+        'overview': 0.5,           # PENALIZE: Generic overviews less specific
+        'ambiguities': 0.4,        # PENALIZE: Ambiguities add noise
         # NOTE: 'guidelines' removed - now frozen in system prompt instead
     }
 

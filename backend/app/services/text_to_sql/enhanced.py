@@ -26,7 +26,7 @@ class EnhancedSQLGenerator:
         database_name: str,
         connection_name: str = "Supabase",
         use_vector_search: bool = True,
-        top_k_chunks: int = 10,
+        top_k_chunks: int = 5,
         db_type: str = 'postgresql'
     ):
         """
@@ -37,7 +37,7 @@ class EnhancedSQLGenerator:
             database_name: Schema/database name
             connection_name: Connection name for semantic layer lookup
             use_vector_search: If True, use vector search for semantic context retrieval
-            top_k_chunks: Number of semantic chunks to retrieve (if using vector search)
+            top_k_chunks: Number of semantic chunks to retrieve (default: 5, optimized via hyperparameter tuning)
             db_type: Database type ('postgresql' or 'sqlite')
         """
         self.database_url = database_url

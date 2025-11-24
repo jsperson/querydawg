@@ -90,8 +90,8 @@ async def generate_semantic_layer(
     """
     Generate a semantic layer for a database.
 
-    Extracts schema and sample data from Supabase,
-    uses LLM to generate semantic documentation, and stores back in Supabase.
+    Extracts schema and sample data from Turso,
+    uses LLM to generate semantic documentation, and stores in Supabase.
 
     Automatically deletes any existing semantic layers for this database before creating new one.
     """
@@ -111,11 +111,10 @@ async def generate_semantic_layer(
             custom_instructions = metadata_store.get_custom_instructions()
         print(f"[GENERATE] Custom instructions: {len(custom_instructions) if custom_instructions else 0} chars")
 
-        # Generate semantic layer (using Supabase PostgreSQL as source)
-        print(f"[GENERATE] Creating generator with DATABASE_URL: {settings.database_url[:50]}...")
+        # Generate semantic layer (using Turso as source)
+        print(f"[GENERATE] Creating generator (using Turso for schema and sample data)...")
         generator = SemanticLayerGenerator(
             llm=llm,
-            database_url=settings.database_url,  # PostgreSQL connection string
             custom_instructions=custom_instructions,
             sample_rows=request.sample_rows
         )
@@ -273,7 +272,6 @@ async def get_generation_prompt(
         # Build prompt only (does NOT call LLM)
         generator = SemanticLayerGenerator(
             llm=llm,
-            database_url=settings.database_url,  # PostgreSQL connection string
             custom_instructions=custom_instructions,
             sample_rows=request.sample_rows
         )

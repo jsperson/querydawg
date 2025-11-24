@@ -4,8 +4,8 @@ Semantic Layer Generator
 Generates natural language documentation (semantic layers) for databases
 using LLM analysis of schema and sample data.
 
-Uses local SQLite files for schema extraction (preserving case) and
-Supabase PostgreSQL for sample data extraction.
+Uses Turso (SQLite) for both schema extraction (preserving case) and
+sample data extraction.
 """
 
 import json
@@ -15,7 +15,6 @@ from datetime import datetime
 
 from .llm.base import LLMProvider
 from ..database.turso_schema_extractor import TursoSchemaExtractor
-from ..database.supabase_schema_extractor import SupabaseSchemaExtractor
 
 
 class SemanticLayerGenerator:
@@ -24,7 +23,6 @@ class SemanticLayerGenerator:
     def __init__(
         self,
         llm: LLMProvider,
-        database_url: str,
         custom_instructions: Optional[str] = None,
         sample_rows: int = 10
     ):
@@ -33,20 +31,15 @@ class SemanticLayerGenerator:
 
         Args:
             llm: LLM provider instance to use for generation
-            database_url: Supabase PostgreSQL connection string (for sample data)
             custom_instructions: Optional custom instructions to add to prompt
             sample_rows: Number of sample rows to extract per table
         """
         self.llm = llm
-        self.database_url = database_url
         self.custom_instructions = custom_instructions or ""
         self.sample_rows = sample_rows
 
-        # Use Turso for schema extraction (preserves original case from Spider SQLite)
+        # Use Turso for both schema and sample data extraction
         self.turso_extractor = TursoSchemaExtractor()
-
-        # Use Supabase for sample data extraction (has actual data)
-        self.supabase_extractor = SupabaseSchemaExtractor(database_url, use_spider_metadata=False)
 
     def generate(
         self,
@@ -69,9 +62,9 @@ class SemanticLayerGenerator:
         print(f"Extracting schema from Turso for {database_name}...")
         schema_info = self.turso_extractor.extract_schema(database_name)
 
-        # Sample data from Supabase (has actual data)
-        print(f"Sampling data from Supabase for {database_name}...")
-        sample_data = self.supabase_extractor.sample_all_tables(
+        # Sample data from Turso
+        print(f"Sampling data from Turso for {database_name}...")
+        sample_data = self.turso_extractor.sample_all_tables(
             database_name,
             limit=self.sample_rows
         )
@@ -166,8 +159,8 @@ class SemanticLayerGenerator:
         # Extract schema from Turso (preserves original case from Spider SQLite)
         schema_info = self.turso_extractor.extract_schema(database_name)
 
-        # Sample data from Supabase (has actual data)
-        sample_data = self.supabase_extractor.sample_all_tables(
+        # Sample data from Turso
+        sample_data = self.turso_extractor.sample_all_tables(
             database_name,
             limit=self.sample_rows
         )

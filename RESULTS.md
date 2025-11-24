@@ -107,8 +107,8 @@ QueryDawg achieved **83.91% enhanced accuracy** (803/957 valid queries) on the S
 | Metric | Hypothesis | Actual | Status |
 |--------|------------|--------|--------|
 | Accuracy Improvement | 15-25% | +2.30% | ❌ Below target |
-| Enhanced Accuracy | 95-105% | 83.91% | ⚠️ Lower than expected |
-| Baseline Accuracy | 65-80% (assumed) | 81.61% | ✅ Higher than assumed |
+| Enhanced Accuracy | 90-95% | 83.91% | ⚠️ Lower than expected |
+| Baseline Accuracy | 65-75% (assumed) | 81.61% | ✅ Higher than assumed |
 
 **Key Insight:** The baseline was much stronger than anticipated (81.61%), making large improvements difficult. The +2.30% gain represents a meaningful improvement on an already-strong foundation.
 

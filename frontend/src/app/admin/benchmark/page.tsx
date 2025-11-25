@@ -91,18 +91,7 @@ export default function BenchmarkControlPanel() {
     }
   };
 
-  const handleStartBenchmark = async () => {
-    if (!name.trim()) {
-      setError('Please enter a name for this benchmark run');
-      return;
-    }
-
-    // Check if admin auth is required
-    if (adminRequired && !isAdmin) {
-      requestAdminAccess();
-      return;
-    }
-
+  const doStartBenchmark = async () => {
     setIsStarting(true);
     setError('');
 
@@ -151,6 +140,21 @@ export default function BenchmarkControlPanel() {
     } finally {
       setIsStarting(false);
     }
+  };
+
+  const handleStartBenchmark = () => {
+    if (!name.trim()) {
+      setError('Please enter a name for this benchmark run');
+      return;
+    }
+
+    // Check if admin auth is required
+    if (adminRequired && !isAdmin) {
+      requestAdminAccess(doStartBenchmark);
+      return;
+    }
+
+    doStartBenchmark();
   };
 
   const getStatusBadge = (status: string) => {

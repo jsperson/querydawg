@@ -38,7 +38,7 @@ export default function SemanticLayerAdmin() {
   // Helper to check admin access before performing action
   const requireAdmin = (action: () => void) => {
     if (adminRequired && !isAdmin) {
-      requestAdminAccess();
+      requestAdminAccess(action);
       return;
     }
     action();

@@ -95,7 +95,7 @@ interface UseAdminAuthReturn {
   isLoading: boolean;
   adminRequired: boolean;
   showLoginModal: boolean;
-  requestAdminAccess: () => void;
+  requestAdminAccess: (onSuccess?: () => void) => void;
   AdminModal: React.ReactNode;
   logout: () => void;
 }
@@ -105,6 +105,7 @@ export function useAdminAuth(): UseAdminAuthReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [adminRequired, setAdminRequired] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -134,17 +135,24 @@ export function useAdminAuth(): UseAdminAuthReturn {
     checkAuth();
   }, []);
 
-  const requestAdminAccess = () => {
+  const requestAdminAccess = (onSuccess?: () => void) => {
+    setPendingAction(() => onSuccess || null);
     setShowLoginModal(true);
   };
 
   const handleLoginSuccess = () => {
     setIsAdmin(true);
     setShowLoginModal(false);
+    // Execute the pending action after successful login
+    if (pendingAction) {
+      pendingAction();
+      setPendingAction(null);
+    }
   };
 
   const handleLoginCancel = () => {
     setShowLoginModal(false);
+    setPendingAction(null);
   };
 
   const logout = () => {

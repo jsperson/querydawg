@@ -247,8 +247,8 @@ querydawg/
 ## Documentation
 
 - **[Final Results](RESULTS.md)** - Complete analysis of final results, findings, and lessons learned
-- **[Project Plan](docs/project_plan.md)** - Original 7-week development plan, architecture, methodology, and research goals
-- **[Progress Tracker](docs/progress_tracker.md)** - Detailed weekly progress tracking and milestone completion
+- **[Project Plan](docs/project/project_plan.md)** - Original 7-week development plan, architecture, methodology, and research goals
+- **[Progress Tracker](docs/project/progress_tracker.md)** - Detailed weekly progress tracking and milestone completion
 - **[Deployment Guide](DEPLOYMENT.md)** - Step-by-step guide for deploying to Railway (backend) and Vercel (frontend)
 - **[Spider Dataset Download](data/spider/DOWNLOAD.md)** - Instructions for downloading and setting up the Spider 1.0 dataset
 
@@ -257,7 +257,7 @@ querydawg/
 - **[Run 22 Analysis](docs/prompt_optimization/RUN22_RESULTS_ANALYSIS.md)** - Final run analysis (best performance: 83.82%)
 - **[Phase 2 Analysis](docs/phase2/RUN21_RESULTS_AND_PHASE2_CONCLUSION.md)** - Semantic layer optimization analysis
 - **[Temperature Optimization](docs/temperature_optimization/TEST_RESULTS_ANALYSIS.md)** - Determinism validation tests
-- **[Session State](docs/SESSION_STATE_2025-11-15.md)** - Final project state snapshot
+- **[Session State](docs/archive/SESSION_STATE_2025-11-15.md)** - Final project state snapshot
 
 ## Research Context
 
@@ -265,7 +265,7 @@ This is an independent study project for the Master of Science in Data Science p
 
 > "Can automatically generated natural language semantic layers bridge the semantic gap between database schemas and business language, resulting in significantly improved text-to-SQL accuracy while reducing documentation burden?"
 
-**For complete research methodology, hypotheses, evaluation metrics, and timeline, see [docs/project_plan.md](docs/project_plan.md).**
+**For complete research methodology, hypotheses, evaluation metrics, and timeline, see [docs/project/project_plan.md](docs/project/project_plan.md).**
 
 ## License
 

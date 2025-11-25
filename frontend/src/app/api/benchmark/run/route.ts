@@ -1,18 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://querydawg-production.up.railway.app';
 const API_KEY = process.env.BACKEND_API_KEY || '';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const adminPassword = request.headers.get('X-Admin-Password');
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'X-API-Key': API_KEY,
+    };
+
+    if (adminPassword) {
+      headers['X-Admin-Password'] = adminPassword;
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/benchmark/run`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': API_KEY,
-      },
+      headers,
       body: JSON.stringify(body),
     });
 

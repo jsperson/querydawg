@@ -5,7 +5,6 @@ const API_KEY = process.env.BACKEND_API_KEY || '';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
     const adminPassword = request.headers.get('X-Admin-Password');
 
     const headers: HeadersInit = {
@@ -17,14 +16,13 @@ export async function POST(request: NextRequest) {
       headers['X-Admin-Password'] = adminPassword;
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/semantic/generate`, {
+    const response = await fetch(`${BACKEND_URL}/api/admin/verify`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({ detail: 'Invalid password' }));
       return NextResponse.json(error, { status: response.status });
     }
 
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch {
     return NextResponse.json(
-      { detail: 'Failed to generate semantic layer' },
+      { detail: 'Failed to verify admin password' },
       { status: 500 }
     );
   }

@@ -16,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useAdminAuth } from '@/components/AdminLoginModal';
+import { adminAuth } from '@/lib/admin';
 
 interface BenchmarkRun {
   run_id: string;
@@ -33,6 +35,7 @@ interface BenchmarkRun {
 
 export default function BenchmarkControlPanel() {
   const router = useRouter();
+  const { isAdmin, isLoading: isLoadingAuth, adminRequired, requestAdminAccess, AdminModal } = useAdminAuth();
 
   // Form state
   const [name, setName] = useState('');
@@ -94,6 +97,12 @@ export default function BenchmarkControlPanel() {
       return;
     }
 
+    // Check if admin auth is required
+    if (adminRequired && !isAdmin) {
+      requestAdminAccess();
+      return;
+    }
+
     setIsStarting(true);
     setError('');
 
@@ -106,9 +115,15 @@ export default function BenchmarkControlPanel() {
         question_limit: questionLimit
       };
 
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      const password = adminAuth.getPassword();
+      if (password) {
+        headers['X-Admin-Password'] = password;
+      }
+
       const response = await fetch('/api/benchmark/run', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(config)
       });
 
@@ -156,6 +171,7 @@ export default function BenchmarkControlPanel() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
+      {AdminModal}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -165,9 +181,21 @@ export default function BenchmarkControlPanel() {
               Run Spider 1.0 evaluation benchmarks to compare baseline vs enhanced approaches
             </p>
           </div>
-          <Button onClick={() => router.push('/compare')} variant="outline">
-            Back to Compare Mode
-          </Button>
+          <div className="flex gap-2 items-center">
+            {adminRequired && (
+              <Badge variant={isAdmin ? "default" : "secondary"} className="mr-2">
+                {isLoadingAuth ? 'Checking...' : isAdmin ? 'Admin' : 'View Only'}
+              </Badge>
+            )}
+            {adminRequired && !isAdmin && (
+              <Button onClick={requestAdminAccess} variant="outline" size="sm">
+                Login as Admin
+              </Button>
+            )}
+            <Button onClick={() => router.push('/compare')} variant="outline">
+              Back to Compare Mode
+            </Button>
+          </div>
         </div>
 
         {/* Start New Benchmark */}
@@ -297,11 +325,11 @@ export default function BenchmarkControlPanel() {
             {/* Start Button */}
             <Button
               onClick={handleStartBenchmark}
-              disabled={isStarting || !name.trim()}
+              disabled={isStarting || !name.trim() || (adminRequired && !isAdmin)}
               className="w-full"
               size="lg"
             >
-              {isStarting ? 'Starting Benchmark...' : 'Start Benchmark'}
+              {isStarting ? 'Starting Benchmark...' : adminRequired && !isAdmin ? 'Admin Login Required' : 'Start Benchmark'}
             </Button>
 
             <p className="text-sm text-muted-foreground text-center">

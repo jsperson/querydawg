@@ -10,7 +10,7 @@ from ..config import get_settings
 from ..services.llm.config import LLMConfig
 from ..services.semantic_layer_generator import SemanticLayerGenerator
 from ..database.metadata_store import MetadataStore, get_metadata_store
-from ..dependencies import verify_api_key
+from ..dependencies import verify_api_key, verify_admin_password
 from ..services.embedding_service import EmbeddingService
 
 
@@ -85,6 +85,7 @@ def get_metadata_store_instance() -> MetadataStore:
 async def generate_semantic_layer(
     request: GenerateRequest,
     _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password),
     metadata_store: MetadataStore = Depends(get_metadata_store_instance)
 ):
     """
@@ -300,6 +301,7 @@ async def delete_semantic_layer(
     database: str,
     connection_name: str = "Supabase",
     _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password),
     metadata_store: MetadataStore = Depends(get_metadata_store_instance)
 ):
     """Delete semantic layer(s) for a database."""
@@ -380,6 +382,7 @@ async def get_custom_instructions(
 async def set_custom_instructions(
     request: CustomInstructionsRequest,
     _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password),
     metadata_store: MetadataStore = Depends(get_metadata_store_instance)
 ):
     """Set custom instructions for semantic layer generation."""

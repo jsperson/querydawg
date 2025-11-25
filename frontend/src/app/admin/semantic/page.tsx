@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAdminAuth } from '@/components/AdminLoginModal';
 import type {
   SemanticLayerResponse,
   ViewPromptResponse,
@@ -22,6 +23,7 @@ interface DatabaseStatus {
 }
 
 export default function SemanticLayerAdmin() {
+  const { isAdmin, isLoading: isLoadingAuth, adminRequired, requestAdminAccess, AdminModal } = useAdminAuth();
   const [databases, setDatabases] = useState<DatabaseStatus[]>([]);
   const [selectedDatabases, setSelectedDatabases] = useState<Set<string>>(new Set());
   const [customInstructions, setCustomInstructions] = useState<string>('');
@@ -32,6 +34,15 @@ export default function SemanticLayerAdmin() {
   const [isViewingPrompt, setIsViewingPrompt] = useState(false);
   const [error, setError] = useState<string>('');
   const connectionName = 'Supabase';
+
+  // Helper to check admin access before performing action
+  const requireAdmin = (action: () => void) => {
+    if (adminRequired && !isAdmin) {
+      requestAdminAccess();
+      return;
+    }
+    action();
+  };
 
   useEffect(() => {
     loadDatabases();
@@ -275,6 +286,7 @@ export default function SemanticLayerAdmin() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
+      {AdminModal}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -285,12 +297,24 @@ export default function SemanticLayerAdmin() {
             >
               ← Back to Query Interface
             </a>
-            <a
-              href="/admin/semantic/view"
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              View Semantic Layers →
-            </a>
+            <div className="flex items-center gap-4">
+              {adminRequired && (
+                <Badge variant={isAdmin ? "default" : "secondary"}>
+                  {isLoadingAuth ? 'Checking...' : isAdmin ? 'Admin' : 'View Only'}
+                </Badge>
+              )}
+              {adminRequired && !isAdmin && (
+                <Button onClick={requestAdminAccess} variant="outline" size="sm">
+                  Login as Admin
+                </Button>
+              )}
+              <a
+                href="/admin/semantic/view"
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                View Semantic Layers →
+              </a>
+            </div>
           </div>
           <h1 className="text-4xl font-bold mb-2">Semantic Layer Admin</h1>
           <p className="text-lg text-muted-foreground">
@@ -345,12 +369,13 @@ export default function SemanticLayerAdmin() {
                   rows={4}
                 />
                 <Button
-                  onClick={handleSaveInstructions}
+                  onClick={() => requireAdmin(handleSaveInstructions)}
                   variant="outline"
                   size="sm"
                   className="mt-2"
+                  disabled={adminRequired && !isAdmin}
                 >
-                  Save as Default Instructions
+                  {adminRequired && !isAdmin ? 'Admin Required' : 'Save as Default Instructions'}
                 </Button>
               </div>
             </CardContent>
@@ -424,8 +449,8 @@ export default function SemanticLayerAdmin() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleGenerateSingle(db.name)}
-                            disabled={db.isGenerating}
+                            onClick={() => requireAdmin(() => handleGenerateSingle(db.name))}
+                            disabled={db.isGenerating || (adminRequired && !isAdmin)}
                           >
                             Generate
                           </Button>
@@ -441,7 +466,8 @@ export default function SemanticLayerAdmin() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDelete(db.name)}
+                                onClick={() => requireAdmin(() => handleDelete(db.name))}
+                                disabled={adminRequired && !isAdmin}
                               >
                                 Delete
                               </Button>
@@ -464,19 +490,21 @@ export default function SemanticLayerAdmin() {
                   {isViewingPrompt ? 'Loading Prompt...' : 'View Prompt'}
                 </Button>
                 <Button
-                  onClick={handleGenerate}
-                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
+                  onClick={() => requireAdmin(handleGenerate)}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0 || (adminRequired && !isAdmin)}
                 >
-                  {generatingCount > 0
+                  {adminRequired && !isAdmin
+                    ? 'Admin Required'
+                    : generatingCount > 0
                     ? `Generating (${generatingCount}/${selectedDatabases.size})...`
                     : `Generate Selected`}
                 </Button>
                 <Button
-                  onClick={handleDeleteSelected}
-                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
+                  onClick={() => requireAdmin(handleDeleteSelected)}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0 || (adminRequired && !isAdmin)}
                   variant="destructive"
                 >
-                  Delete Selected
+                  {adminRequired && !isAdmin ? 'Admin Required' : 'Delete Selected'}
                 </Button>
               </div>
 

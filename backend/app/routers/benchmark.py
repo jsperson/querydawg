@@ -22,7 +22,7 @@ from ..database.benchmark_store import get_benchmark_store, BenchmarkStore
 from ..database.query_executor import QueryExecutorFactory
 from ..services.benchmark_runner import BenchmarkRunner, BudgetExceededError
 from ..services.executor import SQLExecutor, SQLExecutionError
-from ..dependencies import verify_api_key
+from ..dependencies import verify_api_key, verify_admin_password
 
 
 router = APIRouter(prefix="/api/benchmark", tags=["benchmark"])
@@ -52,7 +52,8 @@ def get_runner_instance() -> BenchmarkRunner:
 async def start_benchmark(
     config: BenchmarkConfig,
     background_tasks: BackgroundTasks,
-    _: str = Depends(verify_api_key)
+    _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password)
 ):
     """
     Start a new benchmark run in the background
@@ -292,7 +293,8 @@ async def get_run_results(
 @router.post("/run/{run_id}/cancel")
 async def cancel_run(
     run_id: str,
-    _: str = Depends(verify_api_key)
+    _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password)
 ):
     """Cancel a running or pending benchmark"""
     try:
@@ -421,7 +423,8 @@ async def execute_compare(
 @router.delete("/run/{run_id}")
 async def delete_run(
     run_id: str,
-    _: str = Depends(verify_api_key)
+    _: str = Depends(verify_api_key),
+    __: str = Depends(verify_admin_password)
 ):
     """Delete a benchmark run and all its results"""
     try:

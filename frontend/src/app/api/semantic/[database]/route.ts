@@ -45,12 +45,19 @@ export async function DELETE(
     const { database } = params;
     const { searchParams } = new URL(request.url);
     const connectionName = searchParams.get('connection_name') || 'Supabase';
+    const adminPassword = request.headers.get('X-Admin-Password');
+
+    const headers: HeadersInit = {
+      'X-API-Key': API_KEY,
+    };
+
+    if (adminPassword) {
+      headers['X-Admin-Password'] = adminPassword;
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/semantic/${database}?connection_name=${connectionName}`, {
       method: 'DELETE',
-      headers: {
-        'X-API-Key': API_KEY,
-      },
+      headers,
     });
 
     if (!response.ok) {

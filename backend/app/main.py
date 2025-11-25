@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.dependencies import verify_api_key
+from app.dependencies import verify_api_key, verify_admin_password
+from app.config import get_settings
 from app.models.responses import (
     HealthResponse,
     DatabaseListResponse,
@@ -422,6 +423,46 @@ async def root():
         "docs": "/docs",
         "health": "/api/health"
     }
+
+
+@app.get(
+    "/api/admin/status",
+    tags=["Admin"],
+    summary="Check admin status",
+    description="Check if admin authentication is required and current auth status"
+)
+async def admin_status(api_key: str = Depends(verify_api_key)):
+    """
+    Check if admin password is configured (required for write operations)
+
+    Returns:
+        - admin_required: True if ADMIN_PASSWORD is set
+    """
+    settings = get_settings()
+    return {
+        "admin_required": bool(settings.admin_password)
+    }
+
+
+@app.post(
+    "/api/admin/verify",
+    tags=["Admin"],
+    summary="Verify admin password",
+    description="Verify the admin password for write operations"
+)
+async def verify_admin(
+    api_key: str = Depends(verify_api_key),
+    admin_password: str = Depends(verify_admin_password)
+):
+    """
+    Verify admin password
+
+    Requires: X-API-Key header and X-Admin-Password header
+
+    Returns:
+        - valid: True if password is correct
+    """
+    return {"valid": True}
 
 
 if __name__ == "__main__":

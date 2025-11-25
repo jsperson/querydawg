@@ -19,6 +19,7 @@ import {
   CustomInstructionsResponse,
   DatabaseOverviewResponse,
 } from './api-types';
+import { adminAuth } from './admin';
 
 const API_BASE = '/api';
 
@@ -29,6 +30,33 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> 
       ...options?.headers,
     },
     ...options,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: response.statusText }));
+    throw new Error(error.detail || `API Error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Fetch with admin password header for protected endpoints
+ */
+async function fetchAPIWithAdmin<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const adminPassword = adminAuth.getPassword();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options?.headers,
+  };
+
+  if (adminPassword) {
+    (headers as Record<string, string>)['X-Admin-Password'] = adminPassword;
+  }
+
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers,
   });
 
   if (!response.ok) {
@@ -79,12 +107,12 @@ export const api = {
       body: JSON.stringify(request),
     }),
 
-  // Semantic Layer APIs
+  // Semantic Layer APIs (Admin Protected)
   /**
-   * Generate semantic layer for a database
+   * Generate semantic layer for a database (requires admin)
    */
   generateSemanticLayer: (request: GenerateSemanticLayerRequest) =>
-    fetchAPI<SemanticLayerResponse>('/semantic/generate', {
+    fetchAPIWithAdmin<SemanticLayerResponse>('/semantic/generate', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -119,10 +147,10 @@ export const api = {
     fetchAPI<SemanticLayerListItem[]>(`/semantic?_t=${Date.now()}`),
 
   /**
-   * Delete semantic layer for a database
+   * Delete semantic layer for a database (requires admin)
    */
   deleteSemanticLayer: (database: string, connectionName: string = 'Supabase') =>
-    fetchAPI<{ message: string }>(`/semantic/${database}?connection_name=${connectionName}`, {
+    fetchAPIWithAdmin<{ message: string }>(`/semantic/${database}?connection_name=${connectionName}`, {
       method: 'DELETE',
     }),
 
@@ -133,10 +161,10 @@ export const api = {
     fetchAPI<CustomInstructionsResponse>('/semantic/instructions'),
 
   /**
-   * Set custom instructions
+   * Set custom instructions (requires admin)
    */
   setCustomInstructions: (request: CustomInstructionsRequest) =>
-    fetchAPI<{ message: string }>('/semantic/instructions', {
+    fetchAPIWithAdmin<{ message: string }>('/semantic/instructions', {
       method: 'POST',
       body: JSON.stringify(request),
     }),

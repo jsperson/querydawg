@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     # API Configuration
     api_key: str = os.getenv("API_KEY", "dev-querydawg-api-key-2024")
+    admin_password: str = os.getenv("ADMIN_PASSWORD", "")
     environment: str = os.getenv("ENVIRONMENT", "development")
 
     # LLM Configuration

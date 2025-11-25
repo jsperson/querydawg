@@ -29,13 +29,20 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const adminPassword = request.headers.get('X-Admin-Password');
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'X-API-Key': API_KEY,
+    };
+
+    if (adminPassword) {
+      headers['X-Admin-Password'] = adminPassword;
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/semantic/instructions/set`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': API_KEY,
-      },
+      headers,
       body: JSON.stringify(body),
     });
 

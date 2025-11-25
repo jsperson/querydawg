@@ -5,7 +5,7 @@ export function Footer() {
         <p>
           Jason &ldquo;Scott&rdquo; Person |{" "}
           <a
-            href="https://www.newmanu.edu"
+            href="https://newmanu.edu/academics/data-science-ms"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 hover:underline"

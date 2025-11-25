@@ -2,9 +2,9 @@
 
 A cloud-native text-to-SQL system that uses automatically generated natural language semantic layers to improve SQL query generation accuracy.
 
-**📊 Project Status:** ✅ COMPLETE (November 2025)
+**Project Status:** COMPLETE (November 2025)
 
-**🎯 Final Results:**
+**Final Results:**
 - **Enhanced Accuracy:** 83.91% (803/957 valid questions)
 - **Baseline Accuracy:** 81.61% (781/957 valid questions)
 - **Improvement:** +2.30% (+22 questions, 13.8% error reduction)
@@ -14,15 +14,15 @@ A cloud-native text-to-SQL system that uses automatically generated natural lang
 - **Generation Time:** 2-4 hours automated vs weeks manual
 
 **Key Achievements:**
-- ✅ Fully automated semantic layer generation for 20 databases
-- ✅ Comprehensive benchmark evaluation system with 1,034 questions
-- ✅ Deterministic, reproducible results (temperature=0.0)
-- ✅ Dual database support: Turso (SQLite) + Supabase (PostgreSQL)
-- ✅ Production deployment on Vercel (frontend) and Railway (backend)
-- ✅ Complete documentation and analysis
-- ✅ Open-source release with MIT license
+- Fully automated semantic layer generation for 20 databases
+- Comprehensive benchmark evaluation system with 1,034 questions
+- Deterministic, reproducible results (temperature=0.0)
+- Dual database support: Turso (SQLite) + Supabase (PostgreSQL)
+- Production deployment on Vercel (frontend) and Railway (backend)
+- Complete documentation and analysis
+- Open-source release with MIT license
 
-**📄 See [RESULTS.md](RESULTS.md) for complete analysis and findings.**
+**See [RESULTS.md](RESULTS.md) for complete analysis and findings.**
 
 ## What is QueryDawg?
 
@@ -32,16 +32,16 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
 
 ## Key Features
 
-- **🗄️ Dual Database Support**: Choose between Turso (native SQLite) or Supabase (PostgreSQL) per benchmark run
-- **🎯 Database-Specific Prompts**: LLM prompts automatically adapt to SQL dialect (SQLite vs PostgreSQL)
-- **🤖 Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
-- **📊 Spider 1.0 Benchmark System**: Full evaluation suite with 1,034 questions across 20 databases
-- **🔍 Advanced SQL Comparison**: Execute and compare gold/baseline/enhanced SQL side-by-side
-- **🎯 Intelligent Filtering**: Filter results by baseline/enhanced pass/fail for detailed analysis
-- **⚡ Real-Time Metrics**: Live tracking of execution match rates during benchmark runs
-- **🔄 SQLite → PostgreSQL Conversion**: Automatic query translation with GROUP BY expansion and mixed aggregate handling
-- **🎨 Column-Order-Independent Matching**: Results comparison ignores column order differences
-- **☁️ Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
+- **Dual Database Support**: Choose between Turso (native SQLite) or Supabase (PostgreSQL) per benchmark run
+- **Database-Specific Prompts**: LLM prompts automatically adapt to SQL dialect (SQLite vs PostgreSQL)
+- **Auto-Generated Semantic Layers**: LLM-generated business-context documentation for databases
+- **Spider 1.0 Benchmark System**: Full evaluation suite with 1,034 questions across 20 databases
+- **Advanced SQL Comparison**: Execute and compare gold/baseline/enhanced SQL side-by-side
+- **Intelligent Filtering**: Filter results by baseline/enhanced pass/fail for detailed analysis
+- **Real-Time Metrics**: Live tracking of execution match rates during benchmark runs
+- **SQLite to PostgreSQL Conversion**: Automatic query translation with GROUP BY expansion and mixed aggregate handling
+- **Column-Order-Independent Matching**: Results comparison ignores column order differences
+- **Production-Ready**: Cloud-deployable on Vercel (frontend) and Railway (backend)
 
 ## System Features (Project Complete)
 
@@ -49,14 +49,14 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
 - Modular LLM architecture supporting multiple providers (OpenAI, Anthropic, Ollama)
 - Database schema extraction from Supabase PostgreSQL
 - Text-to-SQL generation with GPT-4o-mini (baseline & enhanced)
-- **✨ Semantic Layer System:**
+- **Semantic Layer System:**
   - Automated LLM-powered documentation creation
   - Business context extraction (domain, entities, relationships)
   - Column-level semantic descriptions with synonyms
   - Query pattern identification and ambiguity detection
   - Vector embeddings with Pinecone for RAG-based semantic retrieval
   - Supabase metadata storage with version control
-- **✨ Spider 1.0 Benchmark System:**
+- **Spider 1.0 Benchmark System:**
   - Full evaluation suite (1,034 questions, 20 databases)
   - Baseline vs Enhanced comparison runs
   - Execution match & exact match scoring
@@ -64,7 +64,7 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
   - Budget controls and cost monitoring
   - Supabase storage for benchmark results
   - SQLite to PostgreSQL automatic conversion:
-    - Double quote → single quote transformation
+    - Double quote to single quote transformation
     - GROUP BY clause expansion for PostgreSQL strictness
     - Mixed aggregate function handling
   - Column-order-independent result matching using frozensets
@@ -78,14 +78,14 @@ QueryDawg addresses a critical gap in text-to-SQL systems: the semantic disconne
 - Natural language query interface with real-time SQL generation
 - Interactive result display with execution metrics
 - Cost and token usage tracking
-- **✨ Semantic Layer Admin Interface:**
+- **Semantic Layer Admin Interface:**
   - Generate semantic layers for databases
   - View and manage existing semantic layers
   - Preview LLM prompts before generation
   - Custom instructions for domain-specific context
   - Delete and regenerate semantic layers
   - Visual metadata display with embedding status
-- **✨ Benchmark Control Panel:**
+- **Benchmark Control Panel:**
   - Configure and launch benchmark runs (baseline/enhanced/both)
   - Database selection and question limit controls
   - Real-time progress monitoring with auto-refresh
@@ -246,7 +246,7 @@ querydawg/
 
 ## Documentation
 
-- **[Final Results](RESULTS.md)** - ⭐ **Complete analysis of final results, findings, and lessons learned**
+- **[Final Results](RESULTS.md)** - Complete analysis of final results, findings, and lessons learned
 - **[Project Plan](docs/project_plan.md)** - Original 7-week development plan, architecture, methodology, and research goals
 - **[Progress Tracker](docs/progress_tracker.md)** - Detailed weekly progress tracking and milestone completion
 - **[Deployment Guide](DEPLOYMENT.md)** - Step-by-step guide for deploying to Railway (backend) and Vercel (frontend)

@@ -373,9 +373,8 @@ export default function SemanticLayerAdmin() {
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  disabled={adminRequired && !isAdmin}
                 >
-                  {adminRequired && !isAdmin ? 'Admin Required' : 'Save as Default Instructions'}
+                  {adminRequired && !isAdmin ? 'Login & Save Instructions' : 'Save as Default Instructions'}
                 </Button>
               </div>
             </CardContent>
@@ -450,7 +449,7 @@ export default function SemanticLayerAdmin() {
                             size="sm"
                             variant="outline"
                             onClick={() => requireAdmin(() => handleGenerateSingle(db.name))}
-                            disabled={db.isGenerating || (adminRequired && !isAdmin)}
+                            disabled={db.isGenerating}
                           >
                             Generate
                           </Button>
@@ -467,7 +466,6 @@ export default function SemanticLayerAdmin() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => requireAdmin(() => handleDelete(db.name))}
-                                disabled={adminRequired && !isAdmin}
                               >
                                 Delete
                               </Button>
@@ -491,20 +489,20 @@ export default function SemanticLayerAdmin() {
                 </Button>
                 <Button
                   onClick={() => requireAdmin(handleGenerate)}
-                  disabled={generatingCount > 0 || selectedDatabases.size === 0 || (adminRequired && !isAdmin)}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
                 >
                   {adminRequired && !isAdmin
-                    ? 'Admin Required'
+                    ? 'Login & Generate'
                     : generatingCount > 0
                     ? `Generating (${generatingCount}/${selectedDatabases.size})...`
                     : `Generate Selected`}
                 </Button>
                 <Button
                   onClick={() => requireAdmin(handleDeleteSelected)}
-                  disabled={generatingCount > 0 || selectedDatabases.size === 0 || (adminRequired && !isAdmin)}
+                  disabled={generatingCount > 0 || selectedDatabases.size === 0}
                   variant="destructive"
                 >
-                  {adminRequired && !isAdmin ? 'Admin Required' : 'Delete Selected'}
+                  {adminRequired && !isAdmin ? 'Login & Delete' : 'Delete Selected'}
                 </Button>
               </div>
 

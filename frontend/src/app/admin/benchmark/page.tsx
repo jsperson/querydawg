@@ -325,11 +325,11 @@ export default function BenchmarkControlPanel() {
             {/* Start Button */}
             <Button
               onClick={handleStartBenchmark}
-              disabled={isStarting || !name.trim() || (adminRequired && !isAdmin)}
+              disabled={isStarting || !name.trim()}
               className="w-full"
               size="lg"
             >
-              {isStarting ? 'Starting Benchmark...' : adminRequired && !isAdmin ? 'Admin Login Required' : 'Start Benchmark'}
+              {isStarting ? 'Starting Benchmark...' : adminRequired && !isAdmin ? 'Login & Start Benchmark' : 'Start Benchmark'}
             </Button>
 
             <p className="text-sm text-muted-foreground text-center">

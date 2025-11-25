@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="w-full border-t border-gray-200 bg-gray-50 py-4 mt-auto">
       <div className="container mx-auto px-4 text-center text-sm text-gray-600">
         <p>
-          Jason "Scott" Person |{" "}
+          Jason &ldquo;Scott&rdquo; Person |{" "}
           <a
             href="https://www.newmanu.edu"
             target="_blank"

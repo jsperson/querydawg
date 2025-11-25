@@ -192,7 +192,7 @@ export default function BenchmarkControlPanel() {
               </Badge>
             )}
             {adminRequired && !isAdmin && (
-              <Button onClick={requestAdminAccess} variant="outline" size="sm">
+              <Button onClick={() => requestAdminAccess()} variant="outline" size="sm">
                 Login as Admin
               </Button>
             )}

@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "QueryDawg - Text-to-SQL with Semantic Layer",
+  title: "QueryDawg",
   description: "Natural Language Semantic Layer for Text-to-SQL",
 };
 

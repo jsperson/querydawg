@@ -300,13 +300,13 @@ export default function ComparePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
-      <div className="container mx-auto px-4 py-8 max-w-[1920px]">
+    <main className="bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
+      <div className="container mx-auto px-4 py-4 max-w-[1920px]">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2">QueryDawg</h1>
-            <p className="text-lg text-muted-foreground">
+            <h1 className="text-2xl font-bold">QueryDawg</h1>
+            <p className="text-sm text-muted-foreground">
               Natural Language to SQL - Comparison Mode
             </p>
           </div>
@@ -330,19 +330,19 @@ export default function ComparePage() {
         <QueryNavigation />
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Input Section */}
           <Card>
-            <CardHeader>
-              <CardTitle>Ask a Question</CardTitle>
-              <CardDescription>
-                Select a database and ask a question. We&apos;ll generate and execute SQL using both baseline (schema only) and enhanced (schema + semantic layer) approaches.
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Ask a Question</CardTitle>
+              <CardDescription className="text-xs">
+                Select a database and ask a question. Compares baseline (schema only) vs enhanced (schema + semantic layer).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pt-2">
               {/* Database Selector */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Database</label>
+                <label className="text-sm font-medium mb-1 block">Database</label>
                 <Select
                   value={selectedDatabase}
                   onValueChange={handleDatabaseChange}
@@ -365,28 +365,25 @@ export default function ComparePage() {
 
               {/* Database Overview */}
               {isLoadingOverview && (
-                <div className="bg-muted/50 p-4 rounded-md text-sm text-muted-foreground">
+                <div className="bg-muted/50 p-2 rounded-md text-xs text-muted-foreground">
                   Loading database overview...
                 </div>
               )}
               {databaseOverview && !isLoadingOverview && (
-                <div className="bg-muted/50 p-4 rounded-md space-y-3 text-sm">
+                <div className="bg-muted/50 p-2 rounded-md space-y-1 text-xs">
                   <div>
                     <span className="font-semibold text-foreground">Domain:</span>{' '}
                     <span className="text-muted-foreground">{databaseOverview.domain}</span>
-                  </div>
-                  <div>
+                    {' | '}
                     <span className="font-semibold text-foreground">Purpose:</span>{' '}
                     <span className="text-muted-foreground">{databaseOverview.purpose}</span>
                   </div>
                   {databaseOverview.typical_questions && databaseOverview.typical_questions.length > 0 && (
                     <div>
-                      <div className="font-semibold text-foreground mb-2">Example Questions:</div>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                        {databaseOverview.typical_questions.slice(0, 3).map((q, idx) => (
-                          <li key={idx}>{q}</li>
-                        ))}
-                      </ul>
+                      <span className="font-semibold text-foreground">Examples:</span>{' '}
+                      <span className="text-muted-foreground">
+                        {databaseOverview.typical_questions.slice(0, 2).join(' | ')}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -394,12 +391,12 @@ export default function ComparePage() {
 
               {/* Question Input */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Question</label>
+                <label className="text-sm font-medium mb-1 block">Question</label>
                 <Textarea
                   placeholder="e.g., What are the top 5 countries by population?"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  rows={3}
+                  rows={2}
                 />
               </div>
 
